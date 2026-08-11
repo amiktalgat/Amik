@@ -22,8 +22,8 @@ export function TilemapLayersPanel({
   return (
     <section className="pf-controls">
       <div className="pf-layerHeader">
-        <h2>Layers</h2>
-        <button className="small" onClick={onAddLayer}>Add</button>
+        <h2>Слои</h2>
+        <button className="small" onClick={onAddLayer}>+ слой</button>
       </div>
       <div className="pf-layerList">
         {layers.map((layer, index) => (
@@ -32,16 +32,16 @@ export function TilemapLayersPanel({
               {layer.name}
             </button>
             <button title="Hide or show layer" onClick={() => onToggleLayer(layer.id)}>
-              {layer.isVisible ? 'Hide' : 'Show'}
+              {layer.isVisible ? 'Видно' : 'Скрыт'}
             </button>
             <button disabled={index === 0} title="Move layer down" onClick={() => onMoveLayer(layer.id, -1)}>
-              Down
+              Ниже
             </button>
             <button disabled={index === layers.length - 1} title="Move layer up" onClick={() => onMoveLayer(layer.id, 1)}>
-              Up
+              Выше
             </button>
             <button disabled={layers.length <= 1} title="Delete layer" onClick={() => onDeleteLayer(layer.id)}>
-              Delete
+              Удалить
             </button>
           </div>
         ))}

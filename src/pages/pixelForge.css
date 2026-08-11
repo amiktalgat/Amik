@@ -1,14 +1,15 @@
 .pf-app {
-  --pf-bg: #0b0d12;
-  --pf-line: #263044;
-  --pf-text: #edf2ff;
-  --pf-muted: #8f9bb3;
-  --pf-accent: #7c5cff;
-  --pf-cyan: #43d9c7;
+  --pf-bg: #101319;
+  --pf-line: #303847;
+  --pf-text: #f4f7fb;
+  --pf-muted: #a6b0c2;
+  --pf-accent: #4f8cff;
+  --pf-cyan: #35d2a4;
+  --pf-panel: #171c25;
   display: grid;
-  grid-template: 64px minmax(0, 1fr) auto 32px / 210px minmax(0, 1fr) 270px;
+  grid-template: 64px minmax(0, 1fr) auto 34px / 230px minmax(0, 1fr) 300px;
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #182036 0, var(--pf-bg) 36%);
+  background: var(--pf-bg);
   color: var(--pf-text);
 }
 
@@ -18,7 +19,7 @@
 
 .pf-app button {
   border: 1px solid var(--pf-line);
-  background: #171d29;
+  background: #1c2330;
   color: var(--pf-text);
   border-radius: 8px;
   padding: 9px 12px;
@@ -36,7 +37,7 @@
   background: #171d29;
   transform: none;
 }
-.pf-primary { border-color: transparent !important; background: linear-gradient(135deg, var(--pf-accent), var(--pf-cyan)) !important; color: #06080d !important; font-weight: 800; }
+.pf-primary { border-color: transparent !important; background: var(--pf-accent) !important; color: #fff !important; font-weight: 800; }
 
 .pf-topbar,
 .pf-statusbar {
@@ -76,7 +77,7 @@
   background: conic-gradient(from 45deg, var(--pf-accent), var(--pf-cyan), #ffd166, var(--pf-accent));
 }
 
-.pf-sidebar { overflow: auto; padding: 16px; background: linear-gradient(180deg, rgba(20, 26, 38, 0.96), rgba(12, 15, 22, 0.96)); }
+.pf-sidebar { overflow: auto; padding: 16px; background: var(--pf-panel); }
 .pf-leftPanel { border-right: 1px solid var(--pf-line); }
 .pf-rightPanel { border-left: 1px solid var(--pf-line); }
 .pf-panelTab, .pf-tool { width: 100%; text-align: left; margin-bottom: 8px; }
@@ -89,11 +90,11 @@
 
 .pf-sectionCard,
 .pf-rightPanel section {
-  margin-top: 18px;
+  margin-top: 14px;
   padding: 14px;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.025);
+  background: #111722;
 }
 
 .pf-sectionCard h3,
@@ -352,10 +353,10 @@
   background: rgba(67, 217, 199, 0.14);
 }
 
-.pf-tilemapWorkspace { padding: 22px; }
+.pf-tilemapWorkspace { padding: 22px; align-content: center; justify-content: center; }
 .pf-tilemapStage {
   position: relative;
-  width: min(100%, 960px);
+  width: min(100%, 980px);
   aspect-ratio: 3 / 2;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
@@ -412,7 +413,7 @@
 .pf-layerList { display: grid; gap: 8px; }
 .pf-layerItem {
   display: grid;
-  grid-template-columns: 1fr 54px 58px 42px 58px;
+  grid-template-columns: 1fr 58px 56px 56px 64px;
   gap: 6px;
   padding: 7px;
   border: 1px solid var(--pf-line);
@@ -422,6 +423,7 @@
   min-width: 0;
   padding: 7px 6px;
   font-size: 11px;
+  white-space: nowrap;
 }
 .pf-layerName {
   overflow: hidden;

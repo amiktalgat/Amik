@@ -3,6 +3,7 @@ import {
   exportTilemapJson,
   makeDefaultLayers,
   makeLayer,
+  makeStarterLayers,
   renderTilemapToCanvas,
   tileSizes,
   type TileLayer,
@@ -19,6 +20,13 @@ type TilemapEditorProps = {
 };
 
 const tools: TilemapTool[] = ['pencil', 'eraser', 'fill', 'eyedropper', 'rectangle'];
+const toolLabels: Record<TilemapTool, string> = {
+  pencil: 'Кисть',
+  eraser: 'Ластик',
+  fill: 'Заливка',
+  eyedropper: 'Пипетка',
+  rectangle: 'Прямоугольник',
+};
 const mapWidth = 24;
 const mapHeight = 16;
 
@@ -26,7 +34,7 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
   const [tileSize, setTileSize] = useState<TileSize>(16);
   const [tool, setTool] = useState<TilemapTool>('pencil');
   const [selectedTileId, setSelectedTileId] = useState(0);
-  const [layers, setLayers] = useState<TileLayer[]>(() => makeDefaultLayers(mapWidth, mapHeight));
+  const [layers, setLayers] = useState<TileLayer[]>(() => makeStarterLayers(mapWidth, mapHeight));
   const [activeLayerId, setActiveLayerId] = useState(() => layers[1]?.id ?? layers[0].id);
 
   const activeLayerName = useMemo(
@@ -39,6 +47,20 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
     setLayers((current) => [...current, nextLayer]);
     setActiveLayerId(nextLayer.id);
     onStatus('Layer created');
+  };
+
+  const showStarterMap = () => {
+    const nextLayers = makeStarterLayers(mapWidth, mapHeight);
+    setLayers(nextLayers);
+    setActiveLayerId(nextLayers[1]?.id ?? nextLayers[0].id);
+    onStatus('Starter map loaded');
+  };
+
+  const clearMap = () => {
+    const nextLayers = makeDefaultLayers(mapWidth, mapHeight);
+    setLayers(nextLayers);
+    setActiveLayerId(nextLayers[1]?.id ?? nextLayers[0].id);
+    onStatus('Tilemap cleared');
   };
 
   const deleteLayer = (layerId: string) => {
@@ -54,6 +76,14 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
       layer.id === layerId ? { ...layer, isVisible: !layer.isVisible } : layer
     )));
     onStatus('Layer visibility changed');
+  };
+
+  const chooseLayer = (layerId: string) => {
+    setActiveLayerId(layerId);
+    setLayers((current) => current.map((layer) => (
+      layer.id === layerId ? { ...layer, isVisible: true } : layer
+    )));
+    onStatus('Active layer selected');
   };
 
   const moveLayer = (layerId: string, direction: -1 | 1) => {
@@ -88,8 +118,19 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
     <>
       <aside className="pf-sidebar pf-leftPanel">
         <section className="pf-sectionCard">
-          <h3>Tilemap Editor</h3>
-          <p>Create maps from pixel-art tiles, paint on layers, keep the grid visible, then export JSON or PNG.</p>
+          <h3>Как делать карту</h3>
+          <p>1. Выбери тайл. 2. Выбери инструмент. 3. Рисуй по клеткам. JSON нужен для игры, PNG - как картинка.</p>
+        </section>
+        <section className="pf-sectionCard">
+          <h3>Сейчас</h3>
+          <p>{mapWidth} x {mapHeight} клеток, активный слой: {activeLayerName}. Размер тайла: {tileSize}px.</p>
+        </section>
+        <section className="pf-sectionCard">
+          <h3>Быстрые действия</h3>
+          <div className="pf-generatorActions">
+            <button className="pf-primary" onClick={showStarterMap}>Пример карты</button>
+            <button onClick={clearMap}>Очистить карту</button>
+          </div>
         </section>
       </aside>
       <main className="pf-workspace pf-tilemapWorkspace">
@@ -119,11 +160,11 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
         </section>
         <TilemapPalette selectedTileId={selectedTileId} tileSize={tileSize} onSelectTile={setSelectedTileId} />
         <section className="pf-controls">
-          <h2>Tools</h2>
+          <h2>Инструменты</h2>
           <div className="pf-toolGrid">
             {tools.map((item) => (
               <button className={`pf-tool ${tool === item ? 'active' : ''}`} key={item} onClick={() => setTool(item)}>
-                {item === 'eyedropper' ? 'Eyedropper' : item[0].toUpperCase() + item.slice(1)}
+                {toolLabels[item]}
               </button>
             ))}
           </div>
@@ -131,18 +172,18 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
         <TilemapLayersPanel
           activeLayerId={activeLayerId}
           layers={layers}
-          onActiveLayerChange={setActiveLayerId}
+          onActiveLayerChange={chooseLayer}
           onAddLayer={addLayer}
           onDeleteLayer={deleteLayer}
           onMoveLayer={moveLayer}
           onToggleLayer={toggleLayer}
         />
         <section className="pf-controls">
-          <h2>Export Tilemap</h2>
-          <span className="pf-exportSize">{mapWidth} x {mapHeight} tiles | Active: {activeLayerName}</span>
+          <h2>Экспорт</h2>
+          <span className="pf-exportSize">{mapWidth} x {mapHeight} тайлов | слой: {activeLayerName}</span>
           <div className="pf-generatorActions">
-            <button className="pf-primary" onClick={exportJson}>Export JSON</button>
-            <button onClick={exportPng}>Export PNG</button>
+            <button className="pf-primary" onClick={exportJson}>Скачать JSON</button>
+            <button onClick={exportPng}>Скачать PNG</button>
           </div>
         </section>
       </aside>

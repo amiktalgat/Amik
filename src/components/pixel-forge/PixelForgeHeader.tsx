@@ -32,19 +32,19 @@ export function PixelForgeHeader({
         PixelForge
       </div>
       <nav className="pf-actions">
-        <button className={mode === 'pixel' ? 'active' : ''} onClick={() => onModeChange('pixel')}>Pixel Editor</button>
-        <button className={mode === 'animation' ? 'active' : ''} onClick={() => onModeChange('animation')}>Animation</button>
-        <button className={mode === 'tilemap' ? 'active' : ''} onClick={() => onModeChange('tilemap')}>Tilemap</button>
+        <button className={mode === 'pixel' ? 'active' : ''} onClick={() => onModeChange('pixel')}>Пиксели</button>
+        <button className={mode === 'animation' ? 'active' : ''} onClick={() => onModeChange('animation')}>Анимация</button>
+        <button className={mode === 'tilemap' ? 'active' : ''} onClick={() => onModeChange('tilemap')}>Карта</button>
         {mode !== 'tilemap' && (
           <>
-            <button onClick={onNew}>New</button>
-            <button onClick={onOpen}>Open</button>
-            <button onClick={onReset}>Reset</button>
-            <button disabled={!canUndo} onClick={onUndo}>Undo</button>
-            <button disabled={!canRedo} onClick={onRedo}>Redo</button>
-            <button onClick={onGenerate}>Generate Pixel Art</button>
+            <button onClick={onNew}>Новый</button>
+            <button onClick={onOpen}>Открыть</button>
+            <button onClick={onReset}>Сброс</button>
+            <button disabled={!canUndo} onClick={onUndo}>Назад</button>
+            <button disabled={!canRedo} onClick={onRedo}>Вперёд</button>
+            <button onClick={onGenerate}>Сделать пиксели</button>
             <button className="pf-primary" onClick={onExport}>
-              Export PNG
+              Скачать PNG
             </button>
           </>
         )}

@@ -43,6 +43,37 @@ export function makeDefaultLayers(width: number, height: number) {
   return ['Background', 'Ground', 'Objects', 'Foreground'].map((name) => makeLayer(name, width, height));
 }
 
+export function makeStarterLayers(width: number, height: number) {
+  const layers = makeDefaultLayers(width, height);
+  const background = layers[0];
+  const ground = layers[1];
+  const objects = layers[2];
+
+  background.tiles = background.tiles.map((_, index) => {
+    const y = Math.floor(index / width);
+    return y < Math.floor(height * 0.36) ? 2 : 0;
+  });
+
+  ground.tiles = ground.tiles.map((_, index) => {
+    const x = index % width;
+    const y = Math.floor(index / width);
+    const center = Math.floor(width / 2);
+    if (Math.abs(x - center) <= 2 && y > Math.floor(height * 0.38)) return 3;
+    if (y === Math.floor(height * 0.36) && x > 2 && x < width - 3) return 1;
+    return null;
+  });
+
+  objects.tiles = objects.tiles.map((_, index) => {
+    const x = index % width;
+    const y = Math.floor(index / width);
+    if ((x === 5 && y === 10) || (x === 18 && y === 8)) return 4;
+    if ((x === 4 && y === 9) || (x === 19 && y === 7)) return 5;
+    return null;
+  });
+
+  return layers;
+}
+
 export function drawTile(
   context: CanvasRenderingContext2D,
   tile: TileDefinition,

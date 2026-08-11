@@ -10,7 +10,7 @@ type TilemapPaletteProps = {
 export function TilemapPalette({ selectedTileId, tileSize, onSelectTile }: TilemapPaletteProps) {
   return (
     <section className="pf-controls">
-      <h2>Tile Palette</h2>
+      <h2>Тайлы</h2>
       <div className="pf-tilePalette">
         {tilePalette.map((tile) => (
           <button
@@ -20,12 +20,24 @@ export function TilemapPalette({ selectedTileId, tileSize, onSelectTile }: Tilem
             onClick={() => onSelectTile(tile.id)}
           >
             <TilePreview tileId={tile.id} tileSize={tileSize} />
-            <span>{tile.name}</span>
+            <span>{tileNameRu(tile.name)}</span>
           </button>
         ))}
       </div>
     </section>
   );
+}
+
+function tileNameRu(name: string) {
+  const labels: Record<string, string> = {
+    Grass: 'Трава',
+    Stone: 'Камень',
+    Water: 'Вода',
+    Path: 'Дорога',
+    Brick: 'Кирпич',
+    Light: 'Свет',
+  };
+  return labels[name] ?? name;
 }
 
 type TilePreviewProps = {

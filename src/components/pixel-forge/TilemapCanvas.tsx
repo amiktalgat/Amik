@@ -62,6 +62,10 @@ export function TilemapCanvas({
     const index = cell.y * width + cell.x;
     const activeLayer = layers.find((layer) => layer.id === activeLayerId);
     if (!activeLayer) return;
+    if (!activeLayer.isVisible) {
+      onStatus('Turn on the active layer before painting');
+      return;
+    }
 
     if (tool === 'eyedropper') {
       const tileId = activeLayer.tiles[index];
