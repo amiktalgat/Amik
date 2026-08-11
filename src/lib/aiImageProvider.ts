@@ -73,6 +73,10 @@ export async function generateAIImage(prompt: string, options: AIImageOptions): 
   }
 
   const payload = await readJson(response);
+  if (isAIErrorPayload(payload)) {
+    throw new AIImageError(payload.code ?? statusToCode(response.status), payload.error);
+  }
+
   if (!response.ok) {
     throw new AIImageError(statusToCode(response.status), errorFromPayload(payload));
   }
@@ -106,6 +110,15 @@ function errorFromPayload(payload: unknown) {
     return payload.error;
   }
   return 'AI provider returned an error.';
+}
+
+function isAIErrorPayload(payload: unknown): payload is { error: string; code?: AIImageErrorCode } {
+  return Boolean(
+    payload
+      && typeof payload === 'object'
+      && 'error' in payload
+      && typeof payload.error === 'string',
+  );
 }
 
 function isAIImagePayload(payload: unknown): payload is AIImageResult {

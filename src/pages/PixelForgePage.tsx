@@ -4,6 +4,7 @@ import { PixelForgeLeftPanel } from '../components/pixel-forge/PixelForgeLeftPan
 import { PixelForgeRightPanel } from '../components/pixel-forge/PixelForgeRightPanel';
 import { PixelForgeWorkspace } from '../components/pixel-forge/PixelForgeWorkspace';
 import { AnimationTimeline } from '../components/pixel-forge/AnimationTimeline';
+import { TilemapEditor } from '../components/pixel-forge/TilemapEditor';
 import {
   canvasToFrameData,
   cloneFrame,
@@ -45,7 +46,7 @@ const defaultSettings: PixelSettings = {
   dithering: 'none',
 };
 
-type EditorMode = 'pixel' | 'animation';
+type EditorMode = 'pixel' | 'animation' | 'tilemap';
 
 const defaultSpriteSheetOptions: SpriteSheetOptions = {
   mode: 'horizontal',
@@ -226,8 +227,10 @@ export function PixelForgePage() {
         context?.drawImage(image, 0, 0);
         window.requestAnimationFrame(() => generatePixelArt(`Loaded ${file.name}`));
       };
+      image.onerror = () => showToast('Image could not be loaded');
       image.src = String(reader.result);
     };
+    reader.onerror = () => showToast('Image file could not be read');
     reader.readAsDataURL(file);
   };
 
@@ -303,6 +306,7 @@ export function PixelForgePage() {
     if (!hasImage || !canvasRef.current) return;
     history.saveUndoStep();
     transformCanvas(canvasRef.current, action);
+    transformCanvas(originalRef.current, action);
     if (mode === 'animation') updateCurrentFrameData();
     setHoverPixel(null);
     setOutputSize(`${canvasRef.current.width} x ${canvasRef.current.height}px`);
@@ -346,7 +350,11 @@ export function PixelForgePage() {
   }, [exportScale, settings.pixelSize]);
 
   const exportImage = useCallback(() => {
-    if (!hasImage) makeDemo(Date.now() % 360);
+    if (!hasImage) {
+      showToast('Nothing to export');
+      return;
+    }
+
     window.requestAnimationFrame(() => {
       const exportCanvas = getExportCanvas();
       if (!exportCanvas) {
@@ -392,7 +400,7 @@ export function PixelForgePage() {
     }
     setMode(nextMode);
     setIsPlayingAnimation(false);
-    setStatus(nextMode === 'animation' ? 'Animation mode' : 'Pixel Editor mode');
+    setStatus(nextMode === 'animation' ? 'Animation mode' : nextMode === 'tilemap' ? 'Tilemap Editor mode' : 'Pixel Editor mode');
   };
 
   const addFrame = () => {
@@ -500,10 +508,6 @@ export function PixelForgePage() {
     showToast('Sprite sheet exported');
   };
 
-  const exportGif = () => {
-    showToast('GIF export needs a GIF encoder library, so it was not added');
-  };
-
   useEffect(() => {
     if (!isPlayingAnimation || mode !== 'animation') return undefined;
 
@@ -584,29 +588,35 @@ export function PixelForgePage() {
         onRedo={history.redo}
         onUndo={history.undo}
       />
-      <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
-      <PixelForgeWorkspace
-        canvasRef={canvasRef}
-        gridOpacity={gridOpacity}
-        hasImage={hasImage}
-        hoverPixel={hoverPixel}
-        isGridVisible={isGridVisible}
-        isDragging={isDragging}
-        nextFrameDataUrl={mode === 'animation' && showNextFrame ? frames[currentFrameIndex + 1]?.dataUrl ?? null : null}
-        onionOpacity={onionOpacity}
-        previousFrameDataUrl={mode === 'animation' && showPreviousFrame ? frames[currentFrameIndex - 1]?.dataUrl ?? null : null}
-        pixelSize={settings.pixelSize}
-        zoom={zoom}
-        onDemo={() => makeDemo()}
-        onDragState={setIsDragging}
-        onDrop={loadFile}
-        onOpen={() => inputRef.current?.click()}
-        onPaintEnd={finishPainting}
-        onPaintHover={painter.onPaintHover}
-        onPaintLeave={painter.onPaintLeave}
-        onPaintMove={painter.onPaintMove}
-        onPaintStart={painter.onPaintStart}
-      />
+      {mode === 'tilemap' ? (
+        <TilemapEditor onStatus={setStatus} />
+      ) : (
+        <>
+          <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
+          <PixelForgeWorkspace
+            canvasRef={canvasRef}
+            gridOpacity={gridOpacity}
+            hasImage={hasImage}
+            hoverPixel={hoverPixel}
+            isGridVisible={isGridVisible}
+            isDragging={isDragging}
+            nextFrameDataUrl={mode === 'animation' && showNextFrame ? frames[currentFrameIndex + 1]?.dataUrl ?? null : null}
+            onionOpacity={onionOpacity}
+            previousFrameDataUrl={mode === 'animation' && showPreviousFrame ? frames[currentFrameIndex - 1]?.dataUrl ?? null : null}
+            pixelSize={settings.pixelSize}
+            zoom={zoom}
+            onDemo={() => makeDemo()}
+            onDragState={setIsDragging}
+            onDrop={loadFile}
+            onOpen={() => inputRef.current?.click()}
+            onPaintEnd={finishPainting}
+            onPaintHover={painter.onPaintHover}
+            onPaintLeave={painter.onPaintLeave}
+            onPaintMove={painter.onPaintMove}
+            onPaintStart={painter.onPaintStart}
+          />
+        </>
+      )}
       {mode === 'animation' && (
         <AnimationTimeline
           currentFrameIndex={currentFrameIndex}
@@ -618,7 +628,7 @@ export function PixelForgePage() {
           onSelectFrame={selectFrame}
         />
       )}
-      <PixelForgeRightPanel
+      {mode !== 'tilemap' && <PixelForgeRightPanel
         animationFps={animationFps}
         aiImage={aiImage}
         aiConversionSettings={aiConversionSettings}
@@ -652,7 +662,6 @@ export function PixelForgePage() {
         onExportPngSequence={exportAnimationSequence}
         onExportSpriteSheet={() => void exportSpriteSheet()}
         onFpsChange={setAnimationFps}
-        onGifExport={exportGif}
         onGridOpacityChange={changeGridOpacity}
         onGridVisibleChange={setIsGridVisible}
         onLoopAnimationChange={setIsLoopingAnimation}
@@ -675,11 +684,11 @@ export function PixelForgePage() {
         onZoomFit={fitZoom}
         onZoomIn={() => stepZoom(1)}
         onZoomOut={() => stepZoom(-1)}
-      />
+      />}
       <footer className="pf-statusbar">
         <span>{status}</span>
-        <span>{hoverPixel ? `X: ${hoverPixel.x} | Y: ${hoverPixel.y}` : 'X: - | Y: -'}</span>
-        <span>{hasImage ? `${outputSize} | ${tool} | ${zoom === 'fit' ? 'Fit' : `${zoom * 100}%`}` : 'No image loaded'}</span>
+        <span>{mode === 'tilemap' ? 'Grid: on' : hoverPixel ? `X: ${hoverPixel.x} | Y: ${hoverPixel.y}` : 'X: - | Y: -'}</span>
+        <span>{mode === 'tilemap' ? 'Tilemap Editor' : hasImage ? `${outputSize} | ${tool} | ${zoom === 'fit' ? 'Fit' : `${zoom * 100}%`}` : 'No image loaded'}</span>
       </footer>
       {toast && <div className="pf-toast">{toast}</div>}
       <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" hidden onChange={onFileChange} />

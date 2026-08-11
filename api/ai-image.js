@@ -12,6 +12,10 @@ export default async function handler(request, response) {
   } catch (error) {
     const status = error instanceof ProviderError ? error.status : 500;
     const message = error instanceof ProviderError ? error.publicMessage : 'AI image generation failed.';
+    if (status === 501) {
+      response.status(200).json({ error: message, code: 'not_configured' });
+      return;
+    }
     response.status(status).json({ error: message });
   }
 }

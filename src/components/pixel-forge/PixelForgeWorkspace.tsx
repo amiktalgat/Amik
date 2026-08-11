@@ -52,12 +52,13 @@ export function PixelForgeWorkspace({
   const canvasStyle = canvas && zoom !== 'fit' ? ({
     width: `${canvas.width * zoom}px`,
   } satisfies CSSProperties) : undefined;
-  const gridStyle = canvas ? ({
+  const canMeasureCanvas = Boolean(canvas && canvas.width > 0 && canvas.height > 0);
+  const gridStyle = canMeasureCanvas && canvas ? ({
     backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
     backgroundSize: `${(pixelSize / canvas.width) * 100}% ${(pixelSize / canvas.height) * 100}%`,
     opacity: gridOpacity / 100,
   } satisfies CSSProperties) : undefined;
-  const hoverStyle = canvas && hoverPixel ? ({
+  const hoverStyle = canMeasureCanvas && canvas && hoverPixel ? ({
     left: `${((hoverPixel.x * pixelSize) / canvas.width) * 100}%`,
     top: `${((hoverPixel.y * pixelSize) / canvas.height) * 100}%`,
     width: `${(Math.min(pixelSize, canvas.width - hoverPixel.x * pixelSize) / canvas.width) * 100}%`,

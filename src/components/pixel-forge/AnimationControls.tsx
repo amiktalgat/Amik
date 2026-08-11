@@ -11,7 +11,6 @@ type AnimationControlsProps = {
   showPreviousFrame: boolean;
   onExportPngSequence: () => void;
   onFpsChange: (fps: AnimationFps) => void;
-  onGifExport: () => void;
   onLoopChange: (isLooping: boolean) => void;
   onOnionOpacityChange: (opacity: number) => void;
   onPause: () => void;
@@ -32,7 +31,6 @@ export function AnimationControls({
   showPreviousFrame,
   onExportPngSequence,
   onFpsChange,
-  onGifExport,
   onLoopChange,
   onOnionOpacityChange,
   onPause,
@@ -101,7 +99,6 @@ export function AnimationControls({
       </label>
       <div className="pf-generatorActions">
         <button className="pf-primary" onClick={onExportPngSequence}>PNG Sequence</button>
-        <button onClick={onGifExport}>GIF</button>
       </div>
     </section>
   );

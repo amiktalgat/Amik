@@ -2,6 +2,7 @@ import { useRef, useState, type RefObject } from 'react';
 import type { PixelSettings } from './pixelForge';
 
 const maxHistoryStates = 50;
+const maxHistoryBytes = 32 * 1024 * 1024;
 
 export type CanvasDocumentState = {
   canvasDataUrl: string | null;
@@ -98,6 +99,22 @@ export function useCanvasHistory({
     && JSON.stringify(first.settings) === JSON.stringify(second.settings)
   );
 
+  const snapshotBytes = (snapshot: CanvasDocumentState) => (
+    (snapshot.canvasDataUrl?.length ?? 0) + (snapshot.sourceDataUrl?.length ?? 0)
+  );
+
+  const trimHistoryStack = (stack: CanvasDocumentState[]) => {
+    const trimmed = stack.slice(-maxHistoryStates);
+    let totalBytes = trimmed.reduce((total, snapshot) => total + snapshotBytes(snapshot), 0);
+
+    while (trimmed.length > 1 && totalBytes > maxHistoryBytes) {
+      const removed = trimmed.shift();
+      totalBytes -= removed ? snapshotBytes(removed) : 0;
+    }
+
+    return trimmed;
+  };
+
   const clearHistory = () => syncHistory({ undo: [], redo: [] });
 
   const saveUndoStep = () => {
@@ -109,7 +126,7 @@ export function useCanvasHistory({
     if (previous && isSameState(previous, snapshot)) return;
 
     syncHistory({
-      undo: [...latest.undo, snapshot].slice(-maxHistoryStates),
+      undo: trimHistoryStack([...latest.undo, snapshot]),
       redo: [],
     });
   };
@@ -130,7 +147,7 @@ export function useCanvasHistory({
 
     syncHistory({
       undo: latest.undo.slice(0, -1),
-      redo: [...latest.redo, current].slice(-maxHistoryStates),
+      redo: trimHistoryStack([...latest.redo, current]),
     });
     restoreSnapshot(previous);
     setStatus('Undo');
@@ -143,7 +160,7 @@ export function useCanvasHistory({
     if (!next || !current) return;
 
     syncHistory({
-      undo: [...latest.undo, current].slice(-maxHistoryStates),
+      undo: trimHistoryStack([...latest.undo, current]),
       redo: latest.redo.slice(0, -1),
     });
     restoreSnapshot(next);

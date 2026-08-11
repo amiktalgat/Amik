@@ -34,7 +34,13 @@ export function PixelForgeViewControls({
       </div>
       <select
         value={zoom === 'fit' ? 'fit' : String(zoom)}
-        onChange={(event) => onZoomChange(Number(event.target.value) as ZoomLevel)}
+        onChange={(event) => {
+          if (event.target.value === 'fit') {
+            onFit();
+            return;
+          }
+          onZoomChange(Number(event.target.value) as ZoomLevel);
+        }}
       >
         <option value="fit" disabled>
           Fit

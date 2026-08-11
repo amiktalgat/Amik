@@ -23,8 +23,15 @@ export function ColorInspector({ color, onAddToPalette, onColorChange, onStatus 
   };
 
   const copyHex = () => {
-    void navigator.clipboard.writeText(color);
-    onStatus('HEX copied');
+    if (!navigator.clipboard) {
+      onStatus('Clipboard is not supported in this browser');
+      return;
+    }
+
+    void navigator.clipboard
+      .writeText(color)
+      .then(() => onStatus('HEX copied'))
+      .catch(() => onStatus('Browser blocked Copy HEX'));
   };
 
   return (

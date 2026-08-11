@@ -22,6 +22,10 @@ createServer(async (request, response) => {
   } catch (error) {
     const status = error instanceof ProviderError ? error.status : 500;
     const message = error instanceof ProviderError ? error.publicMessage : 'AI image generation failed.';
+    if (status === 501) {
+      sendJson(response, 200, { error: message, code: 'not_configured' });
+      return;
+    }
     sendJson(response, status, { error: message });
   }
 }).listen(port, () => {

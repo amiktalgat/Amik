@@ -5,9 +5,9 @@ export type DitheringMode = 'none' | 'floydSteinberg' | 'bayer2' | 'bayer4' | 'b
 export const ditheringOptions: { id: DitheringMode; name: string }[] = [
   { id: 'none', name: 'None' },
   { id: 'floydSteinberg', name: 'Floyd-Steinberg' },
-  { id: 'bayer2', name: 'Bayer 2×2' },
-  { id: 'bayer4', name: 'Bayer 4×4' },
-  { id: 'bayer8', name: 'Bayer 8×8' },
+  { id: 'bayer2', name: 'Bayer 2x2' },
+  { id: 'bayer4', name: 'Bayer 4x4' },
+  { id: 'bayer8', name: 'Bayer 8x8' },
 ];
 
 const bayer2 = [

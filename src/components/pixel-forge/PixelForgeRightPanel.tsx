@@ -60,7 +60,6 @@ type PixelForgeRightPanelProps = {
   onExportPngSequence: () => void;
   onExportSpriteSheet: () => void;
   onFpsChange: (fps: AnimationFps) => void;
-  onGifExport: () => void;
   onGridOpacityChange: (opacity: number) => void;
   onGridVisibleChange: (isVisible: boolean) => void;
   onLoopAnimationChange: (isLooping: boolean) => void;
@@ -121,7 +120,6 @@ export function PixelForgeRightPanel({
   onExportPngSequence,
   onExportSpriteSheet,
   onFpsChange,
-  onGifExport,
   onGenerate,
   onGridOpacityChange,
   onGridVisibleChange,
@@ -164,7 +162,6 @@ export function PixelForgeRightPanel({
             showPreviousFrame={showPreviousFrame}
             onExportPngSequence={onExportPngSequence}
             onFpsChange={onFpsChange}
-            onGifExport={onGifExport}
             onLoopChange={onLoopAnimationChange}
             onOnionOpacityChange={onOnionOpacityChange}
             onPause={onPauseAnimation}
