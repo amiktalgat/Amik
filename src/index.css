@@ -70,6 +70,17 @@ button.ghost {
 }
 button.small { padding: 6px 10px; font-size: 14px; }
 
+a.home-link {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--clay);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .message { margin-top: 12px; color: var(--clay); font-size: 14px; }
 .hello { color: var(--soft); margin-bottom: 8px; }
 .empty { color: var(--soft); margin-top: 16px; }

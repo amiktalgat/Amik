@@ -1,12 +1,17 @@
+import { Link } from 'wouter';
+
 export function HomePage() {
   return (
     <main className="container">
       <section className="hello">
-        <h1>Привет! 🚀</h1>
-        <p>Это твой проект. Пока тут пусто — самое интересное впереди.</p>
+        <h1>PixelForge</h1>
+        <p>Современный редактор Pixel Art на Vite, React, TypeScript и Canvas API.</p>
         <p className="hello__hint">
-          Открой Codex и опиши свою идею — этот экран станет твоим приложением.
+          Загружай PNG, JPG, JPEG или WebP, превращай изображение в пиксель-арт и экспортируй PNG.
         </p>
+        <Link className="home-link" href="/pixel-forge">
+          Открыть редактор
+        </Link>
       </section>
     </main>
   );

@@ -171,3 +171,29 @@ gh auth login
 - **`db:push` ругается на доступ** → сначала `npm run db:login`, потом `npm run db:link`.
 - **На Vercel пусто, локально работает** → забыл добавить Environment Variables на Vercel (шаг 8).
 - **Codex сломал код** → не коммить! Попроси Codex починить или откати изменения в VSCode.
+# PixelForge AI Image Generator
+
+PixelForge can generate a real AI image through a backend proxy, then send that image into the normal PixelForge pixel-art pipeline.
+
+The frontend never stores or sees the secret API key. The provider code lives in `src/lib/aiImageProvider.ts`, and the server-side OpenAI provider lives in `server/ai-image-provider.mjs`.
+
+Local setup:
+
+```bash
+# .env
+OPENAI_API_KEY=sk-your-secret-key
+AI_IMAGE_PROVIDER=openai
+OPENAI_IMAGE_MODEL=gpt-image-1
+AI_IMAGE_SERVER_PORT=8787
+```
+
+Run two terminals:
+
+```bash
+npm run ai:image-server
+npm run dev
+```
+
+Open `http://localhost:5173/pixel-forge`. If `OPENAI_API_KEY` is missing, the app keeps working and shows `AI provider is not configured.`
+
+For Vercel, add `OPENAI_API_KEY`, `AI_IMAGE_PROVIDER=openai`, and `OPENAI_IMAGE_MODEL=gpt-image-1` in Project Settings -> Environment Variables. The `/api/ai-image` function is deployed with the app.

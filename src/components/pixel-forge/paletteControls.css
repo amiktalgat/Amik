@@ -1,0 +1,108 @@
+.pf-app button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
+.pf-paletteList {
+  display: grid;
+  gap: 8px;
+}
+
+.pf-paletteOption {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.pf-paletteOption.active {
+  border-color: var(--pf-cyan);
+  background: rgba(67, 217, 199, 0.12);
+}
+
+.pf-miniPalette {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  height: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+}
+
+.pf-miniSwatch {
+  min-width: 8px;
+}
+
+.pf-currentColor {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.pf-currentColor input[type='color'] {
+  width: 56px;
+  height: 56px;
+  padding: 2px;
+}
+
+.pf-colorMeta {
+  display: grid;
+  gap: 6px;
+}
+
+.pf-colorMeta input,
+.pf-customColor input {
+  min-width: 0;
+  border: 1px solid var(--pf-line);
+  border-radius: 8px;
+  background: #101722;
+  color: var(--pf-text);
+  padding: 9px 10px;
+}
+
+.pf-colorMeta span {
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+
+.pf-inlineActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pf-customPalette {
+  display: grid;
+  gap: 8px;
+}
+
+.pf-customColor {
+  display: grid;
+  grid-template-columns: 34px 42px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.pf-customColor.active {
+  border-color: var(--pf-accent);
+  background: rgba(124, 92, 255, 0.14);
+}
+
+.pf-customColor .pf-swatch {
+  width: 34px;
+  height: 34px;
+}
+
+.pf-customColor input[type='color'] {
+  width: 42px;
+  height: 34px;
+  padding: 2px;
+}

@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "ai:image-server": "node server/ai-image-server.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "db:login": "supabase login",
