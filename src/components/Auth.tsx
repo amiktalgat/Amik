@@ -9,7 +9,7 @@ type AuthProps = {
 export function Auth({ onSuccess }: AuthProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup'>('signup');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -30,7 +30,7 @@ export function Auth({ onSuccess }: AuthProps) {
             })
           : supabase.auth.signInWithPassword({ email, password });
 
-      const { error } = await request;
+      const { data, error } = await request;
 
       if (error) {
         setMessage(error.message);
@@ -38,7 +38,12 @@ export function Auth({ onSuccess }: AuthProps) {
       }
 
       if (mode === 'signup') {
-        setMessage('Готово! Проверь почту, если нужна подтверждалка.');
+        if (data.session) {
+          onSuccess?.();
+          return;
+        }
+
+        setMessage('Аккаунт создан. Проверь почту, если Supabase попросит подтвердить email.');
         return;
       }
 
@@ -51,40 +56,55 @@ export function Auth({ onSuccess }: AuthProps) {
   }
 
   return (
-    <section className="card">
-      <p className="eyebrow">Аккаунт</p>
-      <h2>{mode === 'signin' ? 'Вход' : 'Регистрация'}</h2>
+    <section className="auth-card">
+      <div className="auth-switch" aria-label="Выбор действия">
+        <button
+          className={mode === 'signup' ? 'active' : ''}
+          type="button"
+          onClick={() => setMode('signup')}
+        >
+          Регистрация
+        </button>
+        <button
+          className={mode === 'signin' ? 'active' : ''}
+          type="button"
+          onClick={() => setMode('signin')}
+        >
+          Вход
+        </button>
+      </div>
+
+      <h2>{mode === 'signup' ? 'Создай аккаунт' : 'Войди в аккаунт'}</h2>
+      <p className="auth-copy">Аккаунт нужен, чтобы открыть PixelForge и сохранить личные данные.</p>
 
       <form onSubmit={handleSubmit} className="form">
-        <input
-          type="email"
-          placeholder="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="пароль (6+ символов)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          minLength={6}
-          required
-        />
-        <button type="submit" disabled={busy}>
-          {busy ? '...' : mode === 'signin' ? 'Войти' : 'Создать аккаунт'}
+        <label>
+          Email
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Пароль
+          <input
+            type="password"
+            placeholder="минимум 6 символов"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            required
+          />
+        </label>
+        <button className="primary-button" type="submit" disabled={busy}>
+          {busy ? 'Подождите...' : mode === 'signup' ? 'Зарегистрироваться' : 'Войти'}
         </button>
       </form>
 
       {message && <p className="message">{message}</p>}
-
-      <button
-        className="ghost"
-        type="button"
-        onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-      >
-        {mode === 'signin' ? 'Нет аккаунта? Зарегистрируйся' : 'Уже есть аккаунт? Войти'}
-      </button>
     </section>
   );
 }

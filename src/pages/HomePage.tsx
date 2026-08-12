@@ -1,14 +1,11 @@
 import { Link } from 'wouter';
-import { useAuthSession } from '../lib/auth';
 
 export function HomePage() {
-  const { user } = useAuthSession();
-
   return (
     <main className="container">
       <nav className="top-nav">
         <Link href="/pixel-forge">Редактор</Link>
-        <Link href={user ? '/profile' : '/auth'}>{user ? 'Профиль' : 'Войти'}</Link>
+        <Link href="/profile">Профиль</Link>
       </nav>
 
       <section className="hello">
