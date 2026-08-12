@@ -39,6 +39,14 @@ export type BattleStats = {
   myPixels: number;
 };
 
+export type PlacePixelResult = {
+  x: number;
+  y: number;
+  color: string;
+  balance: number;
+  placedPixels: number;
+};
+
 export type ViewBounds = {
   minX: number;
   maxX: number;
@@ -76,7 +84,7 @@ export async function loadMiniMapPixels() {
 }
 
 export async function placeBattlePixel(x: number, y: number, color: string) {
-  return supabase.functions.invoke<{ balance: number; placedPixels: number }>('place-pixel', {
+  return supabase.functions.invoke<PlacePixelResult>('place-pixel', {
     body: { x, y, color },
   });
 }

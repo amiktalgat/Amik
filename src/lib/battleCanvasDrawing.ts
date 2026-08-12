@@ -20,12 +20,20 @@ export function drawPixels(
 }
 
 export function drawGrid(ctx: CanvasRenderingContext2D, camera: DrawCamera, size: DrawSize) {
-  if (camera.zoom < 8) return;
-  const startX = Math.floor(camera.x - size.width / 2 / camera.zoom);
-  const endX = Math.ceil(camera.x + size.width / 2 / camera.zoom);
-  const startY = Math.floor(camera.y - size.height / 2 / camera.zoom);
-  const endY = Math.ceil(camera.y + size.height / 2 / camera.zoom);
-  ctx.strokeStyle = 'rgba(23, 32, 51, 0.12)';
+  if (camera.zoom < 3) return;
+  const canvasLeft = size.width / 2 - camera.x * camera.zoom;
+  const canvasTop = size.height / 2 - camera.y * camera.zoom;
+  const canvasSide = CANVAS_SIZE * camera.zoom;
+  const startX = Math.max(0, Math.floor(camera.x - size.width / 2 / camera.zoom));
+  const endX = Math.min(CANVAS_SIZE, Math.ceil(camera.x + size.width / 2 / camera.zoom));
+  const startY = Math.max(0, Math.floor(camera.y - size.height / 2 / camera.zoom));
+  const endY = Math.min(CANVAS_SIZE, Math.ceil(camera.y + size.height / 2 / camera.zoom));
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(canvasLeft, canvasTop, canvasSide, canvasSide);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(23, 32, 51, 0.16)';
   ctx.lineWidth = 1;
   for (let x = startX; x <= endX; x += 1) {
     const sx = Math.floor(size.width / 2 + (x - camera.x) * camera.zoom) + 0.5;
@@ -41,6 +49,7 @@ export function drawGrid(ctx: CanvasRenderingContext2D, camera: DrawCamera, size
     ctx.lineTo(size.width, sy);
     ctx.stroke();
   }
+  ctx.restore();
 }
 
 export function drawCanvasFrame(ctx: CanvasRenderingContext2D, camera: DrawCamera, size: DrawSize) {
@@ -48,7 +57,7 @@ export function drawCanvasFrame(ctx: CanvasRenderingContext2D, camera: DrawCamer
   const top = size.height / 2 - camera.y * camera.zoom;
   const side = CANVAS_SIZE * camera.zoom;
 
-  ctx.fillStyle = '#fffef8';
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(left, top, side, side);
   ctx.strokeStyle = '#172033';
   ctx.lineWidth = Math.max(2, Math.min(6, camera.zoom * 0.45));

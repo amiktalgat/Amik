@@ -143,6 +143,17 @@ export function BattlePage() {
       await refreshProfile();
       return;
     }
+    if (data) {
+      const placedPixel = {
+        x: data.x,
+        y: data.y,
+        color: data.color,
+        user_id: user.id,
+        updated_at: new Date().toISOString(),
+      };
+      setPixels((current) => upsertPixel(current, placedPixel));
+      setMiniPixels((current) => upsertPixel(current, placedPixel).slice(-4500));
+    }
     setNotice('Pixel placed!');
     setProfile({ ...profile, balance: data?.balance ?? profile.balance - 1 });
     void refreshProfile();
