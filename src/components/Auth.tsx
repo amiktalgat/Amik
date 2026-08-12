@@ -9,6 +9,7 @@ type AuthProps = {
 export function Auth({ onSuccess }: AuthProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -48,7 +49,7 @@ export function Auth({ onSuccess }: AuthProps) {
           ? supabase.auth.signUp({
               email,
               password,
-              options: { emailRedirectTo: getRedirectUrl() },
+              options: { data: { username }, emailRedirectTo: getRedirectUrl() },
             })
           : supabase.auth.signInWithPassword({ email, password });
 
@@ -114,6 +115,19 @@ export function Auth({ onSuccess }: AuthProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="form">
+        {mode === 'signup' && (
+          <label>
+            Username
+            <input
+              type="text"
+              placeholder="pixel_master"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              maxLength={24}
+              required
+            />
+          </label>
+        )}
         <label>
           Email
           <input

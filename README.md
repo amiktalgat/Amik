@@ -8,6 +8,56 @@ email** и **базы данных**, а также AI-функция. Даль�
 
 ---
 
+## PixelBattle
+
+PixelBattle живёт на странице `/battle`. Это общий pixel-canvas 2000 x 2000, который рисуется через
+Canvas API без тысяч DOM-элементов. Игроки могут смотреть холст гостем, а после входа ставить
+пиксели. Изменения приходят другим пользователям через Supabase Realtime.
+
+Главные части проекта:
+
+| Часть | Где лежит |
+|------|-----------|
+| Страница игры | `src/pages/BattlePage.tsx` |
+| Canvas и панели | `src/components/pixel-battle/` |
+| API и константы | `src/lib/pixelBattle.ts` |
+| Отрисовка canvas | `src/lib/battleCanvasDrawing.ts` |
+| Таблицы и SQL-функции | `supabase/migrations/20260812000000_pixel_battle.sql` |
+| Серверная установка пикселя | `supabase/functions/place-pixel/` |
+
+База создаёт таблицы `pixel_battle_profiles`, `canvas_pixels`, `pixel_events` и
+`pixel_rate_limits`. Баланс хранится на сервере: новый игрок получает 30 пикселей, максимум 100,
+восстановление считается по `last_recharge_at` как `+1` каждые 2 секунды. Клиент не отправляет
+серверу свой баланс. Установка пикселя идёт через RPC `place_battle_pixel`, который проверяет
+авторизацию, координаты, цвет, rate limit и трату баланса атомарно.
+
+Запуск после настройки `.env`:
+
+```bash
+npm install
+npm run db:push -- --dry-run
+npm run db:push -- --yes
+npm run battle:deploy
+npm run dev
+```
+
+`db:login` и `db:link` запускай сам в терминале, если база ещё не подключена. Если терминал просит
+пароль базы, вводи его прямо там: символы не видны, это нормально.
+
+Production:
+
+```bash
+npm run build
+git add -A
+git commit -m "add pixel battle"
+git push
+```
+
+На Vercel должны быть переменные `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY`. Edge Function
+`place-pixel` деплоится командой `npm run battle:deploy`.
+
+---
+
 ## ✅ Запуск за 8 шагов (День 2)
 
 > Всё по галочкам. Застрял на шаге — подними руку, не прыгай дальше.

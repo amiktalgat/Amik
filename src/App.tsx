@@ -6,6 +6,7 @@ import { AIImagePage } from './pages/AIImagePage';
 import { PixelForgePage } from './pages/PixelForgePage';
 import { AuthPage } from './pages/AuthPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { BattlePage } from './pages/BattlePage';
 
 function ProtectedHomePage() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
   return (
     <Switch>
       <Route path="/" component={ProtectedHomePage} />
+      <Route path="/battle" component={BattlePage} />
       <Route path="/pixel-forge" component={ProtectedPixelForgePage} />
       <Route path="/ai-image" component={ProtectedAIImagePage} />
       <Route path="/auth" component={AuthPage} />
