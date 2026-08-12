@@ -1,4 +1,4 @@
-import type { BattlePixel } from './pixelBattle';
+import { CANVAS_SIZE, type BattlePixel } from './pixelBattle';
 
 export type DrawCamera = { x: number; y: number; zoom: number };
 export type DrawSize = { width: number; height: number };
@@ -41,6 +41,18 @@ export function drawGrid(ctx: CanvasRenderingContext2D, camera: DrawCamera, size
     ctx.lineTo(size.width, sy);
     ctx.stroke();
   }
+}
+
+export function drawCanvasFrame(ctx: CanvasRenderingContext2D, camera: DrawCamera, size: DrawSize) {
+  const left = size.width / 2 - camera.x * camera.zoom;
+  const top = size.height / 2 - camera.y * camera.zoom;
+  const side = CANVAS_SIZE * camera.zoom;
+
+  ctx.fillStyle = '#fffef8';
+  ctx.fillRect(left, top, side, side);
+  ctx.strokeStyle = '#172033';
+  ctx.lineWidth = Math.max(2, Math.min(6, camera.zoom * 0.45));
+  ctx.strokeRect(left + 0.5, top + 0.5, side - 1, side - 1);
 }
 
 export function drawHover(

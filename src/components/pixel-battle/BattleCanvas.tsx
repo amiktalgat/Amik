@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { drawGrid, drawHover, drawPixels } from '../../lib/battleCanvasDrawing';
+import { drawCanvasFrame, drawGrid, drawHover, drawPixels } from '../../lib/battleCanvasDrawing';
 import { CANVAS_SIZE, clamp, type BattlePixel } from '../../lib/pixelBattle';
 
 export type Camera = { x: number; y: number; zoom: number };
@@ -52,9 +52,10 @@ export function BattleCanvas(props: BattleCanvasProps) {
     canvas.width = Math.floor(size.width * ratio);
     canvas.height = Math.floor(size.height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    context.fillStyle = '#ffffff';
+    context.fillStyle = '#edf7fb';
     context.fillRect(0, 0, size.width, size.height);
 
+    drawCanvasFrame(context, props.camera, size);
     drawPixels(context, props.pixels, props.camera, size);
     drawGrid(context, props.camera, size);
     if (hover) drawHover(context, hover, props.camera, size, props.color, props.canPlace);
