@@ -28,6 +28,20 @@ body { background: var(--bg); }
 
 .header h1 { font-size: 28px; font-weight: 800; }
 
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.top-nav a {
+  color: var(--soft);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -37,6 +51,14 @@ body { background: var(--bg); }
 }
 
 .card h2 { font-size: 22px; margin-bottom: 16px; }
+
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--clay);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
 
 .form, .form-row { display: flex; gap: 10px; }
 .form { flex-direction: column; }
@@ -79,6 +101,13 @@ a.home-link {
   color: #fff;
   font-weight: 700;
   text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .message { margin-top: 12px; color: var(--clay); font-size: 14px; }

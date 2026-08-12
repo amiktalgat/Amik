@@ -30,6 +30,20 @@ export function makePngCanvas(source: HTMLCanvasElement, pixelSize: PixelSize, s
   return exportCanvas;
 }
 
+export function makeScaledPngCanvas(source: HTMLCanvasElement, scale: ScaleLevel) {
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = source.width * scale;
+  exportCanvas.height = source.height * scale;
+
+  const exportContext = exportCanvas.getContext('2d');
+  if (!exportContext) return null;
+
+  exportContext.imageSmoothingEnabled = false;
+  exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+  exportContext.drawImage(source, 0, 0, exportCanvas.width, exportCanvas.height);
+  return exportCanvas;
+}
+
 export function canvasToPngBlob(canvas: HTMLCanvasElement) {
   return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
 }

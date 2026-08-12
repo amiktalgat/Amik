@@ -23,13 +23,16 @@ import {
   renderPixelArt,
   transformCanvas,
   zoomLevels,
+  clamp,
+  fitInside,
+  type CanvasSize,
   type PixelSettings,
   type ScaleLevel,
   type Tool,
   type TransformAction,
   type ZoomLevel,
 } from '../lib/pixelForge';
-import { canCopyPng, canvasToPngBlob, downloadPng, makePngCanvas } from '../lib/pixelExport';
+import { canCopyPng, canvasToPngBlob, downloadPng, makeScaledPngCanvas } from '../lib/pixelExport';
 import { defaultCustomPalette, normalizeHex } from '../lib/pixelPalettes';
 import { useCanvasHistory } from '../lib/useCanvasHistory';
 import { useCustomPalette } from '../lib/useCustomPalette';
@@ -55,6 +58,11 @@ const defaultSpriteSheetOptions: SpriteSheetOptions = {
   spacing: 0,
 };
 
+const defaultCanvasSize: CanvasSize = {
+  width: 640,
+  height: 640,
+};
+
 export function PixelForgePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const originalRef = useRef(document.createElement('canvas'));
@@ -67,12 +75,13 @@ export function PixelForgePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [gridOpacity, setGridOpacity] = useState(40);
-  const [exportScale, setExportScale] = useState<ScaleLevel>(8);
+  const [exportScale, setExportScale] = useState<ScaleLevel>(1);
   const [outputSize, setOutputSize] = useState('');
+  const [canvasSize, setCanvasSize] = useState<CanvasSize>(defaultCanvasSize);
   const [settings, setSettings] = useState(defaultSettings);
   const [tool, setTool] = useState<Tool>('pencil');
   const [zoom, setZoom] = useState<ZoomLevel | 'fit'>('fit');
-  const [frames, setFrames] = useState<AnimationFrame[]>(() => [createFrame(null, 640, 640)]);
+  const [frames, setFrames] = useState<AnimationFrame[]>(() => [createFrame(null, defaultCanvasSize.width, defaultCanvasSize.height)]);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [animationFps, setAnimationFps] = useState<AnimationFps>(6);
   const [isPlayingAnimation, setIsPlayingAnimation] = useState(false);
@@ -137,6 +146,7 @@ export function PixelForgePage() {
     originalRef.current.width = width;
     originalRef.current.height = height;
     originalRef.current.getContext('2d')?.clearRect(0, 0, width, height);
+    setCanvasSize({ width, height });
     setHasImage(true);
     setOutputSize(`${width} x ${height}px`);
     return canvasToFrameData(canvas);
@@ -184,10 +194,15 @@ export function PixelForgePage() {
     toastTimerRef.current = window.setTimeout(() => setToast(''), 2200);
   }, []);
 
-  const generatePixelArt = (message = 'Pixel art generated', nextSettings = settings, remember = false) => {
+  const generatePixelArt = (
+    message = 'Pixel art generated',
+    nextSettings = settings,
+    remember = false,
+    nextCanvasSize = canvasSize,
+  ) => {
     if (!canvasRef.current || originalRef.current.width === 0 || originalRef.current.height === 0) return;
     if (remember) history.saveUndoStep();
-    renderPixelArt(canvasRef.current, originalRef.current, nextSettings);
+    renderPixelArt(canvasRef.current, originalRef.current, nextSettings, nextCanvasSize);
     setOutputSize(`${canvasRef.current.width} x ${canvasRef.current.height}px`);
     setStatus(message);
     if (mode === 'animation') updateCurrentFrameData();
@@ -217,11 +232,13 @@ export function PixelForgePage() {
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
+        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 1200);
         prepareOriginal(image.naturalWidth, image.naturalHeight);
+        setCanvasSize(nextCanvasSize);
         const context = originalRef.current.getContext('2d');
         context?.clearRect(0, 0, originalRef.current.width, originalRef.current.height);
         context?.drawImage(image, 0, 0);
-        window.requestAnimationFrame(() => generatePixelArt(`Loaded ${file.name}`));
+        window.requestAnimationFrame(() => generatePixelArt(`Loaded ${file.name}`, settings, false, nextCanvasSize));
       };
       image.onerror = () => showToast('Image could not be loaded');
       image.src = String(reader.result);
@@ -231,9 +248,10 @@ export function PixelForgePage() {
   };
 
   const makeDemo = (seed = 42) => {
-    prepareOriginal(640, 640);
+    prepareOriginal(defaultCanvasSize.width, defaultCanvasSize.height);
+    setCanvasSize(defaultCanvasSize);
     drawDemoArt(originalRef.current, seed);
-    window.requestAnimationFrame(() => generatePixelArt('Demo loaded'));
+    window.requestAnimationFrame(() => generatePixelArt('Demo loaded', settings, false, defaultCanvasSize));
   };
 
   const clearDocument = () => {
@@ -242,9 +260,10 @@ export function PixelForgePage() {
     if (inputRef.current) inputRef.current.value = '';
     setHasImage(false);
     setHoverPixel(null);
-    setFrames([createFrame(null, 640, 640)]);
+    setFrames([createFrame(null, defaultCanvasSize.width, defaultCanvasSize.height)]);
     setCurrentFrameIndex(0);
     setIsPlayingAnimation(false);
+    setCanvasSize(defaultCanvasSize);
     history.clearHistory();
     setOutputSize('');
     setStatus('New document');
@@ -259,6 +278,24 @@ export function PixelForgePage() {
   const changeSettings = (nextSettings: PixelSettings) => {
     if (hasImage) history.saveUndoStep();
     setSettings(nextSettings);
+  };
+
+  const changeCanvasSize = (nextSize: CanvasSize) => {
+    const safeSize = {
+      width: Math.round(clamp(nextSize.width || 16, 16, 2048)),
+      height: Math.round(clamp(nextSize.height || 16, 16, 2048)),
+    };
+    if (safeSize.width === canvasSize.width && safeSize.height === canvasSize.height) return;
+
+    if (!hasImage) {
+      prepareBlankCanvas(safeSize.width, safeSize.height);
+      setStatus('Canvas size changed');
+      return;
+    }
+
+    history.saveUndoStep();
+    setCanvasSize(safeSize);
+    generatePixelArt('Canvas size changed', settings, false, safeSize);
   };
 
   const changeZoom = (nextZoom: ZoomLevel) => {
@@ -289,6 +326,7 @@ export function PixelForgePage() {
     transformCanvas(canvasRef.current, action);
     transformCanvas(originalRef.current, action);
     if (mode === 'animation') updateCurrentFrameData();
+    setCanvasSize({ width: canvasRef.current.width, height: canvasRef.current.height });
     setHoverPixel(null);
     setOutputSize(`${canvasRef.current.width} x ${canvasRef.current.height}px`);
     setStatus('Image transformed');
@@ -299,8 +337,8 @@ export function PixelForgePage() {
   const getExportCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || canvas.width === 0 || canvas.height === 0) return null;
-    return makePngCanvas(canvas, settings.pixelSize, exportScale);
-  }, [exportScale, settings.pixelSize]);
+    return makeScaledPngCanvas(canvas, exportScale);
+  }, [exportScale]);
 
   const exportImage = useCallback(() => {
     if (!hasImage) {
@@ -518,8 +556,8 @@ export function PixelForgePage() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [exportImage, history]);
 
-  const exportWidth = canvasRef.current ? Math.ceil(canvasRef.current.width / settings.pixelSize) : 0;
-  const exportHeight = canvasRef.current ? Math.ceil(canvasRef.current.height / settings.pixelSize) : 0;
+  const exportWidth = canvasRef.current ? canvasRef.current.width : 0;
+  const exportHeight = canvasRef.current ? canvasRef.current.height : 0;
   const exportSize = hasImage
     ? `${exportWidth} x ${exportHeight} + ${exportScale}x = ${exportWidth * exportScale} x ${exportHeight * exportScale}px`
     : 'No image loaded';
@@ -597,6 +635,7 @@ export function PixelForgePage() {
         showNextFrame={showNextFrame}
         showPreviousFrame={showPreviousFrame}
         spriteSheetOptions={spriteSheetOptions}
+        canvasSize={canvasSize}
         tool={tool}
         zoom={zoom}
         onAddToPalette={customPalette.addToCustomPalette}
@@ -604,7 +643,6 @@ export function PixelForgePage() {
         onColorChange={changeColor}
         onCustomColorChange={customPalette.changeCustomColor}
         onCustomColorRemove={customPalette.removeCustomColor}
-        onGenerate={() => generatePixelArt('Pixel art generated', settings, true)}
         onExportPng={exportImage}
         onExportPngSequence={exportAnimationSequence}
         onExportSpriteSheet={() => void exportSpriteSheet()}
@@ -612,11 +650,11 @@ export function PixelForgePage() {
         onGridOpacityChange={changeGridOpacity}
         onGridVisibleChange={setIsGridVisible}
         onLoopAnimationChange={setIsLoopingAnimation}
-        onReset={resetDocument}
         onScaleChange={setExportScale}
         onOnionOpacityChange={setOnionOpacity}
         onPauseAnimation={pauseAnimation}
         onPlayAnimation={playAnimation}
+        onCanvasSizeChange={changeCanvasSize}
         onSettingsChange={changeSettings}
         onShowNextFrameChange={setShowNextFrame}
         onShowPreviousFrameChange={setShowPreviousFrame}

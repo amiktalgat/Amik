@@ -4,11 +4,8 @@ import {
   type SpriteSheetOptions,
 } from '../../lib/pixelAnimation';
 import {
-  colorCountOptions,
-  pixelSizeOptions,
-  type ColorCount,
+  type CanvasSize,
   type PixelSettings,
-  type PixelSize,
   type ScaleLevel,
   type Tool,
   type TransformAction,
@@ -18,7 +15,7 @@ import { AnimationControls } from './AnimationControls';
 import type { PaletteId } from '../../lib/pixelPalettes';
 import { ColorInspector } from './ColorInspector';
 import { CustomPaletteEditor } from './CustomPaletteEditor';
-import { DitheringSelector } from './DitheringSelector';
+import { DocumentSizeControls } from './DocumentSizeControls';
 import { PixelForgeExportControls } from './PixelForgeExportControls';
 import { PaletteSelector } from './PaletteSelector';
 import { PixelForgeTransformControls } from './PixelForgeTransformControls';
@@ -40,6 +37,7 @@ type PixelForgeRightPanelProps = {
   showNextFrame: boolean;
   showPreviousFrame: boolean;
   spriteSheetOptions: SpriteSheetOptions;
+  canvasSize: CanvasSize;
   settings: PixelSettings;
   tool: Tool;
   zoom: ZoomLevel | 'fit';
@@ -55,12 +53,11 @@ type PixelForgeRightPanelProps = {
   onGridOpacityChange: (opacity: number) => void;
   onGridVisibleChange: (isVisible: boolean) => void;
   onLoopAnimationChange: (isLooping: boolean) => void;
-  onGenerate: () => void;
-  onReset: () => void;
   onScaleChange: (scale: ScaleLevel) => void;
   onOnionOpacityChange: (opacity: number) => void;
   onPauseAnimation: () => void;
   onPlayAnimation: () => void;
+  onCanvasSizeChange: (size: CanvasSize) => void;
   onSettingsChange: (settings: PixelSettings) => void;
   onShowNextFrameChange: (isVisible: boolean) => void;
   onShowPreviousFrameChange: (isVisible: boolean) => void;
@@ -92,6 +89,7 @@ export function PixelForgeRightPanel({
   showNextFrame,
   showPreviousFrame,
   spriteSheetOptions,
+  canvasSize,
   settings,
   tool,
   zoom,
@@ -104,15 +102,14 @@ export function PixelForgeRightPanel({
   onExportPngSequence,
   onExportSpriteSheet,
   onFpsChange,
-  onGenerate,
   onGridOpacityChange,
   onGridVisibleChange,
   onLoopAnimationChange,
-  onReset,
   onScaleChange,
   onOnionOpacityChange,
   onPauseAnimation,
   onPlayAnimation,
+  onCanvasSizeChange,
   onSettingsChange,
   onShowNextFrameChange,
   onShowPreviousFrameChange,
@@ -168,6 +165,7 @@ export function PixelForgeRightPanel({
         value={settings.paletteId}
         onChange={(paletteId) => changeSetting('paletteId', paletteId as PaletteId)}
       />
+      <DocumentSizeControls size={canvasSize} onChange={onCanvasSizeChange} />
       <ColorInspector color={color} onAddToPalette={onAddToPalette} onColorChange={onColorChange} onStatus={onStatus} />
       <CustomPaletteEditor
         colors={settings.customPalette}
@@ -205,49 +203,6 @@ export function PixelForgeRightPanel({
         onExport={onExportPng}
         onScaleChange={onScaleChange}
       />
-      <section className="pf-controls">
-        <Select
-          label="Pixel Size"
-          value={String(settings.pixelSize)}
-          options={pixelSizeOptions.map((value) => String(value))}
-          onChange={(value) => changeSetting('pixelSize', Number(value) as PixelSize)}
-        />
-        <Select
-          label="Colors"
-          value={String(settings.colorCount)}
-          options={colorCountOptions.map((value) => String(value))}
-          onChange={(value) => changeSetting('colorCount', Number(value) as ColorCount)}
-        />
-        <DitheringSelector value={settings.dithering} onChange={(value) => changeSetting('dithering', value)} />
-        <div className="pf-generatorActions">
-          <button className="pf-primary" onClick={onGenerate}>
-            Generate Pixel Art
-          </button>
-          <button onClick={onReset}>Reset</button>
-        </div>
-      </section>
     </aside>
-  );
-}
-
-type SelectProps = {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (value: string) => void;
-};
-
-function Select({ label, value, options, onChange }: SelectProps) {
-  return (
-    <label>
-      {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option === 'original' ? 'Original' : option}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

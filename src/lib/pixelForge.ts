@@ -22,6 +22,11 @@ export type PixelSettings = {
   dithering: DitheringMode;
 };
 
+export type CanvasSize = {
+  width: number;
+  height: number;
+};
+
 export const paletteColors = [
   '#7C5CFF',
   '#43D9C7',
@@ -63,11 +68,12 @@ export function renderPixelArt(
   canvas: HTMLCanvasElement,
   original: HTMLCanvasElement,
   settings: PixelSettings,
+  targetSize?: CanvasSize,
 ) {
   const context = canvas.getContext('2d', { willReadFrequently: true });
   if (!context) return;
 
-  const size = fitInside(original.width, original.height, 1200);
+  const size = targetSize ?? fitInside(original.width, original.height, 1200);
   canvas.width = size.width;
   canvas.height = size.height;
 
