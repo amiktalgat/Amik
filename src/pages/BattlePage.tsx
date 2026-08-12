@@ -12,6 +12,7 @@ import {
   DAILY_BONUS_HOURS,
   clamp,
   getChunkBounds,
+  getRechargeSeconds,
   loadBattleProfile,
   loadBattleStats,
   loadMiniMapPixels,
@@ -59,12 +60,20 @@ export function BattlePage() {
     return formatBonusWait(nextBonusAt - tick);
   }, [profile, tick]);
 
+  const rechargeText = useMemo(() => {
+    if (!profile) return 'loading';
+    const rechargeSeconds = getRechargeSeconds(profile.placed_pixels);
+    const elapsed = (tick - new Date(profile.last_recharge_at).getTime()) / 1000;
+    const secondsLeft = rechargeSeconds - (elapsed % rechargeSeconds);
+    return `in ${clamp(secondsLeft, 0, rechargeSeconds).toFixed(1)}s`;
+  }, [profile, tick]);
+
   useEffect(() => {
     localStorage.setItem(colorStorageKey, color);
   }, [color]);
 
   useEffect(() => {
-    const id = window.setInterval(() => setTick(Date.now()), 60000);
+    const id = window.setInterval(() => setTick(Date.now()), 200);
     return () => window.clearInterval(id);
   }, []);
 
@@ -216,7 +225,13 @@ export function BattlePage() {
         onPlace={handlePlace}
       />
       <aside className="battle-sidebar">
-        <BattleHud profile={profile} cursor={cursor} nextBonusText={nextBonusText} canPlace={Boolean(user)} />
+        <BattleHud
+          profile={profile}
+          cursor={cursor}
+          rechargeText={rechargeText}
+          nextBonusText={nextBonusText}
+          canPlace={Boolean(user)}
+        />
         <ColorPalette color={color} onChange={setColor} />
         <ZoomControls
           onCenter={() => setCamera({ x: 1000, y: 1000, zoom: camera.zoom })}

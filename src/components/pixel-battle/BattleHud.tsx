@@ -3,25 +3,26 @@ import { DAILY_BONUS_PIXELS, MAX_BALANCE, type BattleProfile } from '../../lib/p
 type BattleHudProps = {
   profile: BattleProfile | null;
   cursor: { x: number; y: number } | null;
+  rechargeText: string;
   nextBonusText: string;
   canPlace: boolean;
 };
 
-export function BattleHud({ profile, cursor, nextBonusText, canPlace }: BattleHudProps) {
+export function BattleHud({ profile, cursor, rechargeText, nextBonusText, canPlace }: BattleHudProps) {
   const balance = profile?.balance ?? 0;
-  const bonusText = balance >= MAX_BALANCE ? 'MAX' : `+${DAILY_BONUS_PIXELS} ${nextBonusText}`;
+  const rechargeStatus = balance >= MAX_BALANCE ? 'MAX' : `+1 ${rechargeText}`;
 
   return (
     <section className="battle-panel battle-hud">
       <div>
         <div className="battle-panel__title">My pixels</div>
         <strong>{balance} / {MAX_BALANCE}</strong>
-        <span>{bonusText}</span>
+        <span>{rechargeStatus}</span>
       </div>
       <div>
         <div className="battle-panel__title">Placed</div>
         <strong>{profile?.placed_pixels ?? 0}</strong>
-        <span>by you</span>
+        <span>daily +{DAILY_BONUS_PIXELS} {nextBonusText}</span>
       </div>
       <div>
         <div className="battle-panel__title">Cursor</div>
@@ -34,7 +35,7 @@ export function BattleHud({ profile, cursor, nextBonusText, canPlace }: BattleHu
         </p>
       )}
       {profile && balance === 0 && (
-        <p className="battle-hint">Pixels are over. Come back for the daily bonus.</p>
+        <p className="battle-hint">Pixels are over. Wait for recharge.</p>
       )}
     </section>
   );

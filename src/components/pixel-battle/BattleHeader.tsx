@@ -15,7 +15,6 @@ export function BattleHeader({ user, onlineCount, stats, onSignOut }: BattleHead
       <Link className="battle-logo" href="/battle">PixelBattle</Link>
       <div className="battle-header__stats">
         <span className="battle-status">Online: {onlineCount}</span>
-        <span>Canvas: {stats?.canvasPixels ?? 0}</span>
         <span>Placed: {stats?.placedPixels ?? 0}</span>
       </div>
       <nav className="battle-header__nav">
