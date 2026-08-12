@@ -10,6 +10,7 @@ import { useAuthSession } from '../lib/auth';
 import {
   CANVAS_SIZE,
   DAILY_BONUS_HOURS,
+  MAX_BALANCE,
   clamp,
   getChunkBounds,
   getRechargeSeconds,
@@ -76,6 +77,10 @@ export function BattlePage() {
     const id = window.setInterval(() => setTick(Date.now()), 200);
     return () => window.clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    setProfile((current) => (current ? rechargeProfile(current, tick) : current));
+  }, [tick]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -262,6 +267,27 @@ function upsertPixel(pixels: BattlePixel[], next: BattlePixel) {
 function restorePixel(pixels: BattlePixel[], x: number, y: number, previous: BattlePixel | null) {
   if (previous) return upsertPixel(pixels, previous);
   return pixels.filter((pixel) => pixel.x !== x || pixel.y !== y);
+}
+
+function rechargeProfile(profile: BattleProfile, now: number) {
+  if (profile.balance >= MAX_BALANCE) return profile;
+  const rechargeSeconds = getRechargeSeconds(profile.placed_pixels);
+  const rechargeMs = rechargeSeconds * 1000;
+  const elapsedMs = now - new Date(profile.last_recharge_at).getTime();
+  const generated = Math.floor(elapsedMs / rechargeMs);
+  if (generated <= 0) return profile;
+
+  const nextBalance = Math.min(MAX_BALANCE, profile.balance + generated);
+  const usedRecharges = nextBalance - profile.balance;
+  const nextRechargeAt = nextBalance >= MAX_BALANCE
+    ? new Date(now)
+    : new Date(new Date(profile.last_recharge_at).getTime() + usedRecharges * rechargeMs);
+
+  return {
+    ...profile,
+    balance: nextBalance,
+    last_recharge_at: nextRechargeAt.toISOString(),
+  };
 }
 
 function formatBonusWait(milliseconds: number) {
