@@ -126,7 +126,7 @@ export function BattleCanvas(props: BattleCanvasProps) {
     pinchDistance.current = null;
     if (!pointer || pointer.moved) return;
     const world = screenToWorld(event.clientX, event.clientY);
-    if (world && isInside(world.x, world.y) && props.canPlace) props.onPlace(world.x, world.y);
+    if (world && isInside(world.x, world.y)) props.onPlace(world.x, world.y);
   }
 
   function handlePinch(first: PointerState, second: PointerState) {

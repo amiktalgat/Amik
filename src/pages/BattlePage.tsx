@@ -133,7 +133,12 @@ export function BattlePage() {
       navigate('/auth?next=/battle');
       return;
     }
-    if (!profile || profile.balance <= 0) {
+    if (!profile) {
+      setNotice('Player profile is loading. Try again in a second.');
+      await refreshProfile();
+      return;
+    }
+    if (profile.balance <= 0) {
       setNotice('Not enough pixels');
       return;
     }
