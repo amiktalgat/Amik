@@ -41,7 +41,7 @@ export function AuthPage() {
 
       {user ? (
         <section className="auth-card">
-          <p className="eyebrow">Аккаунт подключен</p>
+          <p className="eyebrow">Аккаунт подключён</p>
           <h2>Ты уже вошёл</h2>
           <p className="auth-copy">{user.email}</p>
           <div className="actions">

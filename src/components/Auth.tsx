@@ -12,8 +12,30 @@ export function Auth({ onSuccess }: AuthProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
 
   if (!isSupabaseConfigured) return <SupabaseSetupMessage />;
+
+  function getRedirectUrl() {
+    return `${window.location.origin}/auth${window.location.search}`;
+  }
+
+  async function handleGoogleSignIn() {
+    setGoogleBusy(true);
+    setMessage('');
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setGoogleBusy(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +48,7 @@ export function Auth({ onSuccess }: AuthProps) {
           ? supabase.auth.signUp({
               email,
               password,
-              options: { emailRedirectTo: `${window.location.origin}/auth` },
+              options: { emailRedirectTo: getRedirectUrl() },
             })
           : supabase.auth.signInWithPassword({ email, password });
 
@@ -76,6 +98,20 @@ export function Auth({ onSuccess }: AuthProps) {
 
       <h2>{mode === 'signup' ? 'Создай аккаунт' : 'Войди в аккаунт'}</h2>
       <p className="auth-copy">Аккаунт нужен, чтобы открыть PixelForge и сохранить личные данные.</p>
+
+      <button
+        className="google-button"
+        type="button"
+        onClick={handleGoogleSignIn}
+        disabled={busy || googleBusy}
+      >
+        <span aria-hidden="true">G</span>
+        {googleBusy ? 'Открываем Google...' : 'Продолжить с Google'}
+      </button>
+
+      <div className="auth-divider">
+        <span>или</span>
+      </div>
 
       <form onSubmit={handleSubmit} className="form">
         <label>
