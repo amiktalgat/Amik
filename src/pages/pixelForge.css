@@ -1,11 +1,13 @@
 .pf-app {
-  --pf-bg: #101319;
-  --pf-line: #303847;
-  --pf-text: #f4f7fb;
-  --pf-muted: #a6b0c2;
-  --pf-accent: #4f8cff;
-  --pf-cyan: #35d2a4;
-  --pf-panel: #171c25;
+  --pf-bg: #f6faff;
+  --pf-line: #d8e5f2;
+  --pf-text: #172033;
+  --pf-muted: #6d7b91;
+  --pf-accent: #3f7ee8;
+  --pf-cyan: #28a790;
+  --pf-panel: #ffffff;
+  --pf-surface: #eef6ff;
+  --pf-soft: #f9fcff;
   display: grid;
   grid-template: 64px minmax(360px, 52vh) auto auto auto 34px / minmax(0, 1fr);
   min-height: 100vh;
@@ -19,7 +21,7 @@
 
 .pf-app button {
   border: 1px solid var(--pf-line);
-  background: #1c2330;
+  background: #ffffff;
   color: var(--pf-text);
   border-radius: 8px;
   padding: 9px 12px;
@@ -27,14 +29,14 @@
   transition: border-color 0.18s, background 0.18s, transform 0.18s;
 }
 
-.pf-app button:hover { border-color: #41506c; background: #1d2636; transform: translateY(-1px); }
+.pf-app button:hover { border-color: #b8cce2; background: var(--pf-surface); transform: translateY(-1px); }
 .pf-app button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
 .pf-app button:disabled:hover {
   border-color: var(--pf-line);
-  background: #171d29;
+  background: #ffffff;
   transform: none;
 }
 .pf-primary { border-color: transparent !important; background: var(--pf-accent) !important; color: #fff !important; font-weight: 800; }
@@ -45,7 +47,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(12, 15, 22, 0.88);
+  background: rgba(255, 255, 255, 0.88);
   border-bottom: 1px solid var(--pf-line);
   backdrop-filter: blur(18px);
 }
@@ -71,7 +73,7 @@
 .pf-brand { font-size: 19px; font-weight: 900; }
 .pf-actions a {
   border: 1px solid var(--pf-line);
-  background: #1c2330;
+  background: #ffffff;
   color: var(--pf-text);
   border-radius: 8px;
   padding: 9px 12px;
@@ -79,7 +81,7 @@
 }
 .pf-actions a.active {
   border-color: var(--pf-accent);
-  background: rgba(124, 92, 255, 0.18);
+  background: rgba(63, 126, 232, 0.12);
 }
 
 .pf-brandMark {
@@ -108,7 +110,7 @@
 .pf-tool.active,
 .pf-actions button.active {
   border-color: var(--pf-accent);
-  background: rgba(124, 92, 255, 0.18);
+  background: rgba(63, 126, 232, 0.12);
 }
 
 .pf-sectionCard,
@@ -117,7 +119,7 @@
   padding: 14px;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #111722;
+  background: var(--pf-soft);
 }
 .pf-leftPanel .pf-sectionCard { grid-column: 1 / -1; }
 
@@ -132,8 +134,9 @@
   min-height: 0;
   overflow: hidden;
   padding: 16px;
-  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.035) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.035) 25%, transparent 25%);
+  background-color: var(--pf-surface);
+  background-image: linear-gradient(45deg, rgba(63, 126, 232, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(40, 167, 144, 0.05) 25%, transparent 25%);
   background-size: 28px 28px;
 }
 
@@ -148,7 +151,7 @@
   margin: 0 auto 20px;
   border: 1px solid var(--pf-line);
   border-radius: 18px;
-  background: linear-gradient(135deg, #20283a, #111722);
+  background: linear-gradient(135deg, #ffffff, #e8f4ff);
   color: var(--pf-cyan);
   font-size: 28px;
   font-weight: 950;
@@ -167,8 +170,8 @@
   padding: 14px;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #090b10;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+  box-shadow: 0 26px 70px rgba(42, 88, 140, 0.16);
 }
 
 .pf-canvasShell.hidden { display: none; }
@@ -176,12 +179,12 @@
   position: relative;
   max-width: 100%;
   max-height: 100%;
-  background-color: #111722;
+  background-color: #f3f8ff;
   background-image:
-    linear-gradient(45deg, rgba(255, 255, 255, 0.14) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.14) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.14) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.14) 75%);
+    linear-gradient(45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%);
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
   background-size: 16px 16px;
 }
@@ -207,7 +210,7 @@
   position: absolute;
   z-index: 2;
   pointer-events: none;
-  box-shadow: inset 0 0 0 2px #ffffff, 0 0 0 1px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 0 2px #ffffff, 0 0 0 1px rgba(63, 126, 232, 0.55);
 }
 
 .pf-onionSkin {
@@ -232,7 +235,7 @@
   min-width: 0;
   padding: 12px;
   border-top: 1px solid var(--pf-line);
-  background: rgba(12, 15, 22, 0.92);
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .pf-frameStrip {
@@ -250,7 +253,7 @@
 
 .pf-frameButton.active {
   border-color: var(--pf-cyan);
-  background: rgba(67, 217, 199, 0.14);
+  background: rgba(40, 167, 144, 0.12);
 }
 
 .pf-timelineActions {
@@ -272,7 +275,7 @@
   width: 100%;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #101722;
+  background: #ffffff;
   color: var(--pf-text);
   padding: 10px 12px;
 }
@@ -329,12 +332,12 @@
   overflow: auto;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background-color: #111722;
+  background-color: #f3f8ff;
   background-image:
-    linear-gradient(45deg, rgba(255, 255, 255, 0.14) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.14) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.14) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.14) 75%);
+    linear-gradient(45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%);
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
   background-size: 16px 16px;
 }
@@ -363,7 +366,7 @@
   object-fit: contain;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #090b10;
+  background: #ffffff;
   image-rendering: pixelated;
 }
 .pf-aiPreview canvas { margin-bottom: 12px; }
@@ -381,7 +384,7 @@
 .pf-segmented legend { margin-bottom: 8px; color: var(--pf-muted); font-size: 13px; }
 .pf-segmented div { display: flex; flex-wrap: wrap; gap: 6px; }
 .pf-segmented button { padding: 7px 9px; font-size: 12px; }
-.pf-segmented button.active { border-color: var(--pf-cyan); background: rgba(67, 217, 199, 0.14); }
+.pf-segmented button.active { border-color: var(--pf-cyan); background: rgba(40, 167, 144, 0.12); }
 .pf-aiPage {
   grid-template: 64px minmax(0, 1fr) 34px / minmax(0, 1fr);
 }
@@ -398,14 +401,14 @@
   padding: 18px;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #111722;
+  background: var(--pf-soft);
 }
 .pf-segmentedButtons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .pf-segmentedButtons button.active,
 .pf-tileSwatch.active,
 .pf-layerItem.active {
   border-color: var(--pf-cyan);
-  background: rgba(67, 217, 199, 0.14);
+  background: rgba(40, 167, 144, 0.12);
 }
 
 .pf-tilemapWorkspace { padding: 22px; align-content: center; justify-content: center; }
@@ -415,8 +418,8 @@
   aspect-ratio: 3 / 2;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #090b10;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+  box-shadow: 0 26px 70px rgba(42, 88, 140, 0.16);
 }
 .pf-tilemapStage canvas {
   width: 100%;
@@ -429,13 +432,13 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.28) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.52) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.52) 1px, transparent 1px);
 }
 .pf-tilemapHover {
   position: absolute;
   pointer-events: none;
-  box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(63, 126, 232, 0.65);
 }
 .pf-tilePalette { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .pf-tileSwatch {
@@ -492,10 +495,10 @@
   right: 18px;
   bottom: 46px;
   z-index: 10;
-  border: 1px solid rgba(67, 217, 199, 0.38);
+  border: 1px solid rgba(40, 167, 144, 0.34);
   border-radius: 8px;
-  background: rgba(12, 15, 22, 0.94);
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.34);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 46px rgba(42, 88, 140, 0.18);
   color: var(--pf-text);
   font-size: 13px;
   font-weight: 800;

@@ -20,7 +20,7 @@
 
 .pf-paletteOption.active {
   border-color: var(--pf-cyan);
-  background: rgba(67, 217, 199, 0.12);
+  background: rgba(40, 167, 144, 0.12);
 }
 
 .pf-miniPalette {
@@ -28,7 +28,7 @@
   grid-template-columns: repeat(8, minmax(0, 1fr));
   height: 22px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--pf-line);
   border-radius: 6px;
 }
 
@@ -59,7 +59,7 @@
   min-width: 0;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: #101722;
+  background: #ffffff;
   color: var(--pf-text);
   padding: 9px 10px;
 }
@@ -93,7 +93,7 @@
 
 .pf-customColor.active {
   border-color: var(--pf-accent);
-  background: rgba(124, 92, 255, 0.14);
+  background: rgba(63, 126, 232, 0.12);
 }
 
 .pf-customColor .pf-swatch {
