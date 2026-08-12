@@ -1,10 +1,11 @@
-import type { CSSProperties, PointerEvent, RefObject } from 'react';
-import type { PixelSize, ZoomLevel } from '../../lib/pixelForge';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from 'react';
+import type { CanvasSize, PixelSize, ZoomLevel } from '../../lib/pixelForge';
 import type { PixelCoordinates } from '../../lib/usePixelPainter';
 import { PixelForgeEmptyState } from './PixelForgeEmptyState';
 
 type PixelForgeWorkspaceProps = {
   canvasRef: RefObject<HTMLCanvasElement>;
+  canvasSize: CanvasSize;
   hoverPixel: PixelCoordinates | null;
   isDragging: boolean;
   hasImage: boolean;
@@ -28,6 +29,7 @@ type PixelForgeWorkspaceProps = {
 
 export function PixelForgeWorkspace({
   canvasRef,
+  canvasSize,
   hoverPixel,
   isDragging,
   hasImage,
@@ -48,16 +50,40 @@ export function PixelForgeWorkspace({
   onPaintStart,
   onPaintMove,
 }: PixelForgeWorkspaceProps) {
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [shellSize, setShellSize] = useState({ width: 0, height: 0 });
   const canvas = canvasRef.current;
-  const canvasStyle = canvas && zoom !== 'fit' ? ({
-    width: `${canvas.width * zoom}px`,
-  } satisfies CSSProperties) : undefined;
+  const measuredCanvas = canvas && canvas.width > 0 && canvas.height > 0
+    ? { width: canvas.width, height: canvas.height }
+    : canvasSize;
+  const fitScale = shellSize.width > 0 && shellSize.height > 0
+    ? Math.min(shellSize.width / measuredCanvas.width, shellSize.height / measuredCanvas.height)
+    : 1;
+  const displayScale = zoom === 'fit' ? fitScale : Math.min(zoom, fitScale);
+  const canvasStyle = ({
+    height: `${Math.max(1, Math.floor(measuredCanvas.height * displayScale))}px`,
+    width: `${Math.max(1, Math.floor(measuredCanvas.width * displayScale))}px`,
+  } satisfies CSSProperties);
   const canMeasureCanvas = Boolean(canvas && canvas.width > 0 && canvas.height > 0);
   const gridStyle = canMeasureCanvas && canvas ? ({
     backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
     backgroundSize: `${(pixelSize / canvas.width) * 100}% ${(pixelSize / canvas.height) * 100}%`,
     opacity: gridOpacity / 100,
   } satisfies CSSProperties) : undefined;
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return undefined;
+
+    const observer = new ResizeObserver(([entry]) => {
+      setShellSize({
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      });
+    });
+    observer.observe(shell);
+    return () => observer.disconnect();
+  }, []);
   const hoverStyle = canMeasureCanvas && canvas && hoverPixel ? ({
     left: `${((hoverPixel.x * pixelSize) / canvas.width) * 100}%`,
     top: `${((hoverPixel.y * pixelSize) / canvas.height) * 100}%`,
@@ -84,8 +110,8 @@ export function PixelForgeWorkspace({
       }}
     >
       {!hasImage && <PixelForgeEmptyState onOpen={onOpen} onDemo={onDemo} />}
-      <div className={`pf-canvasShell ${hasImage ? '' : 'hidden'}`}>
-        <div className={`pf-canvasStage ${zoom === 'fit' ? 'fit' : ''}`}>
+      <div ref={shellRef} className={`pf-canvasShell ${hasImage ? '' : 'hidden'}`}>
+        <div className="pf-canvasStage" style={canvasStyle}>
           <canvas
             ref={canvasRef}
             width="640"

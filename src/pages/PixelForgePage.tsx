@@ -586,6 +586,7 @@ export function PixelForgePage() {
           <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
           <PixelForgeWorkspace
             canvasRef={canvasRef}
+            canvasSize={canvasSize}
             gridOpacity={gridOpacity}
             hasImage={hasImage}
             hoverPixel={hoverPixel}
