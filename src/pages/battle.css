@@ -90,11 +90,12 @@
   right: 12px;
   bottom: 12px;
   display: grid;
-  align-content: end;
+  align-content: start;
   gap: 10px;
   width: min(340px, calc(100vw - 24px));
   overflow-y: auto;
   padding-left: 4px;
+  padding-bottom: 4px;
 }
 
 .battle-panel {
@@ -276,9 +277,12 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .battle-palette,
   .battle-minimap {
     display: none;
+  }
+
+  .battle-swatches {
+    grid-template-columns: repeat(12, 1fr);
   }
 
   .battle-toast {
