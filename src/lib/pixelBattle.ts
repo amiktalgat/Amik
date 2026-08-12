@@ -3,7 +3,8 @@ import { supabase } from './supabase';
 export const CANVAS_SIZE = 2000;
 export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
-export const RECHARGE_SECONDS = 2;
+export const DAILY_BONUS_PIXELS = 40;
+export const DAILY_BONUS_HOURS = 24;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -29,6 +30,7 @@ export type BattleProfile = {
   best_streak: number;
   active_days: number;
   last_recharge_at: string;
+  last_daily_bonus_at: string | null;
   created_at: string;
 };
 

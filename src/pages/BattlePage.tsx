@@ -9,8 +9,7 @@ import { ZoomControls } from '../components/pixel-battle/ZoomControls';
 import { useAuthSession } from '../lib/auth';
 import {
   CANVAS_SIZE,
-  MAX_BALANCE,
-  RECHARGE_SECONDS,
+  DAILY_BONUS_HOURS,
   clamp,
   getChunkBounds,
   loadBattleProfile,
@@ -54,10 +53,10 @@ export function BattlePage() {
     height: clamp(window.innerHeight / camera.zoom, 1, CANVAS_SIZE),
   }), [camera]);
 
-  const secondsLeft = useMemo(() => {
-    if (!profile || profile.balance >= MAX_BALANCE) return null;
-    const elapsed = (tick - new Date(profile.last_recharge_at).getTime()) / 1000;
-    return clamp(RECHARGE_SECONDS - (elapsed % RECHARGE_SECONDS), 0, RECHARGE_SECONDS);
+  const nextBonusText = useMemo(() => {
+    if (!profile?.last_daily_bonus_at) return 'today';
+    const nextBonusAt = new Date(profile.last_daily_bonus_at).getTime() + DAILY_BONUS_HOURS * 60 * 60 * 1000;
+    return formatBonusWait(nextBonusAt - tick);
   }, [profile, tick]);
 
   useEffect(() => {
@@ -65,7 +64,7 @@ export function BattlePage() {
   }, [color]);
 
   useEffect(() => {
-    const id = window.setInterval(() => setTick(Date.now()), 200);
+    const id = window.setInterval(() => setTick(Date.now()), 60000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -142,9 +141,41 @@ export function BattlePage() {
       setNotice('Not enough pixels');
       return;
     }
+
+    const previousPixel = pixels.find((pixel) => pixel.x === x && pixel.y === y) ?? null;
+    const optimisticPixel = {
+      x,
+      y,
+      color: color.toUpperCase(),
+      user_id: user.id,
+      updated_at: new Date().toISOString(),
+    };
+    const optimisticProfile = {
+      ...profile,
+      balance: profile.balance - 1,
+      placed_pixels: profile.placed_pixels + 1,
+    };
+
+    setPixels((current) => upsertPixel(current, optimisticPixel));
+    setMiniPixels((current) => upsertPixel(current, optimisticPixel).slice(-4500));
+    setProfile(optimisticProfile);
+    setStats((current) => current
+      ? {
+          ...current,
+          canvasPixels: current.canvasPixels + (previousPixel ? 0 : 1),
+          placedPixels: current.placedPixels + 1,
+          myPixels: current.myPixels + 1,
+        }
+      : current);
+    setNotice('Pixel placed!');
+
     const { data, error } = await placeBattlePixel(x, y, color);
     if (error) {
       setNotice(error.message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : error.message);
+      setPixels((current) => restorePixel(current, x, y, previousPixel));
+      setMiniPixels((current) => restorePixel(current, x, y, previousPixel).slice(-4500));
+      setProfile(profile);
+      void refreshStats();
       await refreshProfile();
       return;
     }
@@ -159,8 +190,11 @@ export function BattlePage() {
       setPixels((current) => upsertPixel(current, placedPixel));
       setMiniPixels((current) => upsertPixel(current, placedPixel).slice(-4500));
     }
-    setNotice('Pixel placed!');
-    setProfile({ ...profile, balance: data?.balance ?? profile.balance - 1 });
+    setProfile({
+      ...optimisticProfile,
+      balance: data?.balance ?? optimisticProfile.balance,
+      placed_pixels: data?.placedPixels ?? optimisticProfile.placed_pixels,
+    });
     void refreshProfile();
     void refreshStats();
   }
@@ -182,7 +216,7 @@ export function BattlePage() {
         onPlace={handlePlace}
       />
       <aside className="battle-sidebar">
-        <BattleHud profile={profile} cursor={cursor} secondsLeft={secondsLeft} canPlace={Boolean(user)} />
+        <BattleHud profile={profile} cursor={cursor} nextBonusText={nextBonusText} canPlace={Boolean(user)} />
         <ColorPalette color={color} onChange={setColor} />
         <ZoomControls
           onCenter={() => setCamera({ x: 1000, y: 1000, zoom: camera.zoom })}
@@ -208,4 +242,18 @@ function upsertPixel(pixels: BattlePixel[], next: BattlePixel) {
   const copy = pixels.slice();
   copy[index] = next;
   return copy;
+}
+
+function restorePixel(pixels: BattlePixel[], x: number, y: number, previous: BattlePixel | null) {
+  if (previous) return upsertPixel(pixels, previous);
+  return pixels.filter((pixel) => pixel.x !== x || pixel.y !== y);
+}
+
+function formatBonusWait(milliseconds: number) {
+  if (milliseconds <= 0) return 'today';
+  const totalMinutes = Math.ceil(milliseconds / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours <= 0) return `in ${minutes}m`;
+  return `in ${hours}h ${minutes}m`;
 }

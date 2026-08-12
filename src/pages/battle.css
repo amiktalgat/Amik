@@ -10,11 +10,12 @@
   z-index: 5;
   top: 12px;
   left: 12px;
-  right: 12px;
+  right: auto;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
+  width: min(720px, calc(100vw - 24px));
   min-height: 54px;
   padding: 8px 12px;
   border: 1px solid rgba(148, 163, 184, 0.45);
@@ -85,7 +86,7 @@
 .battle-sidebar {
   position: fixed;
   z-index: 4;
-  top: 84px;
+  top: 88px;
   right: 12px;
   bottom: 12px;
   display: grid;
@@ -114,7 +115,7 @@
 
 .battle-hud {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 12px;
 }
@@ -254,6 +255,9 @@
 @media (max-width: 760px) {
   .battle-header {
     grid-template-columns: 1fr auto;
+    width: calc(100vw - 16px);
+    top: 8px;
+    left: 8px;
   }
 
   .battle-header__stats {
@@ -261,10 +265,15 @@
   }
 
   .battle-sidebar {
+    top: 82px;
     left: 8px;
     right: 8px;
     bottom: 8px;
     width: auto;
+  }
+
+  .battle-hud {
+    grid-template-columns: 1fr 1fr;
   }
 
   .battle-palette,
