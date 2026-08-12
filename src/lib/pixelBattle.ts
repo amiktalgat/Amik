@@ -3,9 +3,8 @@ import { supabase } from './supabase';
 export const CANVAS_SIZE = 2000;
 export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
-export const DAILY_BONUS_PIXELS = 40;
 export const DAILY_BONUS_HOURS = 24;
-export const BASE_RECHARGE_SECONDS = 2;
+export const BASE_RECHARGE_SECONDS = 5;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -107,7 +106,7 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 export function getRechargeSeconds(placedPixels: number) {
-  if (placedPixels >= 3000) return 1;
-  if (placedPixels > 1000) return 1.5;
+  if (placedPixels > 3000) return 3;
+  if (placedPixels > 1000) return 4;
   return BASE_RECHARGE_SECONDS;
 }

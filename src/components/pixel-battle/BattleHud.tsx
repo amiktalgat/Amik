@@ -1,4 +1,4 @@
-import { DAILY_BONUS_PIXELS, MAX_BALANCE, type BattleProfile } from '../../lib/pixelBattle';
+import { MAX_BALANCE, type BattleProfile } from '../../lib/pixelBattle';
 
 type BattleHudProps = {
   profile: BattleProfile | null;
@@ -22,7 +22,7 @@ export function BattleHud({ profile, cursor, rechargeText, nextBonusText, canPla
       <div>
         <div className="battle-panel__title">Placed</div>
         <strong>{profile?.placed_pixels ?? 0}</strong>
-        <span>daily +{DAILY_BONUS_PIXELS} {nextBonusText}</span>
+        <span>daily full {nextBonusText}</span>
       </div>
       <div>
         <div className="battle-panel__title">Cursor</div>
