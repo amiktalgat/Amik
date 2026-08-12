@@ -1,7 +1,11 @@
+import { Link } from 'wouter';
+
+type EditorMode = 'pixel' | 'animation' | 'tilemap';
+
 type PixelForgeHeaderProps = {
   canRedo: boolean;
   canUndo: boolean;
-  mode: 'pixel' | 'animation' | 'tilemap';
+  mode: EditorMode;
   onNew: () => void;
   onOpen: () => void;
   onGenerate: () => void;
@@ -9,7 +13,7 @@ type PixelForgeHeaderProps = {
   onExport: () => void;
   onRedo: () => void;
   onUndo: () => void;
-  onModeChange: (mode: 'pixel' | 'animation' | 'tilemap') => void;
+  onModeChange: (mode: EditorMode) => void;
 };
 
 export function PixelForgeHeader({
@@ -32,19 +36,20 @@ export function PixelForgeHeader({
         PixelForge
       </div>
       <nav className="pf-actions">
-        <button className={mode === 'pixel' ? 'active' : ''} onClick={() => onModeChange('pixel')}>Пиксели</button>
-        <button className={mode === 'animation' ? 'active' : ''} onClick={() => onModeChange('animation')}>Анимация</button>
-        <button className={mode === 'tilemap' ? 'active' : ''} onClick={() => onModeChange('tilemap')}>Карта</button>
+        <button className={mode === 'pixel' ? 'active' : ''} onClick={() => onModeChange('pixel')}>Pixels</button>
+        <button className={mode === 'animation' ? 'active' : ''} onClick={() => onModeChange('animation')}>Animation</button>
+        <button className={mode === 'tilemap' ? 'active' : ''} onClick={() => onModeChange('tilemap')}>Map</button>
+        <Link href="/ai-image">AI Generator</Link>
         {mode !== 'tilemap' && (
           <>
-            <button onClick={onNew}>Новый</button>
-            <button onClick={onOpen}>Открыть</button>
-            <button onClick={onReset}>Сброс</button>
-            <button disabled={!canUndo} onClick={onUndo}>Назад</button>
-            <button disabled={!canRedo} onClick={onRedo}>Вперёд</button>
-            <button onClick={onGenerate}>Сделать пиксели</button>
+            <button onClick={onNew}>New</button>
+            <button onClick={onOpen}>Open</button>
+            <button onClick={onReset}>Reset</button>
+            <button disabled={!canUndo} onClick={onUndo}>Undo</button>
+            <button disabled={!canRedo} onClick={onRedo}>Redo</button>
+            <button onClick={onGenerate}>Make Pixels</button>
             <button className="pf-primary" onClick={onExport}>
-              Скачать PNG
+              Download PNG
             </button>
           </>
         )}

@@ -30,7 +30,6 @@ import {
   type ZoomLevel,
 } from '../lib/pixelForge';
 import { canCopyPng, canvasToPngBlob, downloadPng, makePngCanvas } from '../lib/pixelExport';
-import type { AIImageResult, AIImageSize } from '../lib/aiImageProvider';
 import { defaultCustomPalette, normalizeHex } from '../lib/pixelPalettes';
 import { useCanvasHistory } from '../lib/useCanvasHistory';
 import { useCustomPalette } from '../lib/useCustomPalette';
@@ -62,9 +61,6 @@ export function PixelForgePage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState('image');
   const [mode, setMode] = useState<EditorMode>('pixel');
-  const [aiImage, setAIImage] = useState<AIImageResult | null>(null);
-  const [aiConversionSettings, setAIConversionSettings] = useState<PixelSettings>(defaultSettings);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [color, setColor] = useState('#7C5CFF');
   const [hasImage, setHasImage] = useState(false);
   const [hoverPixel, setHoverPixel] = useState<PixelCoordinates | null>(null);
@@ -234,21 +230,6 @@ export function PixelForgePage() {
     reader.readAsDataURL(file);
   };
 
-  const loadImageDataUrl = (dataUrl: string, message: string, nextSettings = settings, remember = false) => {
-    const image = new Image();
-    image.onload = () => {
-      if (remember) history.saveUndoStep();
-      prepareOriginal(image.naturalWidth, image.naturalHeight, !remember);
-      const context = originalRef.current.getContext('2d');
-      context?.clearRect(0, 0, originalRef.current.width, originalRef.current.height);
-      context?.drawImage(image, 0, 0);
-      setSettings(nextSettings);
-      window.requestAnimationFrame(() => generatePixelArt(message, nextSettings));
-    };
-    image.onerror = () => showToast('The AI image could not be loaded');
-    image.src = dataUrl;
-  };
-
   const makeDemo = (seed = 42) => {
     prepareOriginal(640, 640);
     drawDemoArt(originalRef.current, seed);
@@ -314,34 +295,6 @@ export function PixelForgePage() {
   };
 
   const customPalette = useCustomPalette({ color, settings, changeSettings, setColor, setStatus });
-
-  const receiveAIImage = (image: AIImageResult, prompt: string, size: AIImageSize) => {
-    setAIImage(image);
-    const nextPixelSize = (1024 / size) as PixelSettings['pixelSize'];
-    setAIConversionSettings((current) => ({ ...current, pixelSize: nextPixelSize }));
-    setStatus(`AI image generated from "${prompt.slice(0, 36)}${prompt.length > 36 ? '...' : ''}"`);
-  };
-
-  const convertAIImage = () => {
-    if (!aiImage) {
-      showToast('Generate an AI image first');
-      return;
-    }
-
-    loadImageDataUrl(aiImage.imageDataUrl, 'AI image converted to pixel art', aiConversionSettings, true);
-  };
-
-  const downloadAIOriginal = () => {
-    if (!aiImage) {
-      showToast('No AI image to download');
-      return;
-    }
-    const link = document.createElement('a');
-    link.href = aiImage.imageDataUrl;
-    link.download = 'pixelforge-ai-original.png';
-    link.click();
-    showToast('AI original downloaded');
-  };
 
   const getExportCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -630,14 +583,11 @@ export function PixelForgePage() {
       )}
       {mode !== 'tilemap' && <PixelForgeRightPanel
         animationFps={animationFps}
-        aiImage={aiImage}
-        aiConversionSettings={aiConversionSettings}
         color={color}
         exportScale={exportScale}
         exportSize={exportSize}
         frames={frames}
         gridOpacity={gridOpacity}
-        isGeneratingAI={isGeneratingAI}
         isGridVisible={isGridVisible}
         isLoopingAnimation={isLoopingAnimation}
         isPlayingAnimation={isPlayingAnimation}
@@ -650,9 +600,6 @@ export function PixelForgePage() {
         tool={tool}
         zoom={zoom}
         onAddToPalette={customPalette.addToCustomPalette}
-        onAIImage={receiveAIImage}
-        onAIGeneratingChange={setIsGeneratingAI}
-        onAIConversionSettingsChange={setAIConversionSettings}
         onCopyPng={() => void copyPng()}
         onColorChange={changeColor}
         onCustomColorChange={customPalette.changeCustomColor}
@@ -678,8 +625,6 @@ export function PixelForgePage() {
         onToolChange={setTool}
         onTransform={transformImage}
         onStopAnimation={stopAnimation}
-        onConvertAIImage={convertAIImage}
-        onDownloadAIOriginal={downloadAIOriginal}
         onZoomChange={changeZoom}
         onZoomFit={fitZoom}
         onZoomIn={() => stepZoom(1)}

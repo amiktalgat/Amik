@@ -1,6 +1,5 @@
 const sections = [
   ['image', 'Original Image', 'Load PNG, JPG, JPEG, or WebP files without replacing the saved original.'],
-  ['ai', 'AI Generate', 'Write a prompt, generate a real image through the backend, then use it as editable pixel art.'],
   ['resize', 'Resize', 'The canvas keeps the same proportions and fits large images before processing.'],
   ['pixelation', 'Pixelation', 'Pick a fixed block size and preview crisp nearest-neighbor pixels.'],
   ['colors', 'Color Reduction', 'Keep original colors or reduce the palette to a fixed color count.'],

@@ -14,8 +14,6 @@ import {
   type TransformAction,
   type ZoomLevel,
 } from '../../lib/pixelForge';
-import type { AIImageResult, AIImageSize } from '../../lib/aiImageProvider';
-import { AIImageGenerator } from './AIImageGenerator';
 import { AnimationControls } from './AnimationControls';
 import type { PaletteId } from '../../lib/pixelPalettes';
 import { ColorInspector } from './ColorInspector';
@@ -31,13 +29,10 @@ type PixelForgeRightPanelProps = {
   animationFps: AnimationFps;
   color: string;
   gridOpacity: number;
-  aiImage: AIImageResult | null;
-  aiConversionSettings: PixelSettings;
   exportScale: ScaleLevel;
   exportSize: string;
   frames: AnimationFrame[];
   isGridVisible: boolean;
-  isGeneratingAI: boolean;
   isLoopingAnimation: boolean;
   isPlayingAnimation: boolean;
   mode: 'pixel' | 'animation';
@@ -49,9 +44,6 @@ type PixelForgeRightPanelProps = {
   tool: Tool;
   zoom: ZoomLevel | 'fit';
   onAddToPalette: () => void;
-  onAIImage: (image: AIImageResult, prompt: string, size: AIImageSize) => void;
-  onAIConversionSettingsChange: (settings: PixelSettings) => void;
-  onAIGeneratingChange: (isGenerating: boolean) => void;
   onCopyPng: () => void;
   onCustomColorChange: (index: number, color: string) => void;
   onCustomColorRemove: (index: number) => void;
@@ -77,8 +69,6 @@ type PixelForgeRightPanelProps = {
   onToolChange: (tool: Tool) => void;
   onTransform: (action: TransformAction) => void;
   onStopAnimation: () => void;
-  onConvertAIImage: () => void;
-  onDownloadAIOriginal: () => void;
   onZoomChange: (zoom: ZoomLevel) => void;
   onZoomFit: () => void;
   onZoomIn: () => void;
@@ -91,13 +81,10 @@ export function PixelForgeRightPanel({
   animationFps,
   color,
   gridOpacity,
-  aiImage,
-  aiConversionSettings,
   exportScale,
   exportSize,
   frames,
   isGridVisible,
-  isGeneratingAI,
   isLoopingAnimation,
   isPlayingAnimation,
   mode,
@@ -109,9 +96,6 @@ export function PixelForgeRightPanel({
   tool,
   zoom,
   onAddToPalette,
-  onAIConversionSettingsChange,
-  onAIImage,
-  onAIGeneratingChange,
   onCopyPng,
   onCustomColorChange,
   onCustomColorRemove,
@@ -137,8 +121,6 @@ export function PixelForgeRightPanel({
   onToolChange,
   onTransform,
   onStopAnimation,
-  onConvertAIImage,
-  onDownloadAIOriginal,
   onZoomChange,
   onZoomFit,
   onZoomIn,
@@ -181,18 +163,6 @@ export function PixelForgeRightPanel({
           />
         </>
       )}
-      <AIImageGenerator
-        conversionSettings={aiConversionSettings}
-        customPalette={settings.customPalette}
-        image={aiImage}
-        isGenerating={isGeneratingAI}
-        onConversionSettingsChange={onAIConversionSettingsChange}
-        onDownloadOriginal={onDownloadAIOriginal}
-        onGeneratingChange={onAIGeneratingChange}
-        onImage={onAIImage}
-        onStatus={onStatus}
-        onConvertImage={onConvertAIImage}
-      />
       <PaletteSelector
         customPalette={settings.customPalette}
         value={settings.paletteId}

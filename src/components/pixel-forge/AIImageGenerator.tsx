@@ -31,9 +31,11 @@ type AIImageGeneratorProps = {
   onConvertImage: () => void;
   onDownloadOriginal: () => void;
   onStatus: (status: string) => void;
+  convertLabel?: string;
 };
 
 export function AIImageGenerator({
+  convertLabel = 'Convert to Pixel Art',
   conversionSettings,
   customPalette,
   image,
@@ -171,7 +173,7 @@ export function AIImageGenerator({
           <h3>Pixel Preview</h3>
           <canvas ref={previewCanvasRef} aria-label="Pixel art conversion preview" />
           <div className="pf-aiActions">
-            <button className="pf-primary" onClick={onConvertImage}>Convert to Pixel Art</button>
+            <button className="pf-primary" onClick={onConvertImage}>{convertLabel}</button>
             <button onClick={onDownloadOriginal}>Download Original</button>
           </div>
         </div>
