@@ -62,6 +62,7 @@ export function AIImagePage() {
           AI Image Ideas
         </div>
         <nav className="pf-actions">
+          <Link href="/">Главное меню</Link>
           <Link href="/pixel-forge">Editor</Link>
           <Link className="active" href="/ai-image">AI Generator</Link>
         </nav>

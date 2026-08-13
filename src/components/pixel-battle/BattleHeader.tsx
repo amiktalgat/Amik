@@ -18,7 +18,7 @@ export function BattleHeader({ user, onlineCount, stats, onSignOut }: BattleHead
         <span>Placed: {stats?.placedPixels ?? 0}</span>
       </div>
       <nav className="battle-header__nav">
-        <Link href="/">Home</Link>
+        <Link href="/">Главное меню</Link>
         <Link href="/profile">Profile</Link>
         {user ? (
           <button className="battle-text-button" type="button" onClick={onSignOut}>

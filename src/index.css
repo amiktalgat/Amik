@@ -110,6 +110,11 @@ a.home-link {
   text-decoration: none;
 }
 
+a.auth-home-link {
+  width: fit-content;
+  margin-top: 14px;
+}
+
 .actions {
   display: flex;
   align-items: center;

@@ -53,6 +53,7 @@ export function ProfilePage() {
   return (
     <main className="container">
       <nav className="top-nav">
+        <Link href="/">Главное меню</Link>
         <Link href="/battle">PixelBattle</Link>
         <Link href="/pixel-forge">Редактор</Link>
         <button className="ghost small" type="button" onClick={signOut}>Выйти</button>

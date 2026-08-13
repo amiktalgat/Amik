@@ -30,6 +30,9 @@ export function AuthPage() {
         <Link className="auth-logo" href="/">
           PixelForge
         </Link>
+        <Link className="home-link auth-home-link" href="/">
+          Главное меню
+        </Link>
         <div>
           <p className="eyebrow">Только для пользователей</p>
           <h1>Сначала аккаунт, потом редактор</h1>
