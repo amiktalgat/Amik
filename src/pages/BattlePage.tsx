@@ -102,7 +102,7 @@ export function BattlePage() {
   useEffect(() => {
     void loadVisiblePixels(bounds).then(({ data, error }) => {
       if (error) setNotice(error.message);
-      setPixels(data ?? []);
+      if (data) setPixels((current) => mergePixels(current, data));
     });
   }, [bounds.maxX, bounds.maxY, bounds.minX, bounds.minY]);
 
@@ -118,13 +118,13 @@ export function BattlePage() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'canvas_pixels' }, (payload) => {
         if (payload.eventType === 'DELETE') {
           const oldPixel = payload.old as Pick<BattlePixel, 'x' | 'y'>;
-          setPixels((current) => current.filter((pixel) => pixel.x !== oldPixel.x || pixel.y !== oldPixel.y));
-          setMiniPixels((current) => current.filter((pixel) => pixel.x !== oldPixel.x || pixel.y !== oldPixel.y));
+          setPixels((current) => removePixel(current, oldPixel));
+          setMiniPixels((current) => removePixel(current, oldPixel));
           return;
         }
         const next = payload.new as BattlePixel;
-        setPixels((current) => upsertPixel(current, next));
-        setMiniPixels((current) => upsertPixel(current, next).slice(-4500));
+        setPixels((current) => mergePixels(current, [next]));
+        setMiniPixels((current) => mergePixels(current, [next]).slice(-4500));
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -266,13 +266,19 @@ export function BattlePage() {
   );
 }
 
-function upsertPixel(pixels: BattlePixel[], next: BattlePixel) {
-  const key = `${next.x}:${next.y}`;
-  const index = pixels.findIndex((pixel) => `${pixel.x}:${pixel.y}` === key);
-  if (index === -1) return [...pixels, next];
-  const copy = pixels.slice();
-  copy[index] = next;
-  return copy;
+function pixelKey(pixel: Pick<BattlePixel, 'x' | 'y'>) {
+  return `${pixel.x}:${pixel.y}`;
+}
+
+function mergePixels(pixels: BattlePixel[], nextPixels: BattlePixel[]) {
+  const byKey = new Map(pixels.map((pixel) => [pixelKey(pixel), pixel]));
+  for (const pixel of nextPixels) byKey.set(pixelKey(pixel), pixel);
+  return [...byKey.values()];
+}
+
+function removePixel(pixels: BattlePixel[], target: Pick<BattlePixel, 'x' | 'y'>) {
+  const key = pixelKey(target);
+  return pixels.filter((pixel) => pixelKey(pixel) !== key);
 }
 
 function makeBrushPixels(x: number, y: number, size: number, color: string, userId: string) {
@@ -296,16 +302,18 @@ function makeBrushPixels(x: number, y: number, size: number, color: string, user
 }
 
 function getBrushPixels(pixels: BattlePixel[], x: number, y: number, size: number) {
-  const brushKeys = new Set(makeBrushPixels(x, y, size, '#000000', '').map((pixel) => `${pixel.x}:${pixel.y}`));
-  return pixels.filter((pixel) => brushKeys.has(`${pixel.x}:${pixel.y}`));
+  const brushKeys = new Set(makeBrushPixels(x, y, size, '#000000', '').map(pixelKey));
+  return pixels.filter((pixel) => brushKeys.has(pixelKey(pixel)));
 }
 
 function applyBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], erase: boolean) {
+  const byKey = new Map(pixels.map((pixel) => [pixelKey(pixel), pixel]));
   if (erase) {
-    const eraseKeys = new Set(brushPixels.map((pixel) => `${pixel.x}:${pixel.y}`));
-    return pixels.filter((pixel) => !eraseKeys.has(`${pixel.x}:${pixel.y}`));
+    for (const pixel of brushPixels) byKey.delete(pixelKey(pixel));
+    return [...byKey.values()];
   }
-  return brushPixels.reduce((current, pixel) => upsertPixel(current, pixel), pixels);
+  for (const pixel of brushPixels) byKey.set(pixelKey(pixel), pixel);
+  return [...byKey.values()];
 }
 
 function restoreBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], previousPixels: BattlePixel[]) {

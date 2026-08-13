@@ -6,6 +6,7 @@ export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
 export const BASE_RECHARGE_SECONDS = 7;
 export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
+export const VISIBLE_PIXEL_LIMIT = 50000;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -77,7 +78,9 @@ export async function loadVisiblePixels(bounds: ViewBounds) {
     .lte('x', bounds.maxX)
     .gte('y', bounds.minY)
     .lte('y', bounds.maxY)
-    .limit(12000)
+    .order('x', { ascending: true })
+    .order('y', { ascending: true })
+    .limit(VISIBLE_PIXEL_LIMIT)
     .returns<BattlePixel[]>();
 }
 
