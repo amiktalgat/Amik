@@ -1,6 +1,10 @@
 .battle-shell {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
   background: #edf7fb;
   color: #172033;
 }
@@ -74,8 +78,10 @@
 }
 
 .battle-canvas {
+  position: absolute;
+  inset: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   display: block;
   background: #edf7fb;
   box-shadow: inset 0 0 0 4px rgba(23, 32, 51, 0.72);
