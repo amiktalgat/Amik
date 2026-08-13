@@ -5,9 +5,11 @@ import { BattleHeader } from '../components/pixel-battle/BattleHeader';
 import { BattleHud } from '../components/pixel-battle/BattleHud';
 import { ColorPalette } from '../components/pixel-battle/ColorPalette';
 import { MiniMap } from '../components/pixel-battle/MiniMap';
+import { OwnerTools } from '../components/pixel-battle/OwnerTools';
 import { ZoomControls } from '../components/pixel-battle/ZoomControls';
 import { useAuthSession } from '../lib/auth';
 import {
+  BATTLE_OWNER_EMAIL,
   CANVAS_SIZE,
   DAILY_BONUS_HOURS,
   MAX_BALANCE,
@@ -19,6 +21,7 @@ import {
   loadMiniMapPixels,
   loadVisiblePixels,
   placeBattlePixel,
+  type BattleTool,
   type BattlePixel,
   type BattleProfile,
   type BattleStats,
@@ -38,6 +41,8 @@ export function BattlePage() {
   const [stats, setStats] = useState<BattleStats | null>(null);
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [color, setColor] = useState(() => localStorage.getItem(colorStorageKey) ?? '#ef4444');
+  const [brushSize, setBrushSize] = useState(1);
+  const [tool, setTool] = useState<BattleTool>('paint');
   const [notice, setNotice] = useState('Connecting...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
@@ -68,6 +73,8 @@ export function BattlePage() {
     const secondsLeft = rechargeSeconds - (elapsed % rechargeSeconds);
     return `in ${clamp(secondsLeft, 0, rechargeSeconds).toFixed(1)}s`;
   }, [profile, tick]);
+
+  const isOwner = profile?.email.toLowerCase() === BATTLE_OWNER_EMAIL;
 
   useEffect(() => {
     localStorage.setItem(colorStorageKey, color);
@@ -109,6 +116,12 @@ export function BattlePage() {
         setOnlineCount(Object.keys(channel.presenceState()).length);
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'canvas_pixels' }, (payload) => {
+        if (payload.eventType === 'DELETE') {
+          const oldPixel = payload.old as Pick<BattlePixel, 'x' | 'y'>;
+          setPixels((current) => current.filter((pixel) => pixel.x !== oldPixel.x || pixel.y !== oldPixel.y));
+          setMiniPixels((current) => current.filter((pixel) => pixel.x !== oldPixel.x || pixel.y !== oldPixel.y));
+          return;
+        }
         const next = payload.new as BattlePixel;
         setPixels((current) => upsertPixel(current, next));
         setMiniPixels((current) => upsertPixel(current, next).slice(-4500));
@@ -151,62 +164,52 @@ export function BattlePage() {
       await refreshProfile();
       return;
     }
-    if (profile.balance <= 0) {
+    if (!isOwner && profile.balance <= 0) {
       setNotice('Not enough pixels');
       return;
     }
 
-    const previousPixel = pixels.find((pixel) => pixel.x === x && pixel.y === y) ?? null;
-    const optimisticPixel = {
-      x,
-      y,
-      color: color.toUpperCase(),
-      user_id: user.id,
-      updated_at: new Date().toISOString(),
-    };
+    const size = isOwner ? brushSize : 1;
+    const previousPixels = getBrushPixels(pixels, x, y, size);
+    const optimisticPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
     const optimisticProfile = {
       ...profile,
-      balance: profile.balance - 1,
-      placed_pixels: profile.placed_pixels + 1,
+      balance: isOwner ? MAX_BALANCE : profile.balance - 1,
+      placed_pixels: tool === 'erase' ? profile.placed_pixels : profile.placed_pixels + optimisticPixels.length,
     };
 
-    setPixels((current) => upsertPixel(current, optimisticPixel));
-    setMiniPixels((current) => upsertPixel(current, optimisticPixel).slice(-4500));
+    setPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase'));
+    setMiniPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase').slice(-4500));
     setProfile(optimisticProfile);
     setStats((current) => current
       ? {
           ...current,
-          canvasPixels: current.canvasPixels + (previousPixel ? 0 : 1),
-          placedPixels: current.placedPixels + 1,
-          myPixels: current.myPixels + 1,
+          canvasPixels: tool === 'erase'
+            ? Math.max(0, current.canvasPixels - previousPixels.length)
+            : current.canvasPixels + Math.max(0, optimisticPixels.length - previousPixels.length),
+          placedPixels: tool === 'erase' ? current.placedPixels : current.placedPixels + optimisticPixels.length,
+          myPixels: tool === 'erase' ? current.myPixels : current.myPixels + optimisticPixels.length,
         }
       : current);
-    setNotice('Pixel placed!');
+    setNotice(tool === 'erase' ? 'Pixels erased!' : 'Pixel placed!');
 
-    const { data, error } = await placeBattlePixel(x, y, color);
+    const { data, error } = await placeBattlePixel(x, y, color, size, tool);
     if (error) {
       setNotice(error.message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : error.message);
-      setPixels((current) => restorePixel(current, x, y, previousPixel));
-      setMiniPixels((current) => restorePixel(current, x, y, previousPixel).slice(-4500));
+      setPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels));
+      setMiniPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels).slice(-4500));
       setProfile(profile);
       void refreshStats();
       await refreshProfile();
       return;
     }
     if (data) {
-      const placedPixel = {
-        x: data.x,
-        y: data.y,
-        color: data.color,
-        user_id: user.id,
-        updated_at: new Date().toISOString(),
-      };
-      setPixels((current) => upsertPixel(current, placedPixel));
-      setMiniPixels((current) => upsertPixel(current, placedPixel).slice(-4500));
+      setPixels((current) => applyBrushPixels(current, data.pixels, data.erased));
+      setMiniPixels((current) => applyBrushPixels(current, data.pixels, data.erased).slice(-4500));
     }
     setProfile({
       ...optimisticProfile,
-      balance: data?.balance ?? optimisticProfile.balance,
+      balance: isOwner ? MAX_BALANCE : data?.balance ?? optimisticProfile.balance,
       placed_pixels: data?.placedPixels ?? optimisticProfile.placed_pixels,
     });
     void refreshProfile();
@@ -238,6 +241,14 @@ export function BattlePage() {
           canPlace={Boolean(user)}
         />
         <ColorPalette color={color} onChange={setColor} />
+        {isOwner && (
+          <OwnerTools
+            brushSize={brushSize}
+            tool={tool}
+            onBrushSizeChange={setBrushSize}
+            onToolChange={setTool}
+          />
+        )}
         <ZoomControls
           onCenter={() => setCamera({ x: 1000, y: 1000, zoom: camera.zoom })}
           onReset={() => setCamera({ x: camera.x, y: camera.y, zoom: 4 })}
@@ -264,9 +275,41 @@ function upsertPixel(pixels: BattlePixel[], next: BattlePixel) {
   return copy;
 }
 
-function restorePixel(pixels: BattlePixel[], x: number, y: number, previous: BattlePixel | null) {
-  if (previous) return upsertPixel(pixels, previous);
-  return pixels.filter((pixel) => pixel.x !== x || pixel.y !== y);
+function makeBrushPixels(x: number, y: number, size: number, color: string, userId: string) {
+  const half = Math.floor(size / 2);
+  let startX = clamp(x - half, 0, CANVAS_SIZE - 1);
+  let startY = clamp(y - half, 0, CANVAS_SIZE - 1);
+  const endX = clamp(startX + size - 1, 0, CANVAS_SIZE - 1);
+  const endY = clamp(startY + size - 1, 0, CANVAS_SIZE - 1);
+  startX = clamp(endX - size + 1, 0, CANVAS_SIZE - 1);
+  startY = clamp(endY - size + 1, 0, CANVAS_SIZE - 1);
+  const updatedAt = new Date().toISOString();
+  const nextPixels: BattlePixel[] = [];
+
+  for (let py = startY; py <= endY; py += 1) {
+    for (let px = startX; px <= endX; px += 1) {
+      nextPixels.push({ x: px, y: py, color, user_id: userId, updated_at: updatedAt });
+    }
+  }
+
+  return nextPixels;
+}
+
+function getBrushPixels(pixels: BattlePixel[], x: number, y: number, size: number) {
+  const brushKeys = new Set(makeBrushPixels(x, y, size, '#000000', '').map((pixel) => `${pixel.x}:${pixel.y}`));
+  return pixels.filter((pixel) => brushKeys.has(`${pixel.x}:${pixel.y}`));
+}
+
+function applyBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], erase: boolean) {
+  if (erase) {
+    const eraseKeys = new Set(brushPixels.map((pixel) => `${pixel.x}:${pixel.y}`));
+    return pixels.filter((pixel) => !eraseKeys.has(`${pixel.x}:${pixel.y}`));
+  }
+  return brushPixels.reduce((current, pixel) => upsertPixel(current, pixel), pixels);
+}
+
+function restoreBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], previousPixels: BattlePixel[]) {
+  return applyBrushPixels(applyBrushPixels(pixels, brushPixels, true), previousPixels, false);
 }
 
 function rechargeProfile(profile: BattleProfile, now: number) {

@@ -4,6 +4,8 @@ type PixelRequest = {
   x: number;
   y: number;
   color: string;
+  brushSize?: number;
+  tool?: 'paint' | 'erase';
 };
 
 const headers = {
@@ -18,7 +20,9 @@ function isPixelRequest(value: unknown): value is PixelRequest {
     Number.isInteger(body.x) &&
     Number.isInteger(body.y) &&
     typeof body.color === 'string' &&
-    /^#[0-9A-Fa-f]{6}$/.test(body.color)
+    /^#[0-9A-Fa-f]{6}$/.test(body.color) &&
+    (body.brushSize === undefined || Number.isInteger(body.brushSize)) &&
+    (body.tool === undefined || body.tool === 'paint' || body.tool === 'erase')
   );
 }
 
@@ -56,10 +60,12 @@ Deno.serve(async (req) => {
     { global: { headers: { Authorization: authHeader } } },
   );
 
-  const { data, error } = await supabase.rpc('place_battle_pixel', {
+  const { data, error } = await supabase.rpc('place_battle_pixels', {
     pixel_x: body.x,
     pixel_y: body.y,
     pixel_color: body.color,
+    brush_size: body.brushSize ?? 1,
+    erase_pixels: body.tool === 'erase',
   });
 
   if (error) {

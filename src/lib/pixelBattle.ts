@@ -5,6 +5,7 @@ export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
 export const BASE_RECHARGE_SECONDS = 7;
+export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -47,6 +48,10 @@ export type PlacePixelResult = {
   color: string;
   balance: number;
   placedPixels: number;
+  brushSize: number;
+  erased: boolean;
+  affected: number;
+  pixels: BattlePixel[];
 };
 
 export type ViewBounds = {
@@ -85,9 +90,11 @@ export async function loadMiniMapPixels() {
     .returns<BattlePixel[]>();
 }
 
-export async function placeBattlePixel(x: number, y: number, color: string) {
+export type BattleTool = 'paint' | 'erase';
+
+export async function placeBattlePixel(x: number, y: number, color: string, brushSize = 1, tool: BattleTool = 'paint') {
   return supabase.functions.invoke<PlacePixelResult>('place-pixel', {
-    body: { x, y, color },
+    body: { x, y, color, brushSize, tool },
   });
 }
 
