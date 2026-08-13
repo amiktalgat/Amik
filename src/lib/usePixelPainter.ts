@@ -30,6 +30,8 @@ export function usePixelPainter({
   onUndoStep,
 }: PixelPainterOptions) {
   const isPaintingRef = useRef(false);
+  const lastPaintedCellRef = useRef<string | null>(null);
+  const lastHoverCellRef = useRef<string | null>(null);
 
   const pointerToCanvas = (event: PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -130,6 +132,13 @@ export function usePixelPainter({
     onStatus('Area filled');
   };
 
+  const updateHover = (coordinates: PixelCoordinates | null) => {
+    const key = coordinates ? `${coordinates.x}:${coordinates.y}` : null;
+    if (lastHoverCellRef.current === key) return;
+    lastHoverCellRef.current = key;
+    onHoverChange(coordinates);
+  };
+
   const paintAt = (event: PointerEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     const canvas = canvasRef.current;
@@ -137,7 +146,7 @@ export function usePixelPainter({
     const point = pointerToCanvas(event);
     if (!canvas || !context || !hasImage || !point) return;
 
-    onHoverChange({ x: point.cellX, y: point.cellY });
+    updateHover({ x: point.cellX, y: point.cellY });
 
     if (tool === 'eyedropper') {
       const pixel = context.getImageData(point.x, point.y, 1, 1).data;
@@ -151,35 +160,43 @@ export function usePixelPainter({
       return;
     }
 
+    const cellKey = `${point.cellX}:${point.cellY}`;
+    if (lastPaintedCellRef.current === cellKey) return;
+    lastPaintedCellRef.current = cellKey;
+
     const width = Math.min(pixelSize, canvas.width - point.startX);
     const height = Math.min(pixelSize, canvas.height - point.startY);
 
     if (tool === 'eraser') {
       context.clearRect(point.startX, point.startY, width, height);
-      onStatus('Pixel erased');
       return;
     }
 
     context.fillStyle = color;
     context.fillRect(point.startX, point.startY, width, height);
-    onStatus('Pixel painted');
   };
 
   const onPaintHover = (event: PointerEvent<HTMLCanvasElement>) => {
     const point = pointerToCanvas(event);
-    onHoverChange(point ? { x: point.cellX, y: point.cellY } : null);
+    updateHover(point ? { x: point.cellX, y: point.cellY } : null);
   };
 
   const onPaintStart = (event: PointerEvent<HTMLCanvasElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     if (tool !== 'eyedropper') onUndoStep();
     isPaintingRef.current = true;
+    lastPaintedCellRef.current = null;
     paintAt(event);
+    if (tool === 'eraser') onStatus('Pixel erased');
+    if (tool === 'pencil') onStatus('Pixel painted');
   };
 
   const onPaintMove = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (isPaintingRef.current && tool !== 'fill' && tool !== 'eyedropper') {
+      paintAt(event);
+      return;
+    }
     onPaintHover(event);
-    if (isPaintingRef.current && tool !== 'fill' && tool !== 'eyedropper') paintAt(event);
   };
 
   const onPaintEnd = (event?: PointerEvent<HTMLCanvasElement>) => {
@@ -187,11 +204,13 @@ export function usePixelPainter({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     isPaintingRef.current = false;
+    lastPaintedCellRef.current = null;
   };
 
   const onPaintLeave = () => {
-    onHoverChange(null);
+    updateHover(null);
     isPaintingRef.current = false;
+    lastPaintedCellRef.current = null;
   };
 
   return { onPaintEnd, onPaintHover, onPaintLeave, onPaintMove, onPaintStart };

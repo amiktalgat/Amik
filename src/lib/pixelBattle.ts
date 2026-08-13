@@ -4,7 +4,7 @@ export const CANVAS_SIZE = 2000;
 export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
-export const BASE_RECHARGE_SECONDS = 5;
+export const BASE_RECHARGE_SECONDS = 7;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -105,8 +105,6 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function getRechargeSeconds(placedPixels: number) {
-  if (placedPixels > 3000) return 3;
-  if (placedPixels > 1000) return 4;
+export function getRechargeSeconds(_placedPixels: number) {
   return BASE_RECHARGE_SECONDS;
 }
