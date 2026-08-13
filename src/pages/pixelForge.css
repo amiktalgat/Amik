@@ -370,6 +370,24 @@
   image-rendering: pixelated;
 }
 .pf-aiPreview canvas { margin-bottom: 12px; }
+.pf-aiTextResult {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--pf-line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+.pf-aiTextResult h3 {
+  margin: 0 0 8px;
+  color: var(--pf-muted);
+  font-size: 12px;
+}
+.pf-aiTextResult p {
+  margin: 0;
+  color: var(--pf-text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
 .pf-aiConvertControls {
   display: grid;
   grid-template-columns: 1fr 1fr;

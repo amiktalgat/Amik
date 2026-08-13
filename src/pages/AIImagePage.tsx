@@ -1,73 +1,65 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { AIImageGenerator } from '../components/pixel-forge/AIImageGenerator';
-import { downloadPng } from '../lib/pixelExport';
-import { renderPixelArt, type PixelSettings } from '../lib/pixelForge';
-import type { AIImageResult, AIImageSize } from '../lib/aiImageProvider';
-import { defaultCustomPalette } from '../lib/pixelPalettes';
+import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import './pixelForge.css';
-import '../components/pixel-forge/paletteControls.css';
 
-const defaultSettings: PixelSettings = {
-  pixelSize: 32,
-  colorCount: 16,
-  paletteId: 'original',
-  customPalette: defaultCustomPalette,
-  dithering: 'none',
+type AITextResponse = {
+  text?: string;
+  error?: string;
 };
 
+const systemPrompt = [
+  'Ты генератор картинок.',
+  'Придумывай безопасное описание картинки по теме пользователя.',
+  'Не генерируй плохие картинки: жестокость, ненависть, опасные действия, сексуальный контент и травлю.',
+  'Если тема плохая, предложи безопасную добрую альтернативу.',
+].join(' ');
+
 export function AIImagePage() {
-  const [image, setImage] = useState<AIImageResult | null>(null);
-  const [settings, setSettings] = useState<PixelSettings>(defaultSettings);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [result, setResult] = useState('');
   const [status, setStatus] = useState('AI generator ready');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const receiveImage = (nextImage: AIImageResult, prompt: string, size: AIImageSize) => {
-    setImage(nextImage);
-    setSettings((current) => ({ ...current, pixelSize: (1024 / size) as PixelSettings['pixelSize'] }));
-    setStatus(`Generated: ${prompt.slice(0, 40)}${prompt.length > 40 ? '...' : ''}`);
-  };
-
-  const downloadOriginal = () => {
-    if (!image) {
-      setStatus('Generate an image first');
+  async function generateImageIdea() {
+    const cleanPrompt = prompt.trim();
+    if (!cleanPrompt) {
+      setStatus('Напиши тему для картинки');
       return;
     }
 
-    const link = document.createElement('a');
-    link.href = image.imageDataUrl;
-    link.download = 'ai-image-original.png';
-    link.click();
-    setStatus('Original image downloaded');
-  };
-
-  const downloadPixelArt = () => {
-    if (!image) {
-      setStatus('Generate an image first');
+    if (!isSupabaseConfigured) {
+      setStatus('Supabase is not configured');
       return;
     }
 
-    const sourceImage = new Image();
-    sourceImage.onload = () => {
-      const sourceCanvas = document.createElement('canvas');
-      const pixelCanvas = document.createElement('canvas');
-      sourceCanvas.width = sourceImage.naturalWidth;
-      sourceCanvas.height = sourceImage.naturalHeight;
-      sourceCanvas.getContext('2d')?.drawImage(sourceImage, 0, 0);
-      renderPixelArt(pixelCanvas, sourceCanvas, settings);
-      downloadPng(pixelCanvas, 'ai-image-pixel-art.png');
-      setStatus('Pixel art downloaded');
-    };
-    sourceImage.onerror = () => setStatus('Image could not be converted');
-    sourceImage.src = image.imageDataUrl;
-  };
+    setIsGenerating(true);
+    setStatus('Generating...');
+
+    const { data, error } = await supabase.functions.invoke<AITextResponse>('ai', {
+      body: {
+        prompt: `Сгенерируй картинку по теме: ${cleanPrompt}`,
+        system: systemPrompt,
+      },
+    });
+
+    if (error) {
+      setStatus(error.message);
+      setIsGenerating(false);
+      return;
+    }
+
+    setResult(data?.text ?? data?.error ?? 'AI returned empty text');
+    setStatus('Done');
+    setIsGenerating(false);
+  }
 
   return (
     <div className="pf-app pf-aiPage">
       <header className="pf-topbar">
         <div className="pf-brand">
           <span className="pf-brandMark" />
-          AI Image Generator
+          AI Image Ideas
         </div>
         <nav className="pf-actions">
           <Link href="/pixel-forge">Editor</Link>
@@ -75,24 +67,34 @@ export function AIImagePage() {
         </nav>
       </header>
       <main className="pf-aiPageMain">
-        <AIImageGenerator
-          conversionSettings={settings}
-          customPalette={settings.customPalette}
-          image={image}
-          isGenerating={isGenerating}
-          convertLabel="Download Pixel Art"
-          onConversionSettingsChange={setSettings}
-          onConvertImage={downloadPixelArt}
-          onDownloadOriginal={downloadOriginal}
-          onGeneratingChange={setIsGenerating}
-          onImage={receiveImage}
-          onStatus={setStatus}
-        />
+        <section className="pf-aiPanel">
+          <h2>Generate Image By Topic</h2>
+          <label>
+            Theme
+            <textarea
+              rows={4}
+              value={prompt}
+              placeholder="Например: космический кот, город будущего, магический лес"
+              onChange={(event) => setPrompt(event.target.value)}
+            />
+          </label>
+          <div className="pf-aiActions">
+            <button className="pf-primary" type="button" disabled={isGenerating} onClick={() => void generateImageIdea()}>
+              {isGenerating ? 'Generating...' : 'Generate'}
+            </button>
+          </div>
+          {result && (
+            <article className="pf-aiTextResult">
+              <h3>Result</h3>
+              <p>{result}</p>
+            </article>
+          )}
+        </section>
       </main>
       <footer className="pf-statusbar">
         <span>{status}</span>
-        <span>Generator</span>
-        <span>{image ? 'Image ready' : 'No image yet'}</span>
+        <span>Gemini</span>
+        <span>{result ? 'Text ready' : 'No result yet'}</span>
       </footer>
     </div>
   );
