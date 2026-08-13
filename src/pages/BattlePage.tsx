@@ -172,10 +172,11 @@ export function BattlePage() {
     const size = isOwner ? brushSize : 1;
     const previousPixels = getBrushPixels(pixels, x, y, size);
     const optimisticPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
+    const newPixelCount = Math.max(0, optimisticPixels.length - previousPixels.length);
     const optimisticProfile = {
       ...profile,
       balance: isOwner ? MAX_BALANCE : profile.balance - 1,
-      placed_pixels: tool === 'erase' ? profile.placed_pixels : profile.placed_pixels + optimisticPixels.length,
+      placed_pixels: tool === 'erase' ? profile.placed_pixels : profile.placed_pixels + newPixelCount,
     };
 
     setPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase'));
@@ -186,9 +187,9 @@ export function BattlePage() {
           ...current,
           canvasPixels: tool === 'erase'
             ? Math.max(0, current.canvasPixels - previousPixels.length)
-            : current.canvasPixels + Math.max(0, optimisticPixels.length - previousPixels.length),
-          placedPixels: tool === 'erase' ? current.placedPixels : current.placedPixels + optimisticPixels.length,
-          myPixels: tool === 'erase' ? current.myPixels : current.myPixels + optimisticPixels.length,
+            : current.canvasPixels + newPixelCount,
+          placedPixels: tool === 'erase' ? current.placedPixels : current.placedPixels + newPixelCount,
+          myPixels: tool === 'erase' ? current.myPixels : current.myPixels + newPixelCount,
         }
       : current);
     setNotice(tool === 'erase' ? 'Pixels erased!' : 'Pixel placed!');
