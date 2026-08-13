@@ -7,7 +7,7 @@ type OwnerToolsProps = {
   onToolChange: (tool: BattleTool) => void;
 };
 
-const brushSizes = [1, 2, 3, 4, 6, 8, 12];
+const brushSizes = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48];
 
 export function OwnerTools({ brushSize, tool, onBrushSizeChange, onToolChange }: OwnerToolsProps) {
   return (
