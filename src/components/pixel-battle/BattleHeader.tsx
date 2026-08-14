@@ -1,5 +1,5 @@
-import { Link } from 'wouter';
 import type { User } from '@supabase/supabase-js';
+import { Link } from 'wouter';
 import type { BattleStats } from '../../lib/pixelBattle';
 
 type BattleHeaderProps = {
@@ -18,7 +18,7 @@ export function BattleHeader({ user, onlineCount, stats, onSignOut }: BattleHead
         <span>Placed: {stats?.placedPixels ?? 0}</span>
       </div>
       <nav className="battle-header__nav">
-        <Link href="/">Главное меню</Link>
+        <Link href="/">Menu</Link>
         <Link href="/profile">Profile</Link>
         {user ? (
           <button className="battle-text-button" type="button" onClick={onSignOut}>

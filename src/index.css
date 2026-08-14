@@ -7,6 +7,7 @@
   --mint: #ecab37;
   --line: #3d4f97;
   --wash: #9fbee7;
+  --carbon: #21242e;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--ink);
 }

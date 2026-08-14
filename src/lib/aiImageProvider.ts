@@ -1,3 +1,5 @@
+import { isSupabaseConfigured, supabase } from './supabase';
+
 export type AIImageStyle = 'Pixel Art' | '8-bit' | '16-bit' | 'Retro' | 'GameBoy' | 'Fantasy' | 'Cyberpunk';
 export type AIImageSize = 16 | 32 | 64;
 
@@ -36,13 +38,13 @@ export function aiErrorMessage(error: unknown) {
   if (!(error instanceof AIImageError)) return 'AI image generation failed. Please try again.';
 
   const messages: Record<AIImageErrorCode, string> = {
-    not_configured: 'AI provider is not configured.',
+    not_configured: 'Supabase or Gemini is not configured yet.',
     empty_prompt: 'Write a prompt before generating.',
     rate_limited: 'The AI provider is rate limited. Try again in a minute.',
     unavailable: 'The AI provider is unavailable right now.',
     timeout: 'Generation timed out. Try a smaller prompt or generate again.',
     network: 'Network error. Check your connection and try again.',
-    invalid_response: 'The AI provider returned an invalid response.',
+    invalid_response: 'The AI provider returned no image.',
     api_error: error.message || 'AI provider returned an error.',
   };
 
@@ -52,64 +54,36 @@ export function aiErrorMessage(error: unknown) {
 export async function generateAIImage(prompt: string, options: AIImageOptions): Promise<AIImageResult> {
   const cleanPrompt = prompt.trim();
   if (!cleanPrompt) throw new AIImageError('empty_prompt', 'Prompt is empty.');
+  if (!isSupabaseConfigured) throw new AIImageError('not_configured', 'Supabase is not configured.');
 
-  let response: Response;
+  const abortPromise = new Promise<never>((_, reject) => {
+    options.signal?.addEventListener('abort', () => {
+      reject(new AIImageError('timeout', 'The request timed out.'));
+    }, { once: true });
+  });
+
   try {
-    response = await fetch('/api/ai-image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: cleanPrompt,
-        style: options.style,
-        size: options.size,
+    const { data, error } = await Promise.race([
+      supabase.functions.invoke<unknown>('ai', {
+        body: {
+          mode: 'image',
+          prompt: cleanPrompt,
+          style: options.style,
+          size: options.size,
+        },
       }),
-      signal: options.signal,
-    });
+      abortPromise,
+    ]);
+
+    if (error) throw new AIImageError('api_error', error.message);
+    if (isAIErrorPayload(data)) throw new AIImageError(data.code ?? 'api_error', data.error);
+    if (!isAIImagePayload(data)) throw new AIImageError('invalid_response', 'Missing image data.');
+
+    return data;
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new AIImageError('timeout', 'The request timed out.');
-    }
+    if (error instanceof AIImageError) throw error;
     throw new AIImageError('network', 'Could not reach the AI provider.');
   }
-
-  const payload = await readJson(response);
-  if (isAIErrorPayload(payload)) {
-    throw new AIImageError(payload.code ?? statusToCode(response.status), payload.error);
-  }
-
-  if (!response.ok) {
-    throw new AIImageError(statusToCode(response.status), errorFromPayload(payload));
-  }
-
-  if (!isAIImagePayload(payload)) {
-    throw new AIImageError('invalid_response', 'Missing image data.');
-  }
-
-  return payload;
-}
-
-async function readJson(response: Response): Promise<unknown> {
-  try {
-    return await response.json();
-  } catch {
-    throw new AIImageError('invalid_response', 'Response was not valid JSON.');
-  }
-}
-
-function statusToCode(status: number): AIImageErrorCode {
-  if (status === 400) return 'empty_prompt';
-  if (status === 404 || status === 501) return 'not_configured';
-  if (status === 408 || status === 504) return 'timeout';
-  if (status === 429) return 'rate_limited';
-  if (status === 503) return 'unavailable';
-  return 'api_error';
-}
-
-function errorFromPayload(payload: unknown) {
-  if (payload && typeof payload === 'object' && 'error' in payload && typeof payload.error === 'string') {
-    return payload.error;
-  }
-  return 'AI provider returned an error.';
 }
 
 function isAIErrorPayload(payload: unknown): payload is { error: string; code?: AIImageErrorCode } {

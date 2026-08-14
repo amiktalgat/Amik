@@ -88,6 +88,20 @@
   border-color: var(--pf-accent);
   background: rgba(246, 141, 31, 0.12);
 }
+.pf-downloadButton {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--pf-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--pf-text);
+  padding: 9px 12px;
+  text-decoration: none;
+}
+.pf-downloadButton.disabled {
+  pointer-events: none;
+  opacity: 0.45;
+}
 
 .pf-brandMark {
   width: 24px;
@@ -459,12 +473,15 @@
   grid-column: 1;
   grid-row: 2;
   display: grid;
-  place-items: end center;
+  grid-template-columns: minmax(0, 720px) minmax(320px, 420px);
+  align-items: start;
+  justify-content: center;
+  gap: 18px;
   overflow: auto;
   padding: 28px 28px 44px;
 }
 .pf-aiPage .pf-aiPanel {
-  width: min(720px, 100%);
+  width: 100%;
   padding: 18px;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
@@ -591,6 +608,7 @@
   .pf-sectionCard, .pf-rightPanel section:last-child { grid-column: 1 / -1; }
   .pf-canvasShell { min-height: 0; }
   .pf-timelineActions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-aiPageMain { grid-template-columns: 1fr; }
 }
 
 .device-preview--mobile .pf-app {
@@ -635,4 +653,13 @@
 
 .device-preview--mobile .pf-timelineActions {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.device-preview--mobile .pf-aiPage {
+  grid-template: auto minmax(0, 1fr) auto / 1fr;
+}
+
+.device-preview--mobile .pf-aiPageMain {
+  grid-template-columns: 1fr;
+  padding: 14px;
 }
