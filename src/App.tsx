@@ -1,4 +1,5 @@
 import { Route, Switch } from 'wouter';
+import { DevicePreview } from './components/DevicePreview';
 import { RequireAuth } from './components/RequireAuth';
 import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -50,14 +51,16 @@ function ProtectedNotFoundPage() {
 
 export default function App() {
   return (
-    <Switch>
-      <Route path="/" component={ProtectedHomePage} />
-      <Route path="/battle" component={BattlePage} />
-      <Route path="/pixel-forge" component={ProtectedPixelForgePage} />
-      <Route path="/ai-image" component={ProtectedAIImagePage} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/profile" component={ProtectedProfilePage} />
-      <Route component={ProtectedNotFoundPage} />
-    </Switch>
+    <DevicePreview>
+      <Switch>
+        <Route path="/" component={ProtectedHomePage} />
+        <Route path="/battle" component={BattlePage} />
+        <Route path="/pixel-forge" component={ProtectedPixelForgePage} />
+        <Route path="/ai-image" component={ProtectedAIImagePage} />
+        <Route path="/auth" component={AuthPage} />
+        <Route path="/profile" component={ProtectedProfilePage} />
+        <Route component={ProtectedNotFoundPage} />
+      </Switch>
+    </DevicePreview>
   );
 }

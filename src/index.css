@@ -1,12 +1,12 @@
 :root {
-  --bg: #f7fbff;
+  --bg: #7a8aba;
   --card: #ffffff;
-  --ink: #172033;
-  --soft: #68758a;
-  --clay: #3f7ee8;
-  --mint: #28a790;
-  --line: #dce7f3;
-  --wash: #eef7ff;
+  --ink: #21242e;
+  --soft: #3d4f97;
+  --clay: #f68d1f;
+  --mint: #ecab37;
+  --line: #3d4f97;
+  --wash: #9fbee7;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--ink);
 }
@@ -14,6 +14,80 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { background: var(--bg); }
+
+.device-preview {
+  min-height: 100vh;
+}
+
+.device-toolbar {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 3px 0 var(--line);
+}
+
+.device-toolbar button {
+  min-height: 32px;
+  padding: 7px 10px;
+  border-color: #5a5f8c;
+  border-top-color: #ffffff;
+  border-left-color: #c0d5e6;
+  background: linear-gradient(#ffffff, #dedede);
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.device-toolbar button.active {
+  border-color: #a85000;
+  background: linear-gradient(#ffb551, var(--clay));
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #8a2d00;
+}
+
+.device-frame,
+.device-stage {
+  min-height: 100vh;
+}
+
+.device-preview--mobile {
+  display: grid;
+  place-items: start center;
+  min-height: 100vh;
+  padding: 78px 14px 28px;
+}
+
+.device-preview--mobile .device-frame {
+  width: min(390px, 100%);
+  height: min(844px, calc(100vh - 106px));
+  min-height: 560px;
+  overflow: hidden;
+  border: 8px solid var(--carbon);
+  border-radius: 26px;
+  background: var(--card);
+  box-shadow: 0 18px 42px rgba(33, 36, 46, 0.32);
+}
+
+.device-preview--mobile .device-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  transform: translateZ(0);
+}
+
+.device-preview--mobile .container,
+.device-preview--mobile .auth-page {
+  width: 100%;
+  max-width: 390px;
+}
 
 .container {
   max-width: 560px;
@@ -49,7 +123,7 @@ body { background: var(--bg); }
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 24px;
-  box-shadow: 0 10px 30px rgba(42, 88, 140, 0.08);
+  box-shadow: 0 10px 30px rgba(33, 36, 46, 0.14);
 }
 
 .card h2 { font-size: 22px; margin-bottom: 16px; }
@@ -174,9 +248,9 @@ a.auth-home-link {
   min-height: 168px;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--card);
-  box-shadow: 0 10px 30px rgba(42, 88, 140, 0.08);
+  box-shadow: 0 10px 30px rgba(33, 36, 46, 0.14);
   color: var(--ink);
   text-decoration: none;
   transition: border-color 0.18s, transform 0.18s;
@@ -216,7 +290,7 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 18px;
   background:
-    linear-gradient(135deg, rgba(63, 126, 232, 0.14), rgba(40, 167, 144, 0.16)),
+    linear-gradient(135deg, rgba(246, 141, 31, 0.14), rgba(236, 171, 55, 0.16)),
     var(--wash);
 }
 
@@ -247,7 +321,7 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 28px;
-  box-shadow: 0 18px 52px rgba(42, 88, 140, 0.12);
+  box-shadow: 0 18px 52px rgba(33, 36, 46, 0.16);
 }
 
 .auth-card h2 {

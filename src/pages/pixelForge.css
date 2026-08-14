@@ -1,13 +1,14 @@
 .pf-app {
-  --pf-bg: #f6faff;
-  --pf-line: #d8e5f2;
-  --pf-text: #172033;
-  --pf-muted: #6d7b91;
-  --pf-accent: #3f7ee8;
-  --pf-cyan: #28a790;
-  --pf-panel: #ffffff;
-  --pf-surface: #eef6ff;
-  --pf-soft: #f9fcff;
+  --pf-bg: #7a8aba;
+  --pf-line: #3d4f97;
+  --pf-text: #21242e;
+  --pf-muted: #3d4f97;
+  --pf-accent: #f68d1f;
+  --pf-cyan: #9fbee7;
+  --pf-panel: #dedede;
+  --pf-surface: #9fbee7;
+  --pf-soft: #ffffff;
+  --pf-gold: #ecab37;
   display: grid;
   grid-template: 64px minmax(360px, 52vh) auto auto auto 34px / minmax(0, 1fr);
   min-height: 100vh;
@@ -29,7 +30,11 @@
   transition: border-color 0.18s, background 0.18s, transform 0.18s;
 }
 
-.pf-app button:hover { border-color: #b8cce2; background: var(--pf-surface); transform: translateY(-1px); }
+.pf-app button:hover {
+  border-color: var(--pf-accent);
+  background: var(--pf-surface);
+  transform: translateY(-1px);
+}
 .pf-app button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
@@ -81,17 +86,21 @@
 }
 .pf-actions a.active {
   border-color: var(--pf-accent);
-  background: rgba(63, 126, 232, 0.12);
+  background: rgba(246, 141, 31, 0.12);
 }
 
 .pf-brandMark {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: conic-gradient(from 45deg, var(--pf-accent), var(--pf-cyan), #ffd166, var(--pf-accent));
+  background: conic-gradient(from 45deg, var(--pf-accent), var(--pf-cyan), var(--pf-gold), var(--pf-accent));
 }
 
-.pf-sidebar { overflow: visible; padding: 16px; background: var(--pf-panel); }
+.pf-sidebar {
+  overflow: visible;
+  padding: 16px;
+  background: var(--pf-panel);
+}
 .pf-leftPanel {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -110,7 +119,7 @@
 .pf-tool.active,
 .pf-actions button.active {
   border-color: var(--pf-accent);
-  background: rgba(63, 126, 232, 0.12);
+  background: rgba(246, 141, 31, 0.12);
 }
 
 .pf-sectionCard,
@@ -120,6 +129,7 @@
   border: 1px solid var(--pf-line);
   border-radius: 8px;
   background: var(--pf-soft);
+  box-shadow: none;
 }
 .pf-leftPanel .pf-sectionCard { grid-column: 1 / -1; }
 
@@ -135,8 +145,8 @@
   overflow: hidden;
   padding: 16px;
   background-color: var(--pf-surface);
-  background-image: linear-gradient(45deg, rgba(63, 126, 232, 0.05) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(40, 167, 144, 0.05) 25%, transparent 25%);
+  background-image: linear-gradient(45deg, rgba(246, 141, 31, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(61, 79, 151, 0.05) 25%, transparent 25%);
   background-size: 28px 28px;
 }
 
@@ -151,7 +161,7 @@
   margin: 0 auto 20px;
   border: 1px solid var(--pf-line);
   border-radius: 18px;
-  background: linear-gradient(135deg, #ffffff, #e8f4ff);
+  background: linear-gradient(135deg, #ffffff, var(--pf-surface));
   color: var(--pf-cyan);
   font-size: 28px;
   font-weight: 950;
@@ -171,7 +181,7 @@
   border: 1px solid var(--pf-line);
   border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 26px 70px rgba(42, 88, 140, 0.16);
+  box-shadow: 0 26px 70px rgba(33, 36, 46, 0.16);
 }
 
 .pf-canvasShell.hidden { display: none; }
@@ -179,12 +189,12 @@
   position: relative;
   max-width: 100%;
   max-height: 100%;
-  background-color: #f3f8ff;
+  background-color: #c0d5e6;
   background-image:
-    linear-gradient(45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%);
+    linear-gradient(45deg, rgba(61, 79, 151, 0.18) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(61, 79, 151, 0.18) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(61, 79, 151, 0.18) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(61, 79, 151, 0.18) 75%);
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
   background-size: 16px 16px;
 }
@@ -210,7 +220,7 @@
   position: absolute;
   z-index: 2;
   pointer-events: none;
-  box-shadow: inset 0 0 0 2px #ffffff, 0 0 0 1px rgba(63, 126, 232, 0.55);
+  box-shadow: inset 0 0 0 2px #ffffff, 0 0 0 1px rgba(246, 141, 31, 0.75);
 }
 
 .pf-onionSkin {
@@ -252,8 +262,8 @@
 }
 
 .pf-frameButton.active {
-  border-color: var(--pf-cyan);
-  background: rgba(40, 167, 144, 0.12);
+  border-color: var(--pf-accent);
+  background: rgba(159, 190, 231, 0.12);
 }
 
 .pf-timelineActions {
@@ -332,12 +342,12 @@
   overflow: auto;
   border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background-color: #f3f8ff;
+  background-color: #c0d5e6;
   background-image:
-    linear-gradient(45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(63, 126, 232, 0.14) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(63, 126, 232, 0.14) 75%);
+    linear-gradient(45deg, rgba(61, 79, 151, 0.18) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(61, 79, 151, 0.18) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(61, 79, 151, 0.18) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(61, 79, 151, 0.18) 75%);
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
   background-size: 16px 16px;
 }
@@ -410,11 +420,11 @@
   background: #ffffff;
 }
 .pf-aiBubble.user {
-  border-color: rgba(63, 126, 232, 0.34);
-  background: rgba(63, 126, 232, 0.08);
+  border-color: rgba(246, 141, 31, 0.5);
+  background: rgba(236, 171, 55, 0.16);
 }
 .pf-aiBubble.ai {
-  border-color: rgba(40, 167, 144, 0.34);
+  border-color: rgba(61, 79, 151, 0.5);
 }
 .pf-aiBubble h3 {
   margin: 0 0 6px;
@@ -465,7 +475,7 @@
 .pf-tileSwatch.active,
 .pf-layerItem.active {
   border-color: var(--pf-cyan);
-  background: rgba(40, 167, 144, 0.12);
+  background: rgba(159, 190, 231, 0.55);
 }
 
 .pf-tilemapWorkspace { padding: 22px; align-content: center; justify-content: center; }
@@ -476,7 +486,7 @@
   border: 1px solid var(--pf-line);
   border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 26px 70px rgba(42, 88, 140, 0.16);
+  box-shadow: 0 26px 70px rgba(33, 36, 46, 0.16);
 }
 .pf-tilemapStage canvas {
   width: 100%;
@@ -495,7 +505,7 @@
 .pf-tilemapHover {
   position: absolute;
   pointer-events: none;
-  box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(63, 126, 232, 0.65);
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 1px rgba(246, 141, 31, 0.75);
 }
 .pf-tilePalette { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .pf-tileSwatch {
@@ -552,10 +562,10 @@
   right: 18px;
   bottom: 46px;
   z-index: 10;
-  border: 1px solid rgba(40, 167, 144, 0.34);
+  border: 1px solid var(--pf-line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 18px 46px rgba(42, 88, 140, 0.18);
+  background: #ffffff;
+  box-shadow: 0 18px 46px rgba(33, 36, 46, 0.18);
   color: var(--pf-text);
   font-size: 13px;
   font-weight: 800;
@@ -581,4 +591,48 @@
   .pf-sectionCard, .pf-rightPanel section:last-child { grid-column: 1 / -1; }
   .pf-canvasShell { min-height: 0; }
   .pf-timelineActions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.device-preview--mobile .pf-app {
+  grid-template: auto minmax(360px, 48vh) auto auto auto auto / 1fr;
+  min-height: 100%;
+}
+
+.device-preview--mobile .pf-topbar,
+.device-preview--mobile .pf-actions {
+  flex-wrap: wrap;
+}
+
+.device-preview--mobile .pf-leftPanel,
+.device-preview--mobile .pf-workspace,
+.device-preview--mobile .pf-timeline,
+.device-preview--mobile .pf-rightPanel,
+.device-preview--mobile .pf-statusbar {
+  grid-column: 1;
+}
+
+.device-preview--mobile .pf-workspace { grid-row: 2; }
+.device-preview--mobile .pf-rightPanel { grid-row: 3; }
+.device-preview--mobile .pf-timeline { grid-row: 4; }
+.device-preview--mobile .pf-leftPanel { grid-row: 5; }
+.device-preview--mobile .pf-statusbar { grid-row: 6; }
+
+.device-preview--mobile .pf-sidebar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: 0;
+}
+
+.device-preview--mobile .pf-sectionCard,
+.device-preview--mobile .pf-rightPanel section:last-child {
+  grid-column: 1 / -1;
+}
+
+.device-preview--mobile .pf-canvasShell {
+  min-height: 0;
+}
+
+.device-preview--mobile .pf-timelineActions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
