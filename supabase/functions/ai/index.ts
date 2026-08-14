@@ -88,17 +88,15 @@ async function generateImage(body: AIRequest) {
   if (!prompt) return json({ error: 'Write a prompt before generating.', code: 'empty_prompt' }, 400);
   if (prompt.length > 2_000) return json({ error: 'The prompt is too long.', code: 'empty_prompt' }, 400);
 
-  const data = await callGemini(IMAGE_MODEL, 'v1', {
-    contents: [{ parts: [{ text: buildImagePrompt(prompt, style, size) }] }],
-    generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE'],
-      responseFormat: {
-        image: {
-          aspectRatio,
-        },
-      },
-    },
-  });
+  let data: GeminiResponse;
+  try {
+    data = await callGemini(IMAGE_MODEL, 'v1', {
+      contents: [{ parts: [{ text: buildImagePrompt(prompt, style, size, aspectRatio) }] }],
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Gemini image generation failed.';
+    return json({ error: message.slice(0, 180), code: 'api_error' }, 502);
+  }
 
   const image = findImagePart(data);
   if (!image) {
@@ -122,10 +120,11 @@ async function callGemini(model: string, version: 'v1' | 'v1beta', body: object)
     },
   );
 
-  const data = (await response.json()) as GeminiResponse;
+  const data = (await response.json()) as GeminiResponse & { error?: { message?: unknown } };
   if (!response.ok) {
     console.error('Gemini request failed', response.status, data);
-    throw new Error(`Gemini failed with ${response.status}`);
+    const message = typeof data.error?.message === 'string' ? data.error.message : `Gemini failed with ${response.status}`;
+    throw new Error(message);
   }
   return data;
 }
@@ -142,13 +141,14 @@ function findImagePart(data: GeminiResponse) {
   return null;
 }
 
-function buildImagePrompt(prompt: string, style: string, size: number) {
+function buildImagePrompt(prompt: string, style: string, size: number, aspectRatio: string) {
   const pixelStyles = new Set(['Pixel Art', '8-bit', '16-bit', 'Retro']);
   if (pixelStyles.has(style)) {
     return [
       prompt,
       `Style: ${style}.`,
       `Create clean pixel art for an editable ${size}x${size} sprite.`,
+      `Composition: ${aspectRatio} aspect ratio.`,
       'Use readable shapes, limited colors, no text, no watermark, and a simple background.',
     ].join(' ');
   }
@@ -156,6 +156,7 @@ function buildImagePrompt(prompt: string, style: string, size: number) {
   return [
     prompt,
     `Style: ${style}.`,
+    `Composition: ${aspectRatio} aspect ratio.`,
     'Create a polished finished image, not pixel art unless the user explicitly asks for it.',
     'Use clear composition, no text, no watermark, and keep it safe for teens.',
   ].join(' ');
