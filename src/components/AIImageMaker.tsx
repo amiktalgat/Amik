@@ -2,13 +2,29 @@ import { useState } from 'react';
 import {
   aiErrorMessage,
   generateAIImage,
+  type AIImageAspectRatio,
   type AIImageResult,
   type AIImageSize,
   type AIImageStyle,
 } from '../lib/aiImageProvider';
 
-const styles: AIImageStyle[] = ['Pixel Art', '8-bit', '16-bit', 'Retro', 'GameBoy', 'Fantasy', 'Cyberpunk'];
+const styles: AIImageStyle[] = [
+  'Photo',
+  'Illustration',
+  'Anime',
+  '3D Render',
+  'Watercolor',
+  'Sticker',
+  'Pixel Art',
+  '8-bit',
+  '16-bit',
+  'Retro',
+  'Fantasy',
+  'Cyberpunk',
+];
 const sizes: AIImageSize[] = [16, 32, 64];
+const aspectRatios: AIImageAspectRatio[] = ['1:1', '16:9', '9:16', '4:3', '3:4'];
+const pixelStyles = new Set<AIImageStyle>(['Pixel Art', '8-bit', '16-bit', 'Retro']);
 
 type AIImageMakerProps = {
   onStatus: (status: string) => void;
@@ -16,8 +32,9 @@ type AIImageMakerProps = {
 
 export function AIImageMaker({ onStatus }: AIImageMakerProps) {
   const [prompt, setPrompt] = useState('');
-  const [style, setStyle] = useState<AIImageStyle>('Pixel Art');
+  const [style, setStyle] = useState<AIImageStyle>('Illustration');
   const [size, setSize] = useState<AIImageSize>(32);
+  const [aspectRatio, setAspectRatio] = useState<AIImageAspectRatio>('1:1');
   const [image, setImage] = useState<AIImageResult | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [message, setMessage] = useState('Ready to create a picture');
@@ -37,7 +54,7 @@ export function AIImageMaker({ onStatus }: AIImageMakerProps) {
     onStatus('AI picture generation started');
 
     try {
-      const result = await generateAIImage(cleanPrompt, { style, size, signal: controller.signal });
+      const result = await generateAIImage(cleanPrompt, { aspectRatio, style, size, signal: controller.signal });
       setImage(result);
       setMessage('Picture is ready');
       onStatus('AI picture is ready');
@@ -64,13 +81,16 @@ export function AIImageMaker({ onStatus }: AIImageMakerProps) {
         />
       </label>
       <Picker label="Style" options={styles} value={style} onChange={setStyle} />
-      <Picker
-        label="Sprite size"
-        options={sizes}
-        value={size}
-        format={(value) => `${value}x${value}`}
-        onChange={setSize}
-      />
+      <Picker label="Format" options={aspectRatios} value={aspectRatio} onChange={setAspectRatio} />
+      {pixelStyles.has(style) && (
+        <Picker
+          label="Pixel sprite hint"
+          options={sizes}
+          value={size}
+          format={(value) => `${value}x${value}`}
+          onChange={setSize}
+        />
+      )}
       <div className="pf-aiActions">
         <button className="pf-primary" type="button" disabled={isGenerating} onClick={() => void createImage()}>
           {isGenerating ? 'Drawing...' : 'Make Picture'}

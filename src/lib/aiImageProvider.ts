@@ -1,11 +1,26 @@
 import { isSupabaseConfigured, supabase } from './supabase';
 
-export type AIImageStyle = 'Pixel Art' | '8-bit' | '16-bit' | 'Retro' | 'GameBoy' | 'Fantasy' | 'Cyberpunk';
+export type AIImageStyle =
+  | 'Photo'
+  | 'Illustration'
+  | 'Anime'
+  | '3D Render'
+  | 'Watercolor'
+  | 'Sticker'
+  | 'Pixel Art'
+  | '8-bit'
+  | '16-bit'
+  | 'GameBoy'
+  | 'Retro'
+  | 'Fantasy'
+  | 'Cyberpunk';
 export type AIImageSize = 16 | 32 | 64;
+export type AIImageAspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
 
 export type AIImageOptions = {
   style: AIImageStyle;
   size: AIImageSize;
+  aspectRatio?: AIImageAspectRatio;
   signal?: AbortSignal;
 };
 
@@ -70,6 +85,7 @@ export async function generateAIImage(prompt: string, options: AIImageOptions): 
           prompt: cleanPrompt,
           style: options.style,
           size: options.size,
+          aspectRatio: options.aspectRatio ?? '1:1',
         },
       }),
       abortPromise,

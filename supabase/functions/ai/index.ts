@@ -13,6 +13,7 @@ type AIRequest = {
   system?: unknown;
   style?: unknown;
   size?: unknown;
+  aspectRatio?: unknown;
 };
 
 type GeminiPart = {
@@ -82,6 +83,7 @@ async function generateImage(body: AIRequest) {
   const prompt = cleanString(body.prompt);
   const style = cleanImageStyle(body.style);
   const size = cleanImageSize(body.size);
+  const aspectRatio = cleanAspectRatio(body.aspectRatio);
 
   if (!prompt) return json({ error: 'Write a prompt before generating.', code: 'empty_prompt' }, 400);
   if (prompt.length > 2_000) return json({ error: 'The prompt is too long.', code: 'empty_prompt' }, 400);
@@ -90,6 +92,11 @@ async function generateImage(body: AIRequest) {
     contents: [{ parts: [{ text: buildImagePrompt(prompt, style, size) }] }],
     generationConfig: {
       responseModalities: ['TEXT', 'IMAGE'],
+      responseFormat: {
+        image: {
+          aspectRatio,
+        },
+      },
     },
   });
 
@@ -136,11 +143,21 @@ function findImagePart(data: GeminiResponse) {
 }
 
 function buildImagePrompt(prompt: string, style: string, size: number) {
+  const pixelStyles = new Set(['Pixel Art', '8-bit', '16-bit', 'Retro']);
+  if (pixelStyles.has(style)) {
+    return [
+      prompt,
+      `Style: ${style}.`,
+      `Create clean pixel art for an editable ${size}x${size} sprite.`,
+      'Use readable shapes, limited colors, no text, no watermark, and a simple background.',
+    ].join(' ');
+  }
+
   return [
     prompt,
     `Style: ${style}.`,
-    `Create a clean square pixel-art source image for an editable ${size}x${size} sprite.`,
-    'Use readable shapes, limited colors, no text, no watermark, and a simple background.',
+    'Create a polished finished image, not pixel art unless the user explicitly asks for it.',
+    'Use clear composition, no text, no watermark, and keep it safe for teens.',
   ].join(' ');
 }
 
@@ -149,11 +166,30 @@ function cleanString(value: unknown) {
 }
 
 function cleanImageStyle(value: unknown) {
-  const styles = new Set(['Pixel Art', '8-bit', '16-bit', 'Retro', 'GameBoy', 'Fantasy', 'Cyberpunk']);
-  return typeof value === 'string' && styles.has(value) ? value : 'Pixel Art';
+  const styles = new Set([
+    'Photo',
+    'Illustration',
+    'Anime',
+    '3D Render',
+    'Watercolor',
+    'Sticker',
+    'Pixel Art',
+    '8-bit',
+    '16-bit',
+    'GameBoy',
+    'Retro',
+    'Fantasy',
+    'Cyberpunk',
+  ]);
+  return typeof value === 'string' && styles.has(value) ? value : 'Illustration';
 }
 
 function cleanImageSize(value: unknown) {
   const size = Number(value);
   return size === 16 || size === 32 || size === 64 ? size : 32;
+}
+
+function cleanAspectRatio(value: unknown) {
+  const ratios = new Set(['1:1', '16:9', '9:16', '4:3', '3:4']);
+  return typeof value === 'string' && ratios.has(value) ? value : '1:1';
 }
