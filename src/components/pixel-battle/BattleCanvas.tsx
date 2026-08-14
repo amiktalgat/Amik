@@ -12,6 +12,7 @@ type BattleCanvasProps = {
   onCameraChange: (camera: Camera) => void;
   onCursorChange: (cursor: { x: number; y: number } | null) => void;
   onPlace: (x: number, y: number) => void;
+  onSizeChange: (size: { width: number; height: number }) => void;
 };
 
 type PointerState = {
@@ -24,6 +25,7 @@ type PointerState = {
 };
 
 export function BattleCanvas(props: BattleCanvasProps) {
+  const { onSizeChange } = props;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pointers = useRef(new Map<number, PointerState>());
   const pinchDistance = useRef<number | null>(null);
@@ -42,6 +44,10 @@ export function BattleCanvas(props: BattleCanvasProps) {
     observer.observe(canvas);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    onSizeChange(size);
+  }, [onSizeChange, size]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

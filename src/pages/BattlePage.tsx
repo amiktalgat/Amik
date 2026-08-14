@@ -42,23 +42,24 @@ export function BattlePage() {
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [color, setColor] = useState(() => localStorage.getItem(colorStorageKey) ?? '#ef4444');
   const [brushSize, setBrushSize] = useState(1);
+  const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [tool, setTool] = useState<BattleTool>('paint');
   const [notice, setNotice] = useState('Connecting...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
 
   const bounds = useMemo(() => {
-    const worldWidth = window.innerWidth / camera.zoom;
-    const worldHeight = window.innerHeight / camera.zoom;
+    const worldWidth = canvasSize.width / camera.zoom;
+    const worldHeight = canvasSize.height / camera.zoom;
     return getChunkBounds(camera.x, camera.y, worldWidth, worldHeight);
-  }, [camera]);
+  }, [camera, canvasSize]);
 
   const visibleView = useMemo(() => ({
-    x: clamp(camera.x - window.innerWidth / 2 / camera.zoom, 0, CANVAS_SIZE),
-    y: clamp(camera.y - window.innerHeight / 2 / camera.zoom, 0, CANVAS_SIZE),
-    width: clamp(window.innerWidth / camera.zoom, 1, CANVAS_SIZE),
-    height: clamp(window.innerHeight / camera.zoom, 1, CANVAS_SIZE),
-  }), [camera]);
+    x: clamp(camera.x - canvasSize.width / 2 / camera.zoom, 0, CANVAS_SIZE),
+    y: clamp(camera.y - canvasSize.height / 2 / camera.zoom, 0, CANVAS_SIZE),
+    width: clamp(canvasSize.width / camera.zoom, 1, CANVAS_SIZE),
+    height: clamp(canvasSize.height / camera.zoom, 1, CANVAS_SIZE),
+  }), [camera, canvasSize]);
 
   const nextBonusText = useMemo(() => {
     if (!profile?.last_daily_bonus_at) return 'today';
@@ -170,8 +171,14 @@ export function BattlePage() {
     }
 
     const size = isOwner ? brushSize : 1;
-    const previousPixels = getBrushPixels(pixels, x, y, size);
-    const optimisticPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
+    const brushPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
+    const optimisticPixels = getChangedBrushPixels(pixels, brushPixels, tool);
+    if (optimisticPixels.length === 0) {
+      setNotice(tool === 'erase' ? 'Nothing to erase here.' : 'This pixel already has that color.');
+      return;
+    }
+
+    const previousPixels = getBrushPixels(pixels, optimisticPixels);
     const newCanvasPixelCount = Math.max(0, optimisticPixels.length - previousPixels.length);
     const placedPixelCount = optimisticPixels.length;
     const optimisticProfile = {
@@ -227,12 +234,13 @@ export function BattlePage() {
       <BattleHeader user={user} onlineCount={onlineCount} stats={stats} onSignOut={handleSignOut} />
       <BattleCanvas
         camera={camera}
-        canPlace={Boolean(user && profile && profile.balance > 0)}
+        canPlace={Boolean(user && profile && (isOwner || profile.balance > 0))}
         color={color}
         pixels={pixels}
         onCameraChange={setCamera}
         onCursorChange={setCursor}
         onPlace={handlePlace}
+        onSizeChange={setCanvasSize}
       />
       <aside className="battle-sidebar">
         <BattleHud
@@ -303,9 +311,17 @@ function makeBrushPixels(x: number, y: number, size: number, color: string, user
   return nextPixels;
 }
 
-function getBrushPixels(pixels: BattlePixel[], x: number, y: number, size: number) {
-  const brushKeys = new Set(makeBrushPixels(x, y, size, '#000000', '').map(pixelKey));
+function getBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[]) {
+  const brushKeys = new Set(brushPixels.map(pixelKey));
   return pixels.filter((pixel) => brushKeys.has(pixelKey(pixel)));
+}
+
+function getChangedBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], tool: BattleTool) {
+  const currentByKey = new Map(pixels.map((pixel) => [pixelKey(pixel), pixel.color.toUpperCase()]));
+  return brushPixels.filter((pixel) => {
+    const currentColor = currentByKey.get(pixelKey(pixel));
+    return tool === 'erase' ? Boolean(currentColor) : currentColor !== pixel.color.toUpperCase();
+  });
 }
 
 function applyBrushPixels(pixels: BattlePixel[], brushPixels: BattlePixel[], erase: boolean) {
