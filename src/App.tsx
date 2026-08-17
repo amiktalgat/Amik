@@ -63,6 +63,7 @@ export default function App() {
         <Route path="/register" component={RegisterPage} />
         <Route path="/signup" component={RegisterPage} />
         <Route path="/choose" component={ProtectedChooseWorkspacePage} />
+        <Route path="/menu" component={ProtectedChooseWorkspacePage} />
         <Route path="/profile" component={ProtectedProfilePage} />
         <Route component={ProtectedNotFoundPage} />
       </Switch>

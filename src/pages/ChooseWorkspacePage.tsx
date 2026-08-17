@@ -22,9 +22,9 @@ export function ChooseWorkspacePage() {
   return (
     <main className="container choice-page">
       <section className="choice-hero">
-        <p className="eyebrow">Choose your start</p>
-        <h1>What do you want to open first?</h1>
-        <p>Pick one tool now. You can switch to the others later from the app.</p>
+        <p className="eyebrow">Main menu</p>
+        <h1>Choose one of three pages</h1>
+        <p>Open AI pictures, Pixel Battle, or the pixel editor. You can come back here later.</p>
       </section>
 
       <section className="choice-grid" aria-label="Choose workspace">

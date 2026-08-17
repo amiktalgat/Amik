@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 
 function getNextPath() {
   const next = new URLSearchParams(window.location.search).get('next');
-  return next?.startsWith('/') ? next : '/pixel-forge';
+  return next?.startsWith('/') ? next : '/choose';
 }
 
 export function AuthPage() {
