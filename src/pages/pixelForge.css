@@ -96,22 +96,6 @@
   background: rgba(246, 141, 31, 0.16);
 }
 
-.pf-menuOverlay {
-  position: fixed;
-  z-index: 11;
-  inset: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  cursor: default;
-}
-
-.pf-menuOverlay:hover {
-  background: transparent;
-  transform: none;
-}
-
 .pf-menuDrawer {
   position: fixed;
   z-index: 12;

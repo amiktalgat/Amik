@@ -686,16 +686,13 @@ export function PixelForgePage() {
       ) : (
         <>
           {isMenuOpen && (
-            <>
-              <button className="pf-menuOverlay" type="button" aria-label="Close menu" onClick={() => setIsMenuOpen(false)} />
-              <aside className="pf-menuDrawer" aria-label="Editor menu">
-                <div className="pf-menuDrawer__header">
-                  <h2>{activeMenuLabel}</h2>
-                  <button type="button" onClick={() => setIsMenuOpen(false)}>Close</button>
-                </div>
-                {editorControls}
-              </aside>
-            </>
+            <aside className="pf-menuDrawer" aria-label="Editor menu">
+              <div className="pf-menuDrawer__header">
+                <h2>{activeMenuLabel}</h2>
+                <button type="button" onClick={() => setIsMenuOpen(false)}>Close</button>
+              </div>
+              {editorControls}
+            </aside>
           )}
           <PixelForgeWorkspace
             canvasRef={canvasRef}
