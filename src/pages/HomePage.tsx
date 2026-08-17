@@ -35,10 +35,10 @@ export function HomePage() {
           <h2>Start creating</h2>
           <p>Make an account to save your art and Battle progress, or sign in if you already have one.</p>
           <div className="home-auth-actions">
-            <Link className="home-auth-button home-auth-button--primary" href="/auth?mode=signup">
+            <Link className="home-auth-button home-auth-button--primary" href="/register">
               Create account
             </Link>
-            <Link className="home-auth-button" href="/auth?mode=signin">
+            <Link className="home-auth-button" href="/auth">
               Sign in
             </Link>
           </div>

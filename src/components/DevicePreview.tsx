@@ -9,6 +9,7 @@ type DevicePreviewProps = {
 const storageKey = 'amikDeviceMode';
 
 export function DevicePreview({ children }: DevicePreviewProps) {
+  const [isToolbarOpen, setIsToolbarOpen] = useState(false);
   const [mode, setMode] = useState<DeviceMode>(() => {
     const savedMode = localStorage.getItem(storageKey);
     return savedMode === 'mobile' ? 'mobile' : 'desktop';
@@ -20,21 +21,38 @@ export function DevicePreview({ children }: DevicePreviewProps) {
 
   return (
     <div className={`device-preview device-preview--${mode}`}>
-      <div className="device-toolbar" aria-label="Preview mode">
+      <div className={`device-toolbar ${isToolbarOpen ? 'open' : ''}`} aria-label="Preview mode">
         <button
-          className={mode === 'desktop' ? 'active' : ''}
+          className="device-toolbar__toggle"
           type="button"
-          onClick={() => setMode('desktop')}
+          onClick={() => setIsToolbarOpen((current) => !current)}
         >
-          Desktop
+          View
         </button>
-        <button
-          className={mode === 'mobile' ? 'active' : ''}
-          type="button"
-          onClick={() => setMode('mobile')}
-        >
-          Mobile
-        </button>
+        {isToolbarOpen && (
+          <div className="device-toolbar__options">
+            <button
+              className={mode === 'desktop' ? 'active' : ''}
+              type="button"
+              onClick={() => {
+                setMode('desktop');
+                setIsToolbarOpen(false);
+              }}
+            >
+              Desktop
+            </button>
+            <button
+              className={mode === 'mobile' ? 'active' : ''}
+              type="button"
+              onClick={() => {
+                setMode('mobile');
+                setIsToolbarOpen(false);
+              }}
+            >
+              Mobile
+            </button>
+          </div>
+        )}
       </div>
       <div className="device-frame">
         <div className="device-stage">{children}</div>

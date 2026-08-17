@@ -12,7 +12,6 @@ import { OwnerTools } from '../components/pixel-battle/OwnerTools';
 import { ZoomControls } from '../components/pixel-battle/ZoomControls';
 import { useAuthSession } from '../lib/auth';
 import {
-  BATTLE_OWNER_EMAIL,
   CANVAS_SIZE,
   DAILY_BONUS_HOURS,
   MAX_BALANCE,
@@ -25,6 +24,9 @@ import {
   loadMiniMapPixels,
   loadVisiblePixels,
   placeBattlePixel,
+  isBattleHelper,
+  isBattleOwner,
+  isBattlePrivileged,
   type BattleTool,
   type BattleLeaderboardEntry,
   type BattlePixel,
@@ -61,6 +63,8 @@ export function BattlePage() {
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [referenceImageUrl, setReferenceImageUrl] = useState('');
   const [referenceOpacity, setReferenceOpacity] = useState(0.35);
+  const [referencePosition, setReferencePosition] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
+  const [referenceScale, setReferenceScale] = useState(1);
   const visibleLoadId = useRef(0);
 
   const bounds = useMemo(() => {
@@ -90,7 +94,10 @@ export function BattlePage() {
     return `in ${clamp(secondsLeft, 0, rechargeSeconds).toFixed(1)}s`;
   }, [profile, tick]);
 
-  const isOwner = profile?.email.toLowerCase() === BATTLE_OWNER_EMAIL;
+  const isOwner = isBattleOwner(profile?.email);
+  const isHelper = isBattleHelper(profile?.email);
+  const hasPowerTools = isBattlePrivileged(profile?.email);
+  const canUseLargeEraser = isOwner;
 
   useEffect(() => {
     localStorage.setItem(colorStorageKey, color);
@@ -201,12 +208,12 @@ export function BattlePage() {
       await refreshProfile();
       return;
     }
-    if (!isOwner && profile.balance <= 0) {
+    if (!hasPowerTools && profile.balance <= 0) {
       setNotice('Not enough pixels');
       return;
     }
 
-    const size = isOwner ? brushSize : 1;
+    const size = getAllowedBrushSize(brushSize, tool, hasPowerTools, canUseLargeEraser);
     const brushPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
     const optimisticPixels = tool === 'erase' ? brushPixels : getChangedBrushPixels(pixels, brushPixels, tool);
     if (optimisticPixels.length === 0) {
@@ -219,7 +226,7 @@ export function BattlePage() {
     const placedPixelCount = tool === 'erase' ? previousPixels.length : optimisticPixels.length;
     const optimisticProfile = {
       ...profile,
-      balance: isOwner ? MAX_BALANCE : profile.balance - 1,
+      balance: hasPowerTools ? MAX_BALANCE : profile.balance - 1,
       placed_pixels: tool === 'erase' ? profile.placed_pixels : profile.placed_pixels + placedPixelCount,
     };
 
@@ -260,7 +267,7 @@ export function BattlePage() {
     }
     setProfile({
       ...optimisticProfile,
-      balance: isOwner ? MAX_BALANCE : data?.balance ?? optimisticProfile.balance,
+      balance: hasPowerTools ? MAX_BALANCE : data?.balance ?? optimisticProfile.balance,
       placed_pixels: data?.placedPixels ?? optimisticProfile.placed_pixels,
     });
     void refreshProfile();
@@ -289,11 +296,13 @@ export function BattlePage() {
       />
       <BattleCanvas
         camera={camera}
-        canPlace={Boolean(user && profile && (isOwner || profile.balance > 0))}
+        canPlace={Boolean(user && profile && (hasPowerTools || profile.balance > 0))}
         color={color}
         pixels={pixels}
         referenceImageUrl={referenceImageUrl}
         referenceOpacity={referenceOpacity}
+        referencePosition={referencePosition}
+        referenceScale={referenceScale}
         onCameraChange={setCamera}
         onCursorChange={setCursor}
         onPlace={handlePlace}
@@ -316,9 +325,10 @@ export function BattlePage() {
           canPlace={Boolean(user)}
         />
         <ColorPalette color={color} onChange={setColor} />
-        {isOwner && (
+        {hasPowerTools && (
           <OwnerTools
             brushSize={brushSize}
+            canUseLargeEraser={canUseLargeEraser}
             tool={tool}
             onBrushSizeChange={setBrushSize}
             onToolChange={setTool}
@@ -342,14 +352,29 @@ export function BattlePage() {
         imageUrl={referenceImageUrl}
         opacity={referenceOpacity}
         open={isReferenceOpen}
+        position={referencePosition}
+        scale={referenceScale}
         onClose={() => setIsReferenceOpen(false)}
         onImageChange={setReferenceImageUrl}
         onOpacityChange={setReferenceOpacity}
+        onPositionChange={setReferencePosition}
+        onScaleChange={setReferenceScale}
         onRemove={() => setReferenceImageUrl('')}
       />
-      <BattleTutorial isOwner={isOwner} open={isTutorialOpen && !isLoadingPixels} onClose={closeTutorial} />
+      <BattleTutorial isOwner={isOwner || isHelper} open={isTutorialOpen && !isLoadingPixels} onClose={closeTutorial} />
     </main>
   );
+}
+
+function getAllowedBrushSize(
+  brushSize: number,
+  tool: BattleTool,
+  hasPowerTools: boolean,
+  canUseLargeEraser: boolean,
+) {
+  if (!hasPowerTools) return 1;
+  if (tool === 'erase' && !canUseLargeEraser) return 1;
+  return [1, 2, 4].includes(brushSize) ? brushSize : 1;
 }
 
 function pixelKey(pixel: Pick<BattlePixel, 'x' | 'y'>) {

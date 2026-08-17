@@ -5,7 +5,12 @@ export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
 export const BASE_RECHARGE_SECONDS = 7;
-export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
+export const BATTLE_OWNER_EMAILS = ['amiktalgat@gmail.com', 'david3747god@gmail.com'];
+export const BATTLE_HELPER_EMAILS = [
+  'goodheatocean@gmail.com',
+  'tzhutimz@gmail.com',
+  'ratmirtyutyunik2012@gmail.com',
+];
 const VISIBLE_PIXEL_PAGE_SIZE = 1000;
 const VISIBLE_PIXEL_MAX_PAGES = 120;
 
@@ -125,6 +130,18 @@ export async function loadMiniMapPixels() {
 }
 
 export type BattleTool = 'paint' | 'erase';
+
+export function isBattleOwner(email: string | null | undefined) {
+  return Boolean(email && BATTLE_OWNER_EMAILS.includes(email.toLowerCase()));
+}
+
+export function isBattleHelper(email: string | null | undefined) {
+  return Boolean(email && BATTLE_HELPER_EMAILS.includes(email.toLowerCase()));
+}
+
+export function isBattlePrivileged(email: string | null | undefined) {
+  return isBattleOwner(email) || isBattleHelper(email);
+}
 
 export async function placeBattlePixel(x: number, y: number, color: string, brushSize = 1, tool: BattleTool = 'paint') {
   return supabase.functions.invoke<PlacePixelResult>('place-pixel', {

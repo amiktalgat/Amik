@@ -4,10 +4,11 @@ import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 
 type AuthProps = {
   initialMode?: 'signin' | 'signup';
+  showModeSwitch?: boolean;
   onSuccess?: () => void;
 };
 
-export function Auth({ initialMode = 'signup', onSuccess }: AuthProps) {
+export function Auth({ initialMode = 'signup', showModeSwitch = true, onSuccess }: AuthProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -19,7 +20,7 @@ export function Auth({ initialMode = 'signup', onSuccess }: AuthProps) {
   if (!isSupabaseConfigured) return <SupabaseSetupMessage />;
 
   function getRedirectUrl() {
-    return `${window.location.origin}/auth${window.location.search}`;
+    return `${window.location.origin}${window.location.pathname}${window.location.search}`;
   }
 
   async function handleGoogleSignIn() {
@@ -73,14 +74,16 @@ export function Auth({ initialMode = 'signup', onSuccess }: AuthProps) {
 
   return (
     <section className="auth-card">
-      <div className="auth-switch" aria-label="Choose auth action">
-        <button className={mode === 'signup' ? 'active' : ''} type="button" onClick={() => setMode('signup')}>
-          Create account
-        </button>
-        <button className={mode === 'signin' ? 'active' : ''} type="button" onClick={() => setMode('signin')}>
-          Sign in
-        </button>
-      </div>
+      {showModeSwitch && (
+        <div className="auth-switch" aria-label="Choose auth action">
+          <button className={mode === 'signup' ? 'active' : ''} type="button" onClick={() => setMode('signup')}>
+            Create account
+          </button>
+          <button className={mode === 'signin' ? 'active' : ''} type="button" onClick={() => setMode('signin')}>
+            Sign in
+          </button>
+        </div>
+      )}
 
       <h2>{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
       <p className="auth-copy">Use an account to save your artwork, stats, and Pixel Battle progress.</p>

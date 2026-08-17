@@ -5,6 +5,9 @@ export type DrawSize = { width: number; height: number };
 export type ReferenceImage = {
   image: HTMLImageElement;
   opacity: number;
+  scale: number;
+  x: number;
+  y: number;
 };
 
 export function drawPixels(
@@ -64,10 +67,10 @@ export function drawReferenceImage(
 ) {
   const maxWorldSize = 640;
   const scale = Math.min(maxWorldSize / reference.image.naturalWidth, maxWorldSize / reference.image.naturalHeight, 1);
-  const worldWidth = reference.image.naturalWidth * scale;
-  const worldHeight = reference.image.naturalHeight * scale;
-  const worldLeft = CANVAS_SIZE / 2 - worldWidth / 2;
-  const worldTop = CANVAS_SIZE / 2 - worldHeight / 2;
+  const worldWidth = reference.image.naturalWidth * scale * reference.scale;
+  const worldHeight = reference.image.naturalHeight * scale * reference.scale;
+  const worldLeft = reference.x - worldWidth / 2;
+  const worldTop = reference.y - worldHeight / 2;
   const sx = size.width / 2 + (worldLeft - camera.x) * camera.zoom;
   const sy = size.height / 2 + (worldTop - camera.y) * camera.zoom;
 

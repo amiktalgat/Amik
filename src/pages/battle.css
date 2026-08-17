@@ -139,6 +139,33 @@
   text-transform: uppercase;
 }
 
+.battle-collapsible-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.battle-collapsible-title .battle-panel__title {
+  margin-bottom: 0;
+}
+
+.battle-collapsible-title button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(200, 213, 228, 0.95);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--battle-carbon);
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .battle-hud {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

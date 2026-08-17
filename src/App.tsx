@@ -8,6 +8,7 @@ import { PixelForgePage } from './pages/PixelForgePage';
 import { AuthPage } from './pages/AuthPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { BattlePage } from './pages/BattlePage';
+import { RegisterPage } from './pages/RegisterPage';
 
 function ProtectedPixelForgePage() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/pixel-forge" component={ProtectedPixelForgePage} />
         <Route path="/ai-image" component={ProtectedAIImagePage} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/register" component={RegisterPage} />
         <Route path="/profile" component={ProtectedProfilePage} />
         <Route component={ProtectedNotFoundPage} />
       </Switch>

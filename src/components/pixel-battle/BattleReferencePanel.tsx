@@ -4,9 +4,13 @@ type BattleReferencePanelProps = {
   imageUrl: string;
   opacity: number;
   open: boolean;
+  position: { x: number; y: number };
+  scale: number;
   onClose: () => void;
   onImageChange: (imageUrl: string) => void;
   onOpacityChange: (opacity: number) => void;
+  onPositionChange: (position: { x: number; y: number }) => void;
+  onScaleChange: (scale: number) => void;
   onRemove: () => void;
 };
 
@@ -14,9 +18,13 @@ export function BattleReferencePanel({
   imageUrl,
   opacity,
   open,
+  position,
+  scale,
   onClose,
   onImageChange,
   onOpacityChange,
+  onPositionChange,
+  onScaleChange,
   onRemove,
 }: BattleReferencePanelProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -70,6 +78,39 @@ export function BattleReferencePanel({
           step="0.05"
           value={opacity}
           onChange={(event) => onOpacityChange(Number(event.target.value))}
+        />
+      </label>
+      <label className="battle-reference__opacity">
+        Image size {Math.round(scale * 100)}%
+        <input
+          type="range"
+          min="0.25"
+          max="2"
+          step="0.05"
+          value={scale}
+          onChange={(event) => onScaleChange(Number(event.target.value))}
+        />
+      </label>
+      <label className="battle-reference__opacity">
+        Move X {Math.round(position.x)}
+        <input
+          type="range"
+          min="0"
+          max="2000"
+          step="10"
+          value={position.x}
+          onChange={(event) => onPositionChange({ ...position, x: Number(event.target.value) })}
+        />
+      </label>
+      <label className="battle-reference__opacity">
+        Move Y {Math.round(position.y)}
+        <input
+          type="range"
+          min="0"
+          max="2000"
+          step="10"
+          value={position.y}
+          onChange={(event) => onPositionChange({ ...position, y: Number(event.target.value) })}
         />
       </label>
       <div className="battle-reference__actions">

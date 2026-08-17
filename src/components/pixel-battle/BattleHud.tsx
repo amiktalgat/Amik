@@ -1,4 +1,4 @@
-import { BATTLE_OWNER_EMAIL, MAX_BALANCE, type BattleProfile } from '../../lib/pixelBattle';
+import { isBattlePrivileged, MAX_BALANCE, type BattleProfile } from '../../lib/pixelBattle';
 
 type BattleHudProps = {
   profile: BattleProfile | null;
@@ -10,14 +10,14 @@ type BattleHudProps = {
 
 export function BattleHud({ profile, cursor, rechargeText, nextBonusText, canPlace }: BattleHudProps) {
   const balance = profile?.balance ?? 0;
-  const isOwner = profile?.email.toLowerCase() === BATTLE_OWNER_EMAIL;
-  const rechargeStatus = isOwner || balance >= MAX_BALANCE ? 'MAX' : `+1 ${rechargeText}`;
+  const hasPowerTools = isBattlePrivileged(profile?.email);
+  const rechargeStatus = hasPowerTools || balance >= MAX_BALANCE ? 'MAX' : `+1 ${rechargeText}`;
 
   return (
     <section className="battle-panel battle-hud">
       <div>
         <div className="battle-panel__title">My pixels</div>
-        <strong>{isOwner ? '∞' : `${balance} / ${MAX_BALANCE}`}</strong>
+        <strong>{hasPowerTools ? '∞' : `${balance} / ${MAX_BALANCE}`}</strong>
         <span>{rechargeStatus}</span>
       </div>
       <div>

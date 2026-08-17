@@ -13,6 +13,8 @@ type BattleCanvasProps = {
   canPlace: boolean;
   referenceImageUrl: string;
   referenceOpacity: number;
+  referenceScale: number;
+  referencePosition: { x: number; y: number };
   onCameraChange: (camera: Camera) => void;
   onCursorChange: (cursor: { x: number; y: number } | null) => void;
   onPlace: (x: number, y: number) => void;
@@ -53,12 +55,35 @@ export function BattleCanvas(props: BattleCanvasProps) {
     context.fillRect(0, 0, size.width, size.height);
     drawCanvasFrame(context, props.camera, size);
     if (referenceImage) {
-      drawReferenceImage(context, { image: referenceImage, opacity: props.referenceOpacity }, props.camera, size);
+      drawReferenceImage(
+        context,
+        {
+          image: referenceImage,
+          opacity: props.referenceOpacity,
+          scale: props.referenceScale,
+          x: props.referencePosition.x,
+          y: props.referencePosition.y,
+        },
+        props.camera,
+        size,
+      );
     }
     drawPixels(context, props.pixels, props.camera, size);
     drawGrid(context, props.camera, size);
     if (hover) drawHover(context, hover, props.camera, size, props.color, props.canPlace);
-  }, [hover, props.camera, props.canPlace, props.color, props.pixels, props.referenceOpacity, referenceImage, size]);
+  }, [
+    hover,
+    props.camera,
+    props.canPlace,
+    props.color,
+    props.pixels,
+    props.referenceOpacity,
+    props.referencePosition.x,
+    props.referencePosition.y,
+    props.referenceScale,
+    referenceImage,
+    size,
+  ]);
 
   function screenToWorld(clientX: number, clientY: number) {
     const rect = canvasRef.current?.getBoundingClientRect();

@@ -8,10 +8,6 @@ function getNextPath() {
   return next?.startsWith('/') ? next : '/pixel-forge';
 }
 
-function getAuthMode() {
-  return new URLSearchParams(window.location.search).get('mode') === 'signin' ? 'signin' : 'signup';
-}
-
 export function AuthPage() {
   const [, navigate] = useLocation();
   const { user, loading } = useAuthSession();
@@ -40,8 +36,9 @@ export function AuthPage() {
         </div>
         <div>
           <p className="eyebrow">Your creative account</p>
-          <h1>Save your pixels, images, and Battle progress.</h1>
-          <p>Sign in once, then jump between the editor, AI image studio, and shared Pixel Battle canvas.</p>
+          <h1>Welcome back to your creative workspace.</h1>
+          <p>Sign in to continue drawing, editing, and tracking your Pixel Battle progress.</p>
+          <Link className="auth-side-link" href="/register">Need an account? Register</Link>
         </div>
       </section>
 
@@ -60,7 +57,7 @@ export function AuthPage() {
           </div>
         </section>
       ) : (
-        <Auth initialMode={getAuthMode()} onSuccess={() => navigate(getNextPath())} />
+        <Auth initialMode="signin" showModeSwitch={false} onSuccess={() => navigate(getNextPath())} />
       )}
     </main>
   );
