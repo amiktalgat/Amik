@@ -651,7 +651,7 @@ export function PixelForgePage() {
   );
 
   return (
-    <div className={`pf-app ${mode !== 'tilemap' ? 'pf-app--drawer' : ''}`}>
+    <div className={`pf-app ${mode !== 'tilemap' ? 'pf-app--drawer' : ''} ${isMenuOpen ? 'pf-app--menuOpen' : ''}`}>
       <PixelForgeHeader
         canRedo={history.canRedo}
         canUndo={history.canUndo}
