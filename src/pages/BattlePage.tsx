@@ -38,6 +38,8 @@ import './battle.css';
 
 const colorStorageKey = 'pixelBattleColor';
 const tutorialStorageKey = 'pixelBattleTutorialSeen';
+const ownerBrushSizes = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48];
+const helperBrushSizes = [1, 2, 4];
 
 export function BattlePage() {
   const [, navigate] = useLocation();
@@ -97,7 +99,8 @@ export function BattlePage() {
   const isOwner = isBattleOwner(profile?.email);
   const isHelper = isBattleHelper(profile?.email);
   const hasPowerTools = isBattlePrivileged(profile?.email);
-  const canUseLargeEraser = isOwner;
+  const canErase = isOwner;
+  const availableBrushSizes = isOwner ? ownerBrushSizes : helperBrushSizes;
 
   useEffect(() => {
     localStorage.setItem(colorStorageKey, color);
@@ -111,6 +114,10 @@ export function BattlePage() {
   useEffect(() => {
     setProfile((current) => (current ? rechargeProfile(current, tick) : current));
   }, [tick]);
+
+  useEffect(() => {
+    if (!canErase && tool === 'erase') setTool('paint');
+  }, [canErase, tool]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -213,7 +220,7 @@ export function BattlePage() {
       return;
     }
 
-    const size = getAllowedBrushSize(brushSize, tool, hasPowerTools, canUseLargeEraser);
+    const size = getAllowedBrushSize(brushSize, tool, hasPowerTools, canErase, availableBrushSizes);
     const brushPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
     const optimisticPixels = tool === 'erase' ? brushPixels : getChangedBrushPixels(pixels, brushPixels, tool);
     if (optimisticPixels.length === 0) {
@@ -328,7 +335,8 @@ export function BattlePage() {
         {hasPowerTools && (
           <OwnerTools
             brushSize={brushSize}
-            canUseLargeEraser={canUseLargeEraser}
+            brushSizes={availableBrushSizes}
+            canErase={canErase}
             tool={tool}
             onBrushSizeChange={setBrushSize}
             onToolChange={setTool}
@@ -370,11 +378,12 @@ function getAllowedBrushSize(
   brushSize: number,
   tool: BattleTool,
   hasPowerTools: boolean,
-  canUseLargeEraser: boolean,
+  canErase: boolean,
+  availableBrushSizes: number[],
 ) {
   if (!hasPowerTools) return 1;
-  if (tool === 'erase' && !canUseLargeEraser) return 1;
-  return [1, 2, 4].includes(brushSize) ? brushSize : 1;
+  if (tool === 'erase' && !canErase) return 1;
+  return availableBrushSizes.includes(brushSize) ? brushSize : availableBrushSizes[0];
 }
 
 function pixelKey(pixel: Pick<BattlePixel, 'x' | 'y'>) {

@@ -3,12 +3,20 @@ import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 
 type AuthProps = {
+  copy?: string;
   initialMode?: 'signin' | 'signup';
   showModeSwitch?: boolean;
+  title?: string;
   onSuccess?: () => void;
 };
 
-export function Auth({ initialMode = 'signup', showModeSwitch = true, onSuccess }: AuthProps) {
+export function Auth({
+  copy,
+  initialMode = 'signup',
+  showModeSwitch = true,
+  title,
+  onSuccess,
+}: AuthProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -85,8 +93,8 @@ export function Auth({ initialMode = 'signup', showModeSwitch = true, onSuccess 
         </div>
       )}
 
-      <h2>{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
-      <p className="auth-copy">Use an account to save your artwork, stats, and Pixel Battle progress.</p>
+      <h2>{title ?? (mode === 'signup' ? 'Create your account' : 'Welcome back')}</h2>
+      <p className="auth-copy">{copy ?? 'Use an account to save your artwork, stats, and Pixel Battle progress.'}</p>
 
       <button className="google-button" type="button" onClick={handleGoogleSignIn} disabled={busy || googleBusy}>
         <span aria-hidden="true">G</span>

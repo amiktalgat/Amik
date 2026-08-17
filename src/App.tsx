@@ -52,6 +52,7 @@ export default function App() {
         <Route path="/ai-image" component={ProtectedAIImagePage} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/register" component={RegisterPage} />
+        <Route path="/signup" component={RegisterPage} />
         <Route path="/profile" component={ProtectedProfilePage} />
         <Route component={ProtectedNotFoundPage} />
       </Switch>

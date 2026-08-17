@@ -5,8 +5,9 @@ export const CHUNK_SIZE = 256;
 export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
 export const BASE_RECHARGE_SECONDS = 7;
-export const BATTLE_OWNER_EMAILS = ['amiktalgat@gmail.com', 'david3747god@gmail.com'];
+export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
 export const BATTLE_HELPER_EMAILS = [
+  'david3747god@gmail.com',
   'goodheatocean@gmail.com',
   'tzhutimz@gmail.com',
   'ratmirtyutyunik2012@gmail.com',
@@ -132,7 +133,7 @@ export async function loadMiniMapPixels() {
 export type BattleTool = 'paint' | 'erase';
 
 export function isBattleOwner(email: string | null | undefined) {
-  return Boolean(email && BATTLE_OWNER_EMAILS.includes(email.toLowerCase()));
+  return email?.toLowerCase() === BATTLE_OWNER_EMAIL;
 }
 
 export function isBattleHelper(email: string | null | undefined) {
