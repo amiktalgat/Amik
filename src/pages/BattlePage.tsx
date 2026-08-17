@@ -172,7 +172,7 @@ export function BattlePage() {
 
     const size = isOwner ? brushSize : 1;
     const brushPixels = makeBrushPixels(x, y, size, color.toUpperCase(), user.id);
-    const optimisticPixels = getChangedBrushPixels(pixels, brushPixels, tool);
+    const optimisticPixels = tool === 'erase' ? brushPixels : getChangedBrushPixels(pixels, brushPixels, tool);
     if (optimisticPixels.length === 0) {
       setNotice(tool === 'erase' ? 'Nothing to erase here.' : 'This pixel already has that color.');
       return;
@@ -180,7 +180,7 @@ export function BattlePage() {
 
     const previousPixels = getBrushPixels(pixels, optimisticPixels);
     const newCanvasPixelCount = Math.max(0, optimisticPixels.length - previousPixels.length);
-    const placedPixelCount = optimisticPixels.length;
+    const placedPixelCount = tool === 'erase' ? previousPixels.length : optimisticPixels.length;
     const optimisticProfile = {
       ...profile,
       balance: isOwner ? MAX_BALANCE : profile.balance - 1,
@@ -215,6 +215,12 @@ export function BattlePage() {
     if (data) {
       setPixels((current) => applyBrushPixels(current, data.pixels, data.erased));
       setMiniPixels((current) => applyBrushPixels(current, data.pixels, data.erased).slice(-4500));
+      if (data.erased) {
+        const hiddenErasedCount = Math.max(0, data.affected - previousPixels.length);
+        setStats((current) => current
+          ? { ...current, canvasPixels: Math.max(0, current.canvasPixels - hiddenErasedCount) }
+          : current);
+      }
     }
     setProfile({
       ...optimisticProfile,

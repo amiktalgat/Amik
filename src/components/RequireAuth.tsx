@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 import { useAuthSession } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 
 type RequireAuthProps = {
   children: ReactNode;
@@ -31,7 +30,10 @@ export function RequireAuth({ children }: RequireAuthProps) {
   if (loading || !user) {
     return (
       <main className="container">
-        <p className="empty">Проверяем аккаунт...</p>
+        <section className="empty-state">
+          <h2>Checking your account</h2>
+          <p>We are opening the right screen for you. If this takes too long, sign in again.</p>
+        </section>
       </main>
     );
   }

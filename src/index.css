@@ -200,6 +200,31 @@ a.auth-home-link {
 .message { margin-top: 12px; color: var(--clay); font-size: 14px; }
 .hello { color: var(--soft); margin-bottom: 8px; }
 .empty { color: var(--soft); margin-top: 16px; }
+.empty-state {
+  display: grid;
+  gap: 10px;
+  margin-top: 18vh;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: 0 10px 30px rgba(33, 36, 46, 0.14);
+}
+.empty-state h2 {
+  font-size: 24px;
+}
+.empty-state p {
+  color: var(--soft);
+  line-height: 1.5;
+}
+.empty-state--compact {
+  margin-top: 16px;
+  padding: 16px;
+  box-shadow: none;
+}
+.empty-state--compact h2 {
+  font-size: 18px;
+}
 
 .list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
 .list li {
@@ -269,6 +294,16 @@ a.auth-home-link {
 .home-card span {
   color: var(--soft);
   line-height: 1.45;
+}
+.home-card__hint {
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid rgba(246, 141, 31, 0.42);
+  border-radius: 4px;
+  background: rgba(236, 171, 55, 0.18);
+  color: var(--ink) !important;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .auth-page {

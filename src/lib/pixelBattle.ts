@@ -6,7 +6,8 @@ export const MAX_BALANCE = 100;
 export const DAILY_BONUS_HOURS = 24;
 export const BASE_RECHARGE_SECONDS = 7;
 export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
-export const VISIBLE_PIXEL_LIMIT = 50000;
+const VISIBLE_PIXEL_PAGE_SIZE = 1000;
+const VISIBLE_PIXEL_MAX_PAGES = 120;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -71,17 +72,31 @@ export async function loadBattleStats() {
 }
 
 export async function loadVisiblePixels(bounds: ViewBounds) {
-  return supabase
-    .from('canvas_pixels')
-    .select('x,y,color,user_id,updated_at')
-    .gte('x', bounds.minX)
-    .lte('x', bounds.maxX)
-    .gte('y', bounds.minY)
-    .lte('y', bounds.maxY)
-    .order('x', { ascending: true })
-    .order('y', { ascending: true })
-    .limit(VISIBLE_PIXEL_LIMIT)
-    .returns<BattlePixel[]>();
+  const pixels: BattlePixel[] = [];
+
+  for (let page = 0; page < VISIBLE_PIXEL_MAX_PAGES; page += 1) {
+    const from = page * VISIBLE_PIXEL_PAGE_SIZE;
+    const to = from + VISIBLE_PIXEL_PAGE_SIZE - 1;
+    const { data, error } = await supabase
+      .from('canvas_pixels')
+      .select('x,y,color,user_id,updated_at')
+      .gte('x', bounds.minX)
+      .lte('x', bounds.maxX)
+      .gte('y', bounds.minY)
+      .lte('y', bounds.maxY)
+      .order('x', { ascending: true })
+      .order('y', { ascending: true })
+      .range(from, to)
+      .returns<BattlePixel[]>();
+
+    if (error) return { data: null, error };
+    if (!data || data.length === 0) break;
+
+    pixels.push(...data);
+    if (data.length < VISIBLE_PIXEL_PAGE_SIZE) break;
+  }
+
+  return { data: pixels, error: null };
 }
 
 export async function loadMiniMapPixels() {

@@ -33,7 +33,10 @@ export function ProfilePage() {
   if (loading) {
     return (
       <main className="container">
-        <p className="empty">Загружаем профиль...</p>
+        <section className="empty-state">
+          <h2>Loading profile</h2>
+          <p>Your player stats will appear here after the account check finishes.</p>
+        </section>
       </main>
     );
   }
@@ -41,10 +44,10 @@ export function ProfilePage() {
   if (!user) {
     return (
       <main className="container">
-        <section className="card">
-          <h2>Нужно войти</h2>
-          <p className="empty">Профиль доступен только после входа в аккаунт.</p>
-          <Link className="home-link" href="/auth?next=/profile">Войти</Link>
+        <section className="empty-state">
+          <h2>No profile yet</h2>
+          <p>Sign in to save your pixels, keep your balance, and track your Battle progress.</p>
+          <Link className="home-link" href="/auth?next=/profile">Sign in</Link>
         </section>
       </main>
     );
@@ -53,22 +56,22 @@ export function ProfilePage() {
   return (
     <main className="container">
       <nav className="top-nav">
-        <Link href="/">Главное меню</Link>
-        <Link href="/battle">PixelBattle</Link>
-        <Link href="/pixel-forge">Редактор</Link>
-        <button className="ghost small" type="button" onClick={signOut}>Выйти</button>
+        <Link href="/">Menu</Link>
+        <Link href="/battle">Battle</Link>
+        <Link href="/pixel-forge">Editor</Link>
+        <button className="ghost small" type="button" onClick={signOut}>Sign out</button>
       </nav>
       <section className="card">
-        <p className="eyebrow">Мой профиль</p>
+        <p className="eyebrow">My profile</p>
         <h2>{profile?.username ?? user.email}</h2>
         <ul className="profile-stats">
           <li><span>Email</span><strong>{user.email}</strong></li>
-          <li><span>Дата регистрации</span><strong>{formatDate(profile?.created_at)}</strong></li>
-          <li><span>Всего установлено пикселей</span><strong>{profile?.placed_pixels ?? 0}</strong></li>
-          <li><span>Текущий баланс</span><strong>{profile?.balance ?? 0} / 100</strong></li>
-          <li><span>Лучшее достижение</span><strong>{profile?.best_streak ?? 0}</strong></li>
-          <li><span>Активных дней</span><strong>{profile?.active_days ?? 1}</strong></li>
-          <li><span>Мои пиксели в истории</span><strong>{stats?.myPixels ?? 0}</strong></li>
+          <li><span>Joined</span><strong>{formatDate(profile?.created_at)}</strong></li>
+          <li><span>Total pixels placed</span><strong>{profile?.placed_pixels ?? 0}</strong></li>
+          <li><span>Current balance</span><strong>{profile?.balance ?? 0} / 100</strong></li>
+          <li><span>Best streak</span><strong>{profile?.best_streak ?? 0}</strong></li>
+          <li><span>Active days</span><strong>{profile?.active_days ?? 1}</strong></li>
+          <li><span>My battle history</span><strong>{stats?.myPixels ?? 0}</strong></li>
         </ul>
       </section>
     </main>
@@ -77,5 +80,5 @@ export function ProfilePage() {
 
 function formatDate(value?: string) {
   if (!value) return '-';
-  return new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium' }).format(new Date(value));
+  return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(value));
 }
