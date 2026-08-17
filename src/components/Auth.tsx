@@ -27,9 +27,7 @@ export function Auth({ onSuccess }: AuthProps) {
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: getRedirectUrl(),
-      },
+      options: { redirectTo: getRedirectUrl() },
     });
 
     if (error) {
@@ -38,20 +36,19 @@ export function Auth({ onSuccess }: AuthProps) {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setBusy(true);
     setMessage('');
 
     try {
-      const request =
-        mode === 'signup'
-          ? supabase.auth.signUp({
-              email,
-              password,
-              options: { data: { username }, emailRedirectTo: getRedirectUrl() },
-            })
-          : supabase.auth.signInWithPassword({ email, password });
+      const request = mode === 'signup'
+        ? supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { username }, emailRedirectTo: getRedirectUrl() },
+          })
+        : supabase.auth.signInWithPassword({ email, password });
 
       const { data, error } = await request;
 
@@ -60,19 +57,14 @@ export function Auth({ onSuccess }: AuthProps) {
         return;
       }
 
-      if (mode === 'signup') {
-        if (data.session) {
-          onSuccess?.();
-          return;
-        }
-
-        setMessage('Аккаунт создан. Проверь почту, если Supabase попросит подтвердить email.');
+      if (mode === 'signup' && !data.session) {
+        setMessage('Account created. Check your email if Supabase asks for confirmation.');
         return;
       }
 
       onSuccess?.();
     } catch {
-      setMessage('Что-то пошло не так. Попробуй ещё раз.');
+      setMessage('Something went wrong. Try again.');
     } finally {
       setBusy(false);
     }
@@ -80,38 +72,25 @@ export function Auth({ onSuccess }: AuthProps) {
 
   return (
     <section className="auth-card">
-      <div className="auth-switch" aria-label="Выбор действия">
-        <button
-          className={mode === 'signup' ? 'active' : ''}
-          type="button"
-          onClick={() => setMode('signup')}
-        >
-          Регистрация
+      <div className="auth-switch" aria-label="Choose auth action">
+        <button className={mode === 'signup' ? 'active' : ''} type="button" onClick={() => setMode('signup')}>
+          Create account
         </button>
-        <button
-          className={mode === 'signin' ? 'active' : ''}
-          type="button"
-          onClick={() => setMode('signin')}
-        >
-          Вход
+        <button className={mode === 'signin' ? 'active' : ''} type="button" onClick={() => setMode('signin')}>
+          Sign in
         </button>
       </div>
 
-      <h2>{mode === 'signup' ? 'Создай аккаунт' : 'Войди в аккаунт'}</h2>
-      <p className="auth-copy">Аккаунт нужен, чтобы открыть PixelForge и сохранить личные данные.</p>
+      <h2>{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
+      <p className="auth-copy">Use an account to save your artwork, stats, and Pixel Battle progress.</p>
 
-      <button
-        className="google-button"
-        type="button"
-        onClick={handleGoogleSignIn}
-        disabled={busy || googleBusy}
-      >
+      <button className="google-button" type="button" onClick={handleGoogleSignIn} disabled={busy || googleBusy}>
         <span aria-hidden="true">G</span>
-        {googleBusy ? 'Открываем Google...' : 'Продолжить с Google'}
+        {googleBusy ? 'Opening Google...' : 'Continue with Google'}
       </button>
 
       <div className="auth-divider">
-        <span>или</span>
+        <span>or</span>
       </div>
 
       <form onSubmit={handleSubmit} className="form">
@@ -122,7 +101,7 @@ export function Auth({ onSuccess }: AuthProps) {
               type="text"
               placeholder="pixel_master"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(event) => setUsername(event.target.value)}
               maxLength={24}
               required
             />
@@ -134,23 +113,23 @@ export function Auth({ onSuccess }: AuthProps) {
             type="email"
             placeholder="you@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
             required
           />
         </label>
         <label>
-          Пароль
+          Password
           <input
             type="password"
-            placeholder="минимум 6 символов"
+            placeholder="At least 6 characters"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
             minLength={6}
             required
           />
         </label>
         <button className="primary-button" type="submit" disabled={busy}>
-          {busy ? 'Подождите...' : mode === 'signup' ? 'Зарегистрироваться' : 'Войти'}
+          {busy ? 'Please wait...' : mode === 'signup' ? 'Create account' : 'Sign in'}
         </button>
       </form>
 

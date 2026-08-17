@@ -1,19 +1,18 @@
 import { useMemo, useState } from 'react';
+import { downloadPng } from '../../lib/pixelExport';
 import {
   exportTilemapJson,
   makeDefaultLayers,
   makeLayer,
   makeStarterLayers,
   renderTilemapToCanvas,
-  tileSizes,
   type TileLayer,
   type TilemapTool,
   type TileSize,
 } from '../../lib/tilemap';
-import { downloadPng } from '../../lib/pixelExport';
 import { TilemapCanvas } from './TilemapCanvas';
-import { TilemapLayersPanel } from './TilemapLayersPanel';
-import { TilemapPalette } from './TilemapPalette';
+import { TilemapControlsPanel } from './TilemapControlsPanel';
+import { TilemapInfoPanel } from './TilemapInfoPanel';
 
 type TilemapEditorProps = {
   onStatus: (status: string) => void;
@@ -21,11 +20,11 @@ type TilemapEditorProps = {
 
 const tools: TilemapTool[] = ['pencil', 'eraser', 'fill', 'eyedropper', 'rectangle'];
 const toolLabels: Record<TilemapTool, string> = {
-  pencil: 'Кисть',
-  eraser: 'Ластик',
-  fill: 'Заливка',
-  eyedropper: 'Пипетка',
-  rectangle: 'Прямоугольник',
+  pencil: 'Pencil',
+  eraser: 'Eraser',
+  fill: 'Fill',
+  eyedropper: 'Picker',
+  rectangle: 'Rectangle',
 };
 const mapWidth = 24;
 const mapHeight = 16;
@@ -116,77 +115,26 @@ export function TilemapEditor({ onStatus }: TilemapEditorProps) {
 
   return (
     <>
-      <aside className="pf-sidebar pf-leftPanel">
-        <section className="pf-sectionCard">
-          <h3>Как делать карту</h3>
-          <p>1. Выбери тайл. 2. Выбери инструмент. 3. Рисуй по клеткам. JSON нужен для игры, PNG - как картинка.</p>
-        </section>
-        <section className="pf-sectionCard">
-          <h3>Сейчас</h3>
-          <p>{mapWidth} x {mapHeight} клеток, активный слой: {activeLayerName}. Размер тайла: {tileSize}px.</p>
-        </section>
-        <section className="pf-sectionCard">
-          <h3>Быстрые действия</h3>
-          <div className="pf-generatorActions">
-            <button className="pf-primary" onClick={showStarterMap}>Пример карты</button>
-            <button onClick={clearMap}>Очистить карту</button>
-          </div>
-        </section>
-      </aside>
+      <TilemapInfoPanel
+        activeLayerName={activeLayerName} mapHeight={mapHeight} mapWidth={mapWidth}
+        tileSize={tileSize} onClearMap={clearMap} onStarterMap={showStarterMap}
+      />
       <main className="pf-workspace pf-tilemapWorkspace">
         <TilemapCanvas
-          activeLayerId={activeLayerId}
-          height={mapHeight}
-          layers={layers}
-          selectedTileId={selectedTileId}
-          tileSize={tileSize}
-          tool={tool}
-          width={mapWidth}
-          onEyedrop={setSelectedTileId}
-          onLayersChange={setLayers}
-          onStatus={onStatus}
+          activeLayerId={activeLayerId} height={mapHeight} layers={layers}
+          selectedTileId={selectedTileId} tileSize={tileSize} tool={tool} width={mapWidth}
+          onEyedrop={setSelectedTileId} onLayersChange={setLayers} onStatus={onStatus}
         />
       </main>
-      <aside className="pf-sidebar pf-rightPanel">
-        <section className="pf-controls">
-          <h2>Tile Size</h2>
-          <div className="pf-segmentedButtons">
-            {tileSizes.map((size) => (
-              <button className={tileSize === size ? 'active' : ''} key={size} onClick={() => setTileSize(size)}>
-                {size}x{size}
-              </button>
-            ))}
-          </div>
-        </section>
-        <TilemapPalette selectedTileId={selectedTileId} tileSize={tileSize} onSelectTile={setSelectedTileId} />
-        <section className="pf-controls">
-          <h2>Инструменты</h2>
-          <div className="pf-toolGrid">
-            {tools.map((item) => (
-              <button className={`pf-tool ${tool === item ? 'active' : ''}`} key={item} onClick={() => setTool(item)}>
-                {toolLabels[item]}
-              </button>
-            ))}
-          </div>
-        </section>
-        <TilemapLayersPanel
-          activeLayerId={activeLayerId}
-          layers={layers}
-          onActiveLayerChange={chooseLayer}
-          onAddLayer={addLayer}
-          onDeleteLayer={deleteLayer}
-          onMoveLayer={moveLayer}
-          onToggleLayer={toggleLayer}
-        />
-        <section className="pf-controls">
-          <h2>Экспорт</h2>
-          <span className="pf-exportSize">{mapWidth} x {mapHeight} тайлов | слой: {activeLayerName}</span>
-          <div className="pf-generatorActions">
-            <button className="pf-primary" onClick={exportJson}>Скачать JSON</button>
-            <button onClick={exportPng}>Скачать PNG</button>
-          </div>
-        </section>
-      </aside>
+      <TilemapControlsPanel
+        activeLayerId={activeLayerId} activeLayerName={activeLayerName} layers={layers}
+        mapHeight={mapHeight} mapWidth={mapWidth} selectedTileId={selectedTileId}
+        tileSize={tileSize} tool={tool} toolLabels={toolLabels} tools={tools}
+        onActiveLayerChange={chooseLayer} onAddLayer={addLayer} onDeleteLayer={deleteLayer}
+        onExportJson={exportJson} onExportPng={exportPng} onMoveLayer={moveLayer}
+        onSelectTile={setSelectedTileId} onTileSizeChange={setTileSize}
+        onToggleLayer={toggleLayer} onToolChange={setTool}
+      />
     </>
   );
 }

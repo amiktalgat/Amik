@@ -19,7 +19,10 @@ export function AuthPage() {
   if (loading) {
     return (
       <main className="auth-page">
-        <p className="empty">Проверяем вход...</p>
+        <section className="empty-state">
+          <h2>Checking sign in</h2>
+          <p>One moment while we open your workspace.</p>
+        </section>
       </main>
     );
   }
@@ -27,32 +30,28 @@ export function AuthPage() {
   return (
     <main className="auth-page">
       <section className="auth-hero">
-        <Link className="auth-logo" href="/">
-          PixelForge
-        </Link>
-        <Link className="home-link auth-home-link" href="/">
-          Главное меню
-        </Link>
         <div>
-          <p className="eyebrow">Только для пользователей</p>
-          <h1>Сначала аккаунт, потом редактор</h1>
-          <p>
-            Регистрация теперь обязательна: без входа страницы проекта будут возвращать сюда.
-          </p>
+          <Link className="auth-logo" href="/">Amik Pixel Studio</Link>
+          <Link className="home-link auth-home-link" href="/">Back to menu</Link>
+        </div>
+        <div>
+          <p className="eyebrow">Your creative account</p>
+          <h1>Save your pixels, images, and Battle progress.</h1>
+          <p>Sign in once, then jump between the editor, AI image studio, and shared Pixel Battle canvas.</p>
         </div>
       </section>
 
       {user ? (
         <section className="auth-card">
-          <p className="eyebrow">Аккаунт подключён</p>
-          <h2>Ты уже вошёл</h2>
+          <p className="eyebrow">Account connected</p>
+          <h2>You are signed in</h2>
           <p className="auth-copy">{user.email}</p>
           <div className="actions">
             <button className="primary-button" type="button" onClick={() => navigate(getNextPath())}>
-              Продолжить
+              Continue
             </button>
             <button className="ghost" type="button" onClick={signOut}>
-              Выйти
+              Sign out
             </button>
           </div>
         </section>
