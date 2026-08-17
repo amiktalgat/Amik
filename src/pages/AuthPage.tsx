@@ -8,6 +8,10 @@ function getNextPath() {
   return next?.startsWith('/') ? next : '/pixel-forge';
 }
 
+function getAuthMode() {
+  return new URLSearchParams(window.location.search).get('mode') === 'signin' ? 'signin' : 'signup';
+}
+
 export function AuthPage() {
   const [, navigate] = useLocation();
   const { user, loading } = useAuthSession();
@@ -56,7 +60,7 @@ export function AuthPage() {
           </div>
         </section>
       ) : (
-        <Auth onSuccess={() => navigate(getNextPath())} />
+        <Auth initialMode={getAuthMode()} onSuccess={() => navigate(getNextPath())} />
       )}
     </main>
   );

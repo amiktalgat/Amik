@@ -9,14 +9,6 @@ import { AuthPage } from './pages/AuthPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { BattlePage } from './pages/BattlePage';
 
-function ProtectedHomePage() {
-  return (
-    <RequireAuth>
-      <HomePage />
-    </RequireAuth>
-  );
-}
-
 function ProtectedPixelForgePage() {
   return (
     <RequireAuth>
@@ -53,7 +45,7 @@ export default function App() {
   return (
     <DevicePreview>
       <Switch>
-        <Route path="/" component={ProtectedHomePage} />
+        <Route path="/" component={HomePage} />
         <Route path="/battle" component={BattlePage} />
         <Route path="/pixel-forge" component={ProtectedPixelForgePage} />
         <Route path="/ai-image" component={ProtectedAIImagePage} />

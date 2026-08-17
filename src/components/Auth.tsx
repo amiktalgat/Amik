@@ -3,14 +3,15 @@ import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 
 type AuthProps = {
+  initialMode?: 'signin' | 'signup';
   onSuccess?: () => void;
 };
 
-export function Auth({ onSuccess }: AuthProps) {
+export function Auth({ initialMode = 'signup', onSuccess }: AuthProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [mode, setMode] = useState<'signin' | 'signup'>('signup');
+  const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);

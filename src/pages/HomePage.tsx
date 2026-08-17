@@ -21,17 +21,28 @@ const menuItems = [
 export function HomePage() {
   return (
     <main className="container home-menu">
-      <nav className="top-nav">
-        <Link href="/battle">Battle</Link>
-        <Link href="/pixel-forge">Editor</Link>
-        <Link href="/ai-image">AI Studio</Link>
-        <Link href="/profile">Profile</Link>
-      </nav>
+      <section className="home-landing" aria-labelledby="home-title">
+        <div className="home-intro">
+          <p className="eyebrow">Welcome</p>
+          <h1 id="home-title">Amik Pixel Studio</h1>
+          <p>
+            A creative app for drawing pixel art, generating image ideas with AI, and joining a shared
+            Pixel Battle canvas.
+          </p>
+        </div>
 
-      <section className="hello">
-        <p className="eyebrow">Welcome</p>
-        <h1>Amik Pixel Studio</h1>
-        <p>Create pixel art, generate image ideas with AI, and draw together on a shared canvas.</p>
+        <aside className="home-auth-panel" aria-label="Account actions">
+          <h2>Start creating</h2>
+          <p>Make an account to save your art and Battle progress, or sign in if you already have one.</p>
+          <div className="home-auth-actions">
+            <Link className="home-auth-button home-auth-button--primary" href="/auth?mode=signup">
+              Create account
+            </Link>
+            <Link className="home-auth-button" href="/auth?mode=signin">
+              Sign in
+            </Link>
+          </div>
+        </aside>
       </section>
 
       <section className="home-grid" aria-label="Main menu">

@@ -6,11 +6,19 @@ type BattleHeaderProps = {
   user: User | null;
   onlineCount: number;
   stats: BattleStats | null;
+  onReferenceOpen: () => void;
   onSignOut: () => void;
   onTutorialOpen: () => void;
 };
 
-export function BattleHeader({ user, onlineCount, stats, onSignOut, onTutorialOpen }: BattleHeaderProps) {
+export function BattleHeader({
+  user,
+  onlineCount,
+  stats,
+  onReferenceOpen,
+  onSignOut,
+  onTutorialOpen,
+}: BattleHeaderProps) {
   return (
     <header className="battle-header">
       <Link className="battle-logo" href="/battle">PixelBattle</Link>
@@ -19,6 +27,9 @@ export function BattleHeader({ user, onlineCount, stats, onSignOut, onTutorialOp
         <span>Placed: {stats?.placedPixels ?? 0}</span>
       </div>
       <nav className="battle-header__nav">
+        <button className="battle-text-button battle-help-button" type="button" onClick={onReferenceOpen}>
+          Image
+        </button>
         <button className="battle-text-button battle-help-button" type="button" onClick={onTutorialOpen}>
           Help
         </button>

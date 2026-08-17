@@ -450,6 +450,107 @@
   background: var(--battle-orange);
 }
 
+.battle-reference {
+  position: fixed;
+  z-index: 7;
+  top: 88px;
+  left: 12px;
+  width: min(320px, calc(100vw - 24px));
+  padding: 14px;
+  border: 1px solid rgba(200, 213, 228, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.battle-reference__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.battle-reference__header h2 {
+  font-size: 18px;
+}
+
+.battle-reference__header button,
+.battle-reference__actions button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(200, 213, 228, 0.95);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--battle-carbon);
+  font-size: 13px;
+}
+
+.battle-reference__drop {
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  overflow: hidden;
+  border: 1px dashed var(--battle-line);
+  border-radius: 8px;
+  background: rgba(216, 231, 241, 0.72);
+  color: var(--battle-line);
+  cursor: pointer;
+  text-align: center;
+}
+
+.battle-reference__drop.active {
+  border-color: var(--battle-orange);
+  background: rgba(250, 204, 21, 0.18);
+}
+
+.battle-reference__drop img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+.battle-reference__drop p {
+  padding: 14px;
+  line-height: 1.4;
+}
+
+.battle-reference__opacity {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  color: var(--battle-line);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.battle-reference__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.battle-reference__actions button:first-child {
+  border-color: var(--battle-orange);
+  background: var(--battle-orange);
+  color: #ffffff;
+}
+
+.battle-reference__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.battle-reference__hint {
+  margin-top: 10px;
+  color: var(--battle-line);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .profile-stats {
   display: grid;
   gap: 10px;
@@ -542,6 +643,13 @@
     left: 8px;
     bottom: calc(var(--battle-mobile-panel-height) + 18px);
     max-width: calc(100vw - 16px);
+  }
+
+  .battle-reference {
+    top: 64px;
+    left: 8px;
+    right: 8px;
+    width: auto;
   }
 }
 
@@ -637,4 +745,12 @@
 .device-preview--mobile .battle-tutorial {
   position: absolute;
   padding: 14px;
+}
+
+.device-preview--mobile .battle-reference {
+  position: absolute;
+  top: 64px;
+  left: 8px;
+  right: 8px;
+  width: auto;
 }

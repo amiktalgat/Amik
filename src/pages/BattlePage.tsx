@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { BattleCanvas, type Camera } from '../components/pixel-battle/BattleCanvas';
 import { BattleHeader } from '../components/pixel-battle/BattleHeader';
 import { BattleHud } from '../components/pixel-battle/BattleHud';
+import { BattleReferencePanel } from '../components/pixel-battle/BattleReferencePanel';
 import { BattleTutorial } from '../components/pixel-battle/BattleTutorial';
 import { ColorPalette } from '../components/pixel-battle/ColorPalette';
 import { Leaderboard } from '../components/pixel-battle/Leaderboard';
@@ -57,6 +58,9 @@ export function BattlePage() {
   const [hasLoadedPixels, setHasLoadedPixels] = useState(false);
   const [isLoadingPixels, setIsLoadingPixels] = useState(true);
   const [isTutorialOpen, setIsTutorialOpen] = useState(() => localStorage.getItem(tutorialStorageKey) !== 'yes');
+  const [isReferenceOpen, setIsReferenceOpen] = useState(false);
+  const [referenceImageUrl, setReferenceImageUrl] = useState('');
+  const [referenceOpacity, setReferenceOpacity] = useState(0.35);
   const visibleLoadId = useRef(0);
 
   const bounds = useMemo(() => {
@@ -279,6 +283,7 @@ export function BattlePage() {
         user={user}
         onlineCount={onlineCount}
         stats={stats}
+        onReferenceOpen={() => setIsReferenceOpen(true)}
         onSignOut={handleSignOut}
         onTutorialOpen={() => setIsTutorialOpen(true)}
       />
@@ -287,6 +292,8 @@ export function BattlePage() {
         canPlace={Boolean(user && profile && (isOwner || profile.balance > 0))}
         color={color}
         pixels={pixels}
+        referenceImageUrl={referenceImageUrl}
+        referenceOpacity={referenceOpacity}
         onCameraChange={setCamera}
         onCursorChange={setCursor}
         onPlace={handlePlace}
@@ -331,6 +338,15 @@ export function BattlePage() {
         />
       </aside>
       <p className="battle-toast">{notice}</p>
+      <BattleReferencePanel
+        imageUrl={referenceImageUrl}
+        opacity={referenceOpacity}
+        open={isReferenceOpen}
+        onClose={() => setIsReferenceOpen(false)}
+        onImageChange={setReferenceImageUrl}
+        onOpacityChange={setReferenceOpacity}
+        onRemove={() => setReferenceImageUrl('')}
+      />
       <BattleTutorial isOwner={isOwner} open={isTutorialOpen && !isLoadingPixels} onClose={closeTutorial} />
     </main>
   );

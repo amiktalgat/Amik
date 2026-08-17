@@ -2,6 +2,10 @@ import { CANVAS_SIZE, type BattlePixel } from './pixelBattle';
 
 export type DrawCamera = { x: number; y: number; zoom: number };
 export type DrawSize = { width: number; height: number };
+export type ReferenceImage = {
+  image: HTMLImageElement;
+  opacity: number;
+};
 
 export function drawPixels(
   ctx: CanvasRenderingContext2D,
@@ -49,6 +53,27 @@ export function drawGrid(ctx: CanvasRenderingContext2D, camera: DrawCamera, size
     ctx.lineTo(size.width, sy);
     ctx.stroke();
   }
+  ctx.restore();
+}
+
+export function drawReferenceImage(
+  ctx: CanvasRenderingContext2D,
+  reference: ReferenceImage,
+  camera: DrawCamera,
+  size: DrawSize,
+) {
+  const maxWorldSize = 640;
+  const scale = Math.min(maxWorldSize / reference.image.naturalWidth, maxWorldSize / reference.image.naturalHeight, 1);
+  const worldWidth = reference.image.naturalWidth * scale;
+  const worldHeight = reference.image.naturalHeight * scale;
+  const worldLeft = CANVAS_SIZE / 2 - worldWidth / 2;
+  const worldTop = CANVAS_SIZE / 2 - worldHeight / 2;
+  const sx = size.width / 2 + (worldLeft - camera.x) * camera.zoom;
+  const sy = size.height / 2 + (worldTop - camera.y) * camera.zoom;
+
+  ctx.save();
+  ctx.globalAlpha = reference.opacity;
+  ctx.drawImage(reference.image, sx, sy, worldWidth * camera.zoom, worldHeight * camera.zoom);
   ctx.restore();
 }
 

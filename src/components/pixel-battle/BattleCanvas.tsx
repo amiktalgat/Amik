@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { drawCanvasFrame, drawGrid, drawHover, drawPixels } from '../../lib/battleCanvasDrawing';
+import { drawCanvasFrame, drawGrid, drawHover, drawPixels, drawReferenceImage } from '../../lib/battleCanvasDrawing';
 import { CANVAS_SIZE, clamp, type BattlePixel } from '../../lib/pixelBattle';
+import { useCanvasElementSize } from '../../lib/useCanvasElementSize';
+import { useLoadedImage } from '../../lib/useLoadedImage';
 
 export type Camera = { x: number; y: number; zoom: number };
 
@@ -9,6 +11,8 @@ type BattleCanvasProps = {
   color: string;
   pixels: BattlePixel[];
   canPlace: boolean;
+  referenceImageUrl: string;
+  referenceOpacity: number;
   onCameraChange: (camera: Camera) => void;
   onCursorChange: (cursor: { x: number; y: number } | null) => void;
   onPlace: (x: number, y: number) => void;
@@ -29,21 +33,9 @@ export function BattleCanvas(props: BattleCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pointers = useRef(new Map<number, PointerState>());
   const pinchDistance = useRef<number | null>(null);
-  const [size, setSize] = useState({ width: 900, height: 620 });
+  const size = useCanvasElementSize(canvasRef, { width: 900, height: 620 });
+  const referenceImage = useLoadedImage(props.referenceImageUrl);
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setSize({
-        width: Math.max(320, Math.floor(entry.contentRect.width)),
-        height: Math.max(320, Math.floor(entry.contentRect.height)),
-      });
-    });
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     onSizeChange(size);
@@ -53,19 +45,20 @@ export function BattleCanvas(props: BattleCanvasProps) {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
-
     const ratio = window.devicePixelRatio || 1;
     canvas.width = Math.floor(size.width * ratio);
     canvas.height = Math.floor(size.height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     context.fillStyle = '#edf7fb';
     context.fillRect(0, 0, size.width, size.height);
-
     drawCanvasFrame(context, props.camera, size);
+    if (referenceImage) {
+      drawReferenceImage(context, { image: referenceImage, opacity: props.referenceOpacity }, props.camera, size);
+    }
     drawPixels(context, props.pixels, props.camera, size);
     drawGrid(context, props.camera, size);
     if (hover) drawHover(context, hover, props.camera, size, props.color, props.canPlace);
-  }, [hover, props.camera, props.canPlace, props.color, props.pixels, size]);
+  }, [hover, props.camera, props.canPlace, props.color, props.pixels, props.referenceOpacity, referenceImage, size]);
 
   function screenToWorld(clientX: number, clientY: number) {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -101,7 +94,6 @@ export function BattleCanvas(props: BattleCanvasProps) {
       moved: false,
     });
   }
-
   function handlePointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
     const pointer = pointers.current.get(event.pointerId);
     const world = screenToWorld(event.clientX, event.clientY);
@@ -110,7 +102,6 @@ export function BattleCanvas(props: BattleCanvasProps) {
       props.onCursorChange(world);
     }
     if (!pointer) return;
-
     pointer.moved ||= Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) > 4;
     const allPointers = [...pointers.current.values()];
     if (allPointers.length === 2) {
@@ -125,7 +116,6 @@ export function BattleCanvas(props: BattleCanvasProps) {
     pointer.lastX = event.clientX;
     pointer.lastY = event.clientY;
   }
-
   function handlePointerUp(event: React.PointerEvent<HTMLCanvasElement>) {
     const pointer = pointers.current.get(event.pointerId);
     pointers.current.delete(event.pointerId);
@@ -134,7 +124,6 @@ export function BattleCanvas(props: BattleCanvasProps) {
     const world = screenToWorld(event.clientX, event.clientY);
     if (world && isInside(world.x, world.y)) props.onPlace(world.x, world.y);
   }
-
   function handlePinch(first: PointerState, second: PointerState) {
     const distance = Math.hypot(first.lastX - second.lastX, first.lastY - second.lastY);
     if (pinchDistance.current) {
@@ -144,18 +133,11 @@ export function BattleCanvas(props: BattleCanvasProps) {
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="battle-canvas"
-      onPointerDown={handlePointerDown}
-      onPointerLeave={() => {
+    <canvas ref={canvasRef} className="battle-canvas" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp} onWheel={handleWheel} onPointerLeave={() => {
         setHover(null);
         props.onCursorChange(null);
-      }}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onWheel={handleWheel}
-    />
+      }} />
   );
 }
 
