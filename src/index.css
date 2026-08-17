@@ -290,7 +290,7 @@ a.auth-home-link {
   grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
   align-items: stretch;
   gap: 22px;
-  margin-top: 8vh;
+  margin-top: 12vh;
 }
 
 .home-intro,
@@ -572,7 +572,7 @@ a.auth-home-link {
   .home-landing {
     grid-template-columns: 1fr;
     gap: 14px;
-    margin-top: 3vh;
+    margin-top: 5vh;
   }
 
   .home-intro {
