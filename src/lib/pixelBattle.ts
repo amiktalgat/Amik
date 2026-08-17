@@ -44,6 +44,14 @@ export type BattleStats = {
   myPixels: number;
 };
 
+export type BattleLeaderboardEntry = {
+  rank: number;
+  user_id: string;
+  username: string;
+  placed_pixels: number;
+  best_streak: number;
+};
+
 export type PlacePixelResult = {
   x: number;
   y: number;
@@ -69,6 +77,14 @@ export async function loadBattleProfile() {
 
 export async function loadBattleStats() {
   return supabase.rpc('get_pixel_battle_stats').single<BattleStats>();
+}
+
+export async function loadBattleLeaderboard() {
+  const { data, error } = await supabase.rpc('get_pixel_battle_leaderboard');
+  return {
+    data: Array.isArray(data) ? data as BattleLeaderboardEntry[] : [],
+    error,
+  };
 }
 
 export async function loadVisiblePixels(bounds: ViewBounds) {

@@ -5,6 +5,7 @@ import { BattleHeader } from '../components/pixel-battle/BattleHeader';
 import { BattleHud } from '../components/pixel-battle/BattleHud';
 import { BattleTutorial } from '../components/pixel-battle/BattleTutorial';
 import { ColorPalette } from '../components/pixel-battle/ColorPalette';
+import { Leaderboard } from '../components/pixel-battle/Leaderboard';
 import { MiniMap } from '../components/pixel-battle/MiniMap';
 import { OwnerTools } from '../components/pixel-battle/OwnerTools';
 import { ZoomControls } from '../components/pixel-battle/ZoomControls';
@@ -17,12 +18,14 @@ import {
   clamp,
   getChunkBounds,
   getRechargeSeconds,
+  loadBattleLeaderboard,
   loadBattleProfile,
   loadBattleStats,
   loadMiniMapPixels,
   loadVisiblePixels,
   placeBattlePixel,
   type BattleTool,
+  type BattleLeaderboardEntry,
   type BattlePixel,
   type BattleProfile,
   type BattleStats,
@@ -41,6 +44,8 @@ export function BattlePage() {
   const [miniPixels, setMiniPixels] = useState<BattlePixel[]>([]);
   const [profile, setProfile] = useState<BattleProfile | null>(null);
   const [stats, setStats] = useState<BattleStats | null>(null);
+  const [leaderboard, setLeaderboard] = useState<BattleLeaderboardEntry[]>([]);
+  const [isLeaderboardLoading, setIsLeaderboardLoading] = useState(true);
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [color, setColor] = useState(() => localStorage.getItem(colorStorageKey) ?? '#ef4444');
   const [brushSize, setBrushSize] = useState(1);
@@ -103,6 +108,7 @@ export function BattlePage() {
     }
     void refreshProfile();
     void refreshStats();
+    void refreshLeaderboard();
     void loadMiniMapPixels().then(({ data }) => setMiniPixels(data ?? []));
   }, [user]);
 
@@ -144,6 +150,7 @@ export function BattlePage() {
         const next = payload.new as BattlePixel;
         setPixels((current) => mergePixels(current, [next]));
         setMiniPixels((current) => mergePixels(current, [next]).slice(-4500));
+        window.setTimeout(() => void refreshLeaderboard(), 400);
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -171,6 +178,13 @@ export function BattlePage() {
   async function refreshStats() {
     const { data } = await loadBattleStats();
     if (data) setStats(data);
+  }
+
+  async function refreshLeaderboard() {
+    const { data, error } = await loadBattleLeaderboard();
+    if (error) setNotice(error.message);
+    else setLeaderboard(data ?? []);
+    setIsLeaderboardLoading(false);
   }
 
   async function handlePlace(x: number, y: number) {
@@ -247,6 +261,7 @@ export function BattlePage() {
     });
     void refreshProfile();
     void refreshStats();
+    void refreshLeaderboard();
   }
 
   function handleSignOut() {
@@ -308,6 +323,7 @@ export function BattlePage() {
           onZoomIn={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 1.25, 0.2, 32) })}
           onZoomOut={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 0.8, 0.2, 32) })}
         />
+        <Leaderboard entries={leaderboard} currentUserId={user?.id} loading={isLeaderboardLoading} />
         <MiniMap
           pixels={miniPixels}
           view={visibleView}

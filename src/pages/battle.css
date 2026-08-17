@@ -252,6 +252,56 @@
   padding: 12px;
 }
 
+.battle-leaderboard {
+  padding: 12px;
+}
+
+.battle-leaderboard__list {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.battle-leaderboard__list li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(61, 79, 151, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.battle-leaderboard__list li.active {
+  border-color: var(--battle-orange);
+  background: rgba(236, 171, 55, 0.18);
+}
+
+.battle-leaderboard__rank,
+.battle-leaderboard__name {
+  min-width: 0;
+  color: var(--battle-line);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.battle-leaderboard__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-leaderboard__list strong {
+  font-size: 14px;
+}
+
+.battle-leaderboard__empty {
+  color: var(--battle-line);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .battle-minimap__map {
   position: relative;
   width: 100%;
