@@ -49,7 +49,19 @@ const defaultSettings: PixelSettings = {
 };
 
 type EditorMode = 'pixel' | 'animation' | 'tilemap';
-type EditorMenu = 'guide' | 'tools';
+type EditorMenu = 'guide' | 'palette' | 'size' | 'color' | 'tools' | 'view' | 'transform' | 'export' | 'animation';
+
+const editorMenus: Array<{ id: EditorMenu; label: string; animationOnly?: boolean }> = [
+  { id: 'guide', label: 'Guide' },
+  { id: 'palette', label: 'Palette' },
+  { id: 'size', label: 'Size' },
+  { id: 'color', label: 'Color' },
+  { id: 'tools', label: 'Tools' },
+  { id: 'view', label: 'View' },
+  { id: 'transform', label: 'Move' },
+  { id: 'export', label: 'Export' },
+  { id: 'animation', label: 'Anim', animationOnly: true },
+];
 
 const defaultSpriteSheetOptions: SpriteSheetOptions = {
   mode: 'horizontal',
@@ -76,7 +88,7 @@ export function PixelForgePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<EditorMenu>('tools');
+  const [activeMenu, setActiveMenu] = useState<EditorMenu>('palette');
   const [gridOpacity, setGridOpacity] = useState(40);
   const [exportScale, setExportScale] = useState<ScaleLevel>(1);
   const [outputSize, setOutputSize] = useState('');
@@ -219,6 +231,10 @@ export function PixelForgePage() {
     if (hasImage) generatePixelArt('Settings updated');
   }, [hasImage, settings]);
 
+  useEffect(() => {
+    if (mode !== 'animation' && activeMenu === 'animation') setActiveMenu('palette');
+  }, [activeMenu, mode]);
+
   const prepareOriginal = (width: number, height: number, resetHistory = true) => {
     originalRef.current.width = width;
     originalRef.current.height = height;
@@ -235,7 +251,7 @@ export function PixelForgePage() {
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
-        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 640);
+        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 420);
         prepareOriginal(image.naturalWidth, image.naturalHeight);
         setCanvasSize(nextCanvasSize);
         const context = originalRef.current.getContext('2d');
@@ -571,12 +587,13 @@ export function PixelForgePage() {
     setActiveMenu(menu);
     setIsMenuOpen(true);
   };
+  const activeMenuLabel = editorMenus.find((item) => item.id === activeMenu)?.label ?? 'Menu';
   const editorControls = (
     <>
       {activeMenu === 'guide' && (
         <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
       )}
-      {activeMenu === 'tools' && (
+      {activeMenu !== 'guide' && (
         <PixelForgeRightPanel
           animationFps={animationFps}
           color={color}
@@ -589,6 +606,7 @@ export function PixelForgePage() {
           isPlayingAnimation={isPlayingAnimation}
           mode={editorPanelMode}
           onionOpacity={onionOpacity}
+          panel={activeMenu}
           settings={settings}
           showNextFrame={showNextFrame}
           showPreviousFrame={showPreviousFrame}
@@ -647,12 +665,18 @@ export function PixelForgePage() {
       />
       {mode !== 'tilemap' && (
         <div className="pf-menuRail" aria-label="Editor menus">
-          <button className={activeMenu === 'guide' ? 'active' : ''} type="button" onClick={() => openMenu('guide')}>
-            Guide
-          </button>
-          <button className={activeMenu === 'tools' ? 'active' : ''} type="button" onClick={() => openMenu('tools')}>
-            Tools
-          </button>
+          {editorMenus
+            .filter((item) => !item.animationOnly || mode === 'animation')
+            .map((item) => (
+              <button
+                className={activeMenu === item.id ? 'active' : ''}
+                key={item.id}
+                type="button"
+                onClick={() => openMenu(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
         </div>
       )}
       {mode === 'tilemap' ? (
@@ -664,7 +688,7 @@ export function PixelForgePage() {
               <button className="pf-menuOverlay" type="button" aria-label="Close menu" onClick={() => setIsMenuOpen(false)} />
               <aside className="pf-menuDrawer" aria-label="Editor menu">
                 <div className="pf-menuDrawer__header">
-                  <h2>{activeMenu === 'guide' ? 'Guide' : 'Tools'}</h2>
+                  <h2>{activeMenuLabel}</h2>
                   <button type="button" onClick={() => setIsMenuOpen(false)}>Close</button>
                 </div>
                 {editorControls}

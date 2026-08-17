@@ -34,6 +34,7 @@ type PixelForgeRightPanelProps = {
   isPlayingAnimation: boolean;
   mode: 'pixel' | 'animation';
   onionOpacity: number;
+  panel: 'animation' | 'palette' | 'size' | 'color' | 'tools' | 'view' | 'transform' | 'export';
   showNextFrame: boolean;
   showPreviousFrame: boolean;
   spriteSheetOptions: SpriteSheetOptions;
@@ -86,6 +87,7 @@ export function PixelForgeRightPanel({
   isPlayingAnimation,
   mode,
   onionOpacity,
+  panel,
   showNextFrame,
   showPreviousFrame,
   spriteSheetOptions,
@@ -129,7 +131,7 @@ export function PixelForgeRightPanel({
 
   return (
     <aside className="pf-sidebar pf-rightPanel">
-      {mode === 'animation' && (
+      {mode === 'animation' && panel === 'animation' && (
         <>
           <AnimationControls
             fps={animationFps}
@@ -160,49 +162,61 @@ export function PixelForgeRightPanel({
           />
         </>
       )}
-      <PaletteSelector
-        customPalette={settings.customPalette}
-        value={settings.paletteId}
-        onChange={(paletteId) => changeSetting('paletteId', paletteId as PaletteId)}
-      />
-      <DocumentSizeControls size={canvasSize} onChange={onCanvasSizeChange} />
-      <ColorInspector color={color} onAddToPalette={onAddToPalette} onColorChange={onColorChange} onStatus={onStatus} />
-      <CustomPaletteEditor
-        colors={settings.customPalette}
-        currentColor={color}
-        onChangeColor={onCustomColorChange}
-        onRemoveColor={onCustomColorRemove}
-        onSelectColor={onColorChange}
-      />
-      <section>
-        <h2>Tools</h2>
-        <div className="pf-toolGrid">
-          {tools.map((item) => (
-            <button className={`pf-tool ${tool === item ? 'active' : ''}`} key={item} onClick={() => onToolChange(item)}>
-              {item === 'eyedropper' ? 'Eyedropper' : item[0].toUpperCase() + item.slice(1)}
-            </button>
-          ))}
-        </div>
-      </section>
-      <PixelForgeViewControls
-        gridOpacity={gridOpacity}
-        isGridVisible={isGridVisible}
-        zoom={zoom}
-        onFit={onZoomFit}
-        onGridOpacityChange={onGridOpacityChange}
-        onGridVisibleChange={onGridVisibleChange}
-        onZoomChange={onZoomChange}
-        onZoomIn={onZoomIn}
-        onZoomOut={onZoomOut}
-      />
-      <PixelForgeTransformControls onTransform={onTransform} />
-      <PixelForgeExportControls
-        scale={exportScale}
-        sizeLabel={exportSize}
-        onCopy={onCopyPng}
-        onExport={onExportPng}
-        onScaleChange={onScaleChange}
-      />
+      {panel === 'palette' && (
+        <PaletteSelector
+          customPalette={settings.customPalette}
+          value={settings.paletteId}
+          onChange={(paletteId) => changeSetting('paletteId', paletteId as PaletteId)}
+        />
+      )}
+      {panel === 'size' && <DocumentSizeControls size={canvasSize} onChange={onCanvasSizeChange} />}
+      {panel === 'color' && (
+        <>
+          <ColorInspector color={color} onAddToPalette={onAddToPalette} onColorChange={onColorChange} onStatus={onStatus} />
+          <CustomPaletteEditor
+            colors={settings.customPalette}
+            currentColor={color}
+            onChangeColor={onCustomColorChange}
+            onRemoveColor={onCustomColorRemove}
+            onSelectColor={onColorChange}
+          />
+        </>
+      )}
+      {panel === 'tools' && (
+        <section>
+          <h2>Tools</h2>
+          <div className="pf-toolGrid">
+            {tools.map((item) => (
+              <button className={`pf-tool ${tool === item ? 'active' : ''}`} key={item} onClick={() => onToolChange(item)}>
+                {item === 'eyedropper' ? 'Eyedropper' : item[0].toUpperCase() + item.slice(1)}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+      {panel === 'view' && (
+        <PixelForgeViewControls
+          gridOpacity={gridOpacity}
+          isGridVisible={isGridVisible}
+          zoom={zoom}
+          onFit={onZoomFit}
+          onGridOpacityChange={onGridOpacityChange}
+          onGridVisibleChange={onGridVisibleChange}
+          onZoomChange={onZoomChange}
+          onZoomIn={onZoomIn}
+          onZoomOut={onZoomOut}
+        />
+      )}
+      {panel === 'transform' && <PixelForgeTransformControls onTransform={onTransform} />}
+      {panel === 'export' && (
+        <PixelForgeExportControls
+          scale={exportScale}
+          sizeLabel={exportSize}
+          onCopy={onCopyPng}
+          onExport={onExportPng}
+          onScaleChange={onScaleChange}
+        />
+      )}
     </aside>
   );
 }

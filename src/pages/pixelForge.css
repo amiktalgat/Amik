@@ -75,14 +75,19 @@
   position: fixed;
   z-index: 9;
   top: 76px;
+  bottom: 48px;
   left: 12px;
   display: grid;
+  align-content: start;
   gap: 8px;
+  overflow-y: auto;
 }
 
 .pf-menuRail button {
-  min-width: 74px;
+  min-width: 82px;
+  padding: 8px 10px;
   box-shadow: 0 12px 28px rgba(23, 32, 51, 0.16);
+  font-size: 13px;
   font-weight: 900;
 }
 
