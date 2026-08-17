@@ -49,6 +49,7 @@ const defaultSettings: PixelSettings = {
 };
 
 type EditorMode = 'pixel' | 'animation' | 'tilemap';
+type EditorMenu = 'guide' | 'tools';
 
 const defaultSpriteSheetOptions: SpriteSheetOptions = {
   mode: 'horizontal',
@@ -75,6 +76,7 @@ export function PixelForgePage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isGridVisible, setIsGridVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<EditorMenu>('tools');
   const [gridOpacity, setGridOpacity] = useState(40);
   const [exportScale, setExportScale] = useState<ScaleLevel>(1);
   const [outputSize, setOutputSize] = useState('');
@@ -233,7 +235,7 @@ export function PixelForgePage() {
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
-        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 1200);
+        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 640);
         prepareOriginal(image.naturalWidth, image.naturalHeight);
         setCanvasSize(nextCanvasSize);
         const context = originalRef.current.getContext('2d');
@@ -565,58 +567,66 @@ export function PixelForgePage() {
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => loadFile(event.target.files?.[0]);
   const editorPanelMode = mode === 'tilemap' ? 'pixel' : mode;
+  const openMenu = (menu: EditorMenu) => {
+    setActiveMenu(menu);
+    setIsMenuOpen(true);
+  };
   const editorControls = (
     <>
-      <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
-      <PixelForgeRightPanel
-        animationFps={animationFps}
-        color={color}
-        exportScale={exportScale}
-        exportSize={exportSize}
-        frames={frames}
-        gridOpacity={gridOpacity}
-        isGridVisible={isGridVisible}
-        isLoopingAnimation={isLoopingAnimation}
-        isPlayingAnimation={isPlayingAnimation}
-        mode={editorPanelMode}
-        onionOpacity={onionOpacity}
-        settings={settings}
-        showNextFrame={showNextFrame}
-        showPreviousFrame={showPreviousFrame}
-        spriteSheetOptions={spriteSheetOptions}
-        canvasSize={canvasSize}
-        tool={tool}
-        zoom={zoom}
-        onAddToPalette={customPalette.addToCustomPalette}
-        onCopyPng={() => void copyPng()}
-        onColorChange={changeColor}
-        onCustomColorChange={customPalette.changeCustomColor}
-        onCustomColorRemove={customPalette.removeCustomColor}
-        onExportPng={exportImage}
-        onExportPngSequence={exportAnimationSequence}
-        onExportSpriteSheet={() => void exportSpriteSheet()}
-        onFpsChange={setAnimationFps}
-        onGridOpacityChange={changeGridOpacity}
-        onGridVisibleChange={setIsGridVisible}
-        onLoopAnimationChange={setIsLoopingAnimation}
-        onScaleChange={setExportScale}
-        onOnionOpacityChange={setOnionOpacity}
-        onPauseAnimation={pauseAnimation}
-        onPlayAnimation={playAnimation}
-        onCanvasSizeChange={changeCanvasSize}
-        onSettingsChange={changeSettings}
-        onShowNextFrameChange={setShowNextFrame}
-        onShowPreviousFrameChange={setShowPreviousFrame}
-        onSpriteSheetOptionsChange={setSpriteSheetOptions}
-        onStatus={setStatus}
-        onToolChange={setTool}
-        onTransform={transformImage}
-        onStopAnimation={stopAnimation}
-        onZoomChange={changeZoom}
-        onZoomFit={fitZoom}
-        onZoomIn={() => stepZoom(1)}
-        onZoomOut={() => stepZoom(-1)}
-      />
+      {activeMenu === 'guide' && (
+        <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
+      )}
+      {activeMenu === 'tools' && (
+        <PixelForgeRightPanel
+          animationFps={animationFps}
+          color={color}
+          exportScale={exportScale}
+          exportSize={exportSize}
+          frames={frames}
+          gridOpacity={gridOpacity}
+          isGridVisible={isGridVisible}
+          isLoopingAnimation={isLoopingAnimation}
+          isPlayingAnimation={isPlayingAnimation}
+          mode={editorPanelMode}
+          onionOpacity={onionOpacity}
+          settings={settings}
+          showNextFrame={showNextFrame}
+          showPreviousFrame={showPreviousFrame}
+          spriteSheetOptions={spriteSheetOptions}
+          canvasSize={canvasSize}
+          tool={tool}
+          zoom={zoom}
+          onAddToPalette={customPalette.addToCustomPalette}
+          onCopyPng={() => void copyPng()}
+          onColorChange={changeColor}
+          onCustomColorChange={customPalette.changeCustomColor}
+          onCustomColorRemove={customPalette.removeCustomColor}
+          onExportPng={exportImage}
+          onExportPngSequence={exportAnimationSequence}
+          onExportSpriteSheet={() => void exportSpriteSheet()}
+          onFpsChange={setAnimationFps}
+          onGridOpacityChange={changeGridOpacity}
+          onGridVisibleChange={setIsGridVisible}
+          onLoopAnimationChange={setIsLoopingAnimation}
+          onScaleChange={setExportScale}
+          onOnionOpacityChange={setOnionOpacity}
+          onPauseAnimation={pauseAnimation}
+          onPlayAnimation={playAnimation}
+          onCanvasSizeChange={changeCanvasSize}
+          onSettingsChange={changeSettings}
+          onShowNextFrameChange={setShowNextFrame}
+          onShowPreviousFrameChange={setShowPreviousFrame}
+          onSpriteSheetOptionsChange={setSpriteSheetOptions}
+          onStatus={setStatus}
+          onToolChange={setTool}
+          onTransform={transformImage}
+          onStopAnimation={stopAnimation}
+          onZoomChange={changeZoom}
+          onZoomFit={fitZoom}
+          onZoomIn={() => stepZoom(1)}
+          onZoomOut={() => stepZoom(-1)}
+        />
+      )}
     </>
   );
 
@@ -636,9 +646,14 @@ export function PixelForgePage() {
         onUndo={history.undo}
       />
       {mode !== 'tilemap' && (
-        <button className="pf-menuToggle" type="button" onClick={() => setIsMenuOpen(true)}>
-          Menu
-        </button>
+        <div className="pf-menuRail" aria-label="Editor menus">
+          <button className={activeMenu === 'guide' ? 'active' : ''} type="button" onClick={() => openMenu('guide')}>
+            Guide
+          </button>
+          <button className={activeMenu === 'tools' ? 'active' : ''} type="button" onClick={() => openMenu('tools')}>
+            Tools
+          </button>
+        </div>
       )}
       {mode === 'tilemap' ? (
         <TilemapEditor onStatus={setStatus} />
@@ -649,7 +664,7 @@ export function PixelForgePage() {
               <button className="pf-menuOverlay" type="button" aria-label="Close menu" onClick={() => setIsMenuOpen(false)} />
               <aside className="pf-menuDrawer" aria-label="Editor menu">
                 <div className="pf-menuDrawer__header">
-                  <h2>Editor menu</h2>
+                  <h2>{activeMenu === 'guide' ? 'Guide' : 'Tools'}</h2>
                   <button type="button" onClick={() => setIsMenuOpen(false)}>Close</button>
                 </div>
                 {editorControls}

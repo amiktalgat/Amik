@@ -289,6 +289,11 @@ export function BattlePage() {
     setIsTutorialOpen(false);
   }
 
+  function changeReferenceImage(imageUrl: string) {
+    setReferenceImageUrl(imageUrl);
+    setReferenceScale(0.5);
+  }
+
   return (
     <main className="battle-shell">
       <BattleHeader
@@ -361,7 +366,7 @@ export function BattlePage() {
         position={referencePosition}
         scale={referenceScale}
         onClose={() => setIsReferenceOpen(false)}
-        onImageChange={setReferenceImageUrl}
+        onImageChange={changeReferenceImage}
         onOpacityChange={setReferenceOpacity}
         onPositionChange={setReferencePosition}
         onScaleChange={setReferenceScale}

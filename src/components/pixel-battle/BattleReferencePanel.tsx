@@ -117,7 +117,7 @@ export function BattleReferencePanel({
         <button type="button" onClick={() => inputRef.current?.click()}>Choose image</button>
         <button type="button" disabled={!imageUrl} onClick={onRemove}>Remove</button>
       </div>
-      <p className="battle-reference__hint">The image is centered on the canvas under your pixels.</p>
+      <p className="battle-reference__hint">Use size and X/Y controls to place the image under your pixels.</p>
       <input ref={inputRef} type="file" accept="image/*" hidden onChange={(event) => {
         const file = event.target.files?.[0];
         if (file) loadFile(file);

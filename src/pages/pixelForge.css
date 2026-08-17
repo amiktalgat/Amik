@@ -71,14 +71,24 @@
 .pf-app--drawer .pf-timeline { grid-row: 3; }
 .pf-app--drawer .pf-statusbar { grid-row: 4; }
 
-.pf-menuToggle {
+.pf-menuRail {
   position: fixed;
   z-index: 9;
   top: 76px;
   left: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.pf-menuRail button {
   min-width: 74px;
   box-shadow: 0 12px 28px rgba(23, 32, 51, 0.16);
   font-weight: 900;
+}
+
+.pf-menuRail button.active {
+  border-color: var(--pf-accent);
+  background: rgba(246, 141, 31, 0.16);
 }
 
 .pf-menuOverlay {
