@@ -5,7 +5,6 @@ const menuItems = [
     href: '/battle',
     title: 'Pixel Battle',
     text: 'Choose a color and place pixels on a shared canvas with other players.',
-    hint: 'Start here: pick a color, zoom in, then tap the canvas.',
   },
   {
     href: '/pixel-forge',
@@ -38,7 +37,6 @@ export function HomePage() {
       <section className="home-grid" aria-label="Main menu">
         {menuItems.map((item) => (
           <Link className="home-card" href={item.href} key={item.href}>
-            {item.hint && <span className="home-card__hint">{item.hint}</span>}
             <strong>{item.title}</strong>
             <span>{item.text}</span>
           </Link>

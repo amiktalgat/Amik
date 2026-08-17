@@ -28,8 +28,8 @@ body {
 .device-toolbar {
   position: fixed;
   z-index: 100;
-  top: 12px;
-  right: 12px;
+  left: 12px;
+  bottom: 12px;
   display: flex;
   gap: 4px;
   padding: 5px;
@@ -40,8 +40,8 @@ body {
 }
 
 .device-toolbar button {
-  min-height: 32px;
-  padding: 7px 10px;
+  min-height: 30px;
+  padding: 6px 9px;
   border-color: #5a5f8c;
   border-top-color: #ffffff;
   border-left-color: #c0d5e6;
@@ -66,12 +66,12 @@ body {
   display: grid;
   place-items: start center;
   min-height: 100vh;
-  padding: 78px 14px 28px;
+  padding: 18px 14px 58px;
 }
 
 .device-preview--mobile .device-frame {
   width: min(390px, 100%);
-  height: min(844px, calc(100vh - 106px));
+  height: min(844px, calc(100vh - 76px));
   min-height: 560px;
   overflow: hidden;
   border: 8px solid var(--carbon);
@@ -313,17 +313,6 @@ a.auth-home-link {
   color: var(--soft);
   line-height: 1.45;
 }
-.home-card__hint {
-  width: fit-content;
-  padding: 5px 8px;
-  border: 1px solid rgba(246, 141, 31, 0.42);
-  border-radius: 4px;
-  background: rgba(236, 171, 55, 0.18);
-  color: var(--ink) !important;
-  font-size: 12px;
-  font-weight: 800;
-}
-
 .auth-page {
   min-height: 100vh;
   display: grid;
