@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { BattleCanvas, type Camera } from '../components/pixel-battle/BattleCanvas';
 import { BattleHeader } from '../components/pixel-battle/BattleHeader';
 import { BattleHud } from '../components/pixel-battle/BattleHud';
+import { BattleTutorial } from '../components/pixel-battle/BattleTutorial';
 import { ColorPalette } from '../components/pixel-battle/ColorPalette';
 import { MiniMap } from '../components/pixel-battle/MiniMap';
 import { OwnerTools } from '../components/pixel-battle/OwnerTools';
@@ -30,6 +31,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import './battle.css';
 
 const colorStorageKey = 'pixelBattleColor';
+const tutorialStorageKey = 'pixelBattleTutorialSeen';
 
 export function BattlePage() {
   const [, navigate] = useLocation();
@@ -47,6 +49,10 @@ export function BattlePage() {
   const [notice, setNotice] = useState('Connecting...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
+  const [hasLoadedPixels, setHasLoadedPixels] = useState(false);
+  const [isLoadingPixels, setIsLoadingPixels] = useState(true);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(() => localStorage.getItem(tutorialStorageKey) !== 'yes');
+  const visibleLoadId = useRef(0);
 
   const bounds = useMemo(() => {
     const worldWidth = canvasSize.width / camera.zoom;
@@ -101,9 +107,21 @@ export function BattlePage() {
   }, [user]);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setIsLoadingPixels(false);
+      return;
+    }
+
+    const loadId = visibleLoadId.current + 1;
+    visibleLoadId.current = loadId;
+    if (!hasLoadedPixels) setIsLoadingPixels(true);
+
     void loadVisiblePixels(bounds).then(({ data, error }) => {
+      if (loadId !== visibleLoadId.current) return;
       if (error) setNotice(error.message);
       if (data) setPixels((current) => mergePixels(current, data));
+      setHasLoadedPixels(true);
+      setIsLoadingPixels(false);
     });
   }, [bounds.maxX, bounds.maxY, bounds.minX, bounds.minY]);
 
@@ -235,9 +253,20 @@ export function BattlePage() {
     void supabase.auth.signOut();
   }
 
+  function closeTutorial() {
+    localStorage.setItem(tutorialStorageKey, 'yes');
+    setIsTutorialOpen(false);
+  }
+
   return (
     <main className="battle-shell">
-      <BattleHeader user={user} onlineCount={onlineCount} stats={stats} onSignOut={handleSignOut} />
+      <BattleHeader
+        user={user}
+        onlineCount={onlineCount}
+        stats={stats}
+        onSignOut={handleSignOut}
+        onTutorialOpen={() => setIsTutorialOpen(true)}
+      />
       <BattleCanvas
         camera={camera}
         canPlace={Boolean(user && profile && (isOwner || profile.balance > 0))}
@@ -248,6 +277,14 @@ export function BattlePage() {
         onPlace={handlePlace}
         onSizeChange={setCanvasSize}
       />
+      {isLoadingPixels && (
+        <section className="battle-loading" aria-live="polite">
+          <div>
+            <h2>Loading drawings</h2>
+            <p>The shared canvas will appear when the visible pixels are ready.</p>
+          </div>
+        </section>
+      )}
       <aside className="battle-sidebar">
         <BattleHud
           profile={profile}
@@ -278,6 +315,7 @@ export function BattlePage() {
         />
       </aside>
       <p className="battle-toast">{notice}</p>
+      <BattleTutorial isOwner={isOwner} open={isTutorialOpen && !isLoadingPixels} onClose={closeTutorial} />
     </main>
   );
 }
