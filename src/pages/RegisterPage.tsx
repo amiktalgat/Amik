@@ -4,9 +4,9 @@ import { useAuthSession } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 
 const projectHighlights = [
-  'Pixel Editor помогает рисовать пиксель-арт, собирать палитры и сохранять результат.',
-  'AI Image Studio придумывает идеи и создаёт картинки для вдохновения.',
-  'Pixel Battle даёт общее поле, где игроки вместе ставят пиксели.',
+  'Pixel Editor helps you draw pixel art, build palettes, and save your work.',
+  'AI Image Studio creates image ideas when you need inspiration.',
+  'Pixel Battle opens a shared canvas where players place pixels together.',
 ];
 
 export function RegisterPage() {
@@ -21,8 +21,8 @@ export function RegisterPage() {
     return (
       <main className="auth-page">
         <section className="empty-state">
-          <h2>Открываем регистрацию</h2>
-          <p>Секунду, готовим страницу аккаунта.</p>
+          <h2>Opening registration</h2>
+          <p>One moment while we prepare your account screen.</p>
         </section>
       </main>
     );
@@ -33,45 +33,45 @@ export function RegisterPage() {
       <section className="auth-hero">
         <div>
           <Link className="auth-logo" href="/">Amik Pixel Studio</Link>
-          <Link className="home-link auth-home-link" href="/">На главную</Link>
+          <Link className="home-link auth-home-link" href="/">Back to home</Link>
         </div>
         <div>
-          <p className="eyebrow">Регистрация</p>
-          <h1>Amik Pixel Studio — место, где можно рисовать, придумывать идеи и играть в Pixel Battle.</h1>
+          <p className="eyebrow">Registration</p>
+          <h1>Create an account, then choose what you want to open first.</h1>
           <p>
-            Создай аккаунт, чтобы сохранять свои рисунки, прогресс в битве пикселей и быстро
-            переходить между редактором, AI-студией и общим canvas.
+            Amik Pixel Studio is a creative workspace for pixel art, AI pictures, and a shared
+            Pixel Battle canvas.
           </p>
           <ul className="auth-feature-list">
             {projectHighlights.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <Link className="auth-side-link" href="/auth">Уже есть аккаунт? Войти</Link>
+          <Link className="auth-side-link" href="/auth">Already have an account? Sign in</Link>
         </div>
       </section>
 
       {user ? (
         <section className="auth-card">
-          <p className="eyebrow">Аккаунт подключён</p>
-          <h2>Ты уже вошёл</h2>
+          <p className="eyebrow">Account connected</p>
+          <h2>You are already signed in</h2>
           <p className="auth-copy">{user.email}</p>
           <div className="actions">
-            <button className="primary-button" type="button" onClick={() => navigate('/pixel-forge')}>
-              Перейти в редактор
+            <button className="primary-button" type="button" onClick={() => navigate('/choose')}>
+              Choose what to open
             </button>
             <button className="ghost" type="button" onClick={signOut}>
-              Выйти
+              Sign out
             </button>
           </div>
         </section>
       ) : (
         <Auth
-          copy="Зарегистрируйся здесь, чтобы твои рисунки, картинки и статистика Pixel Battle сохранялись."
+          copy="Create your account here, then pick AI pictures, Pixel Battle, or the editor."
           initialMode="signup"
           showModeSwitch={false}
-          title="Создать аккаунт"
-          onSuccess={() => navigate('/pixel-forge')}
+          title="Create account"
+          onSuccess={() => navigate('/choose')}
         />
       )}
     </main>

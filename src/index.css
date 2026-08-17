@@ -367,6 +367,64 @@ a.auth-home-link {
   color: #fff;
 }
 
+.choice-page {
+  max-width: 1040px;
+}
+
+.choice-hero {
+  max-width: 680px;
+  margin: 10vh auto 28px;
+  text-align: center;
+}
+
+.choice-hero h1 {
+  margin-bottom: 14px;
+  font-size: clamp(38px, 6vw, 62px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.choice-hero p {
+  color: var(--soft);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.choice-card {
+  display: grid;
+  gap: 12px;
+  min-height: 210px;
+  align-content: start;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.08);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.choice-card:hover {
+  border-color: var(--clay);
+  transform: translateY(-2px);
+}
+
+.choice-card strong {
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.choice-card span {
+  color: var(--soft);
+  line-height: 1.45;
+}
+
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -566,6 +624,15 @@ a.auth-home-link {
 
 @media (max-width: 760px) {
   .home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .choice-hero {
+    margin-top: 5vh;
+    text-align: left;
+  }
+
+  .choice-grid {
     grid-template-columns: 1fr;
   }
 

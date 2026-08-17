@@ -9,6 +9,7 @@ import { AuthPage } from './pages/AuthPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { BattlePage } from './pages/BattlePage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ChooseWorkspacePage } from './pages/ChooseWorkspacePage';
 
 function ProtectedPixelForgePage() {
   return (
@@ -34,6 +35,14 @@ function ProtectedProfilePage() {
   );
 }
 
+function ProtectedChooseWorkspacePage() {
+  return (
+    <RequireAuth>
+      <ChooseWorkspacePage />
+    </RequireAuth>
+  );
+}
+
 function ProtectedNotFoundPage() {
   return (
     <RequireAuth>
@@ -53,6 +62,7 @@ export default function App() {
         <Route path="/auth" component={AuthPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/signup" component={RegisterPage} />
+        <Route path="/choose" component={ProtectedChooseWorkspacePage} />
         <Route path="/profile" component={ProtectedProfilePage} />
         <Route component={ProtectedNotFoundPage} />
       </Switch>
