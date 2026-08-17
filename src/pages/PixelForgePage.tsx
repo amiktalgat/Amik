@@ -71,9 +71,11 @@ const defaultSpriteSheetOptions: SpriteSheetOptions = {
   spacing: 0,
 };
 
+const defaultEditorMaxSide = 420;
+
 const defaultCanvasSize: CanvasSize = {
-  width: 640,
-  height: 640,
+  width: defaultEditorMaxSide,
+  height: defaultEditorMaxSide,
 };
 
 export function PixelForgePage() {
@@ -150,7 +152,7 @@ export function PixelForgePage() {
     ));
   }, []);
 
-  const prepareBlankCanvas = useCallback((width = 640, height = 640) => {
+  const prepareBlankCanvas = useCallback((width = defaultEditorMaxSide, height = defaultEditorMaxSide) => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!canvas || !context) return null;
@@ -251,7 +253,7 @@ export function PixelForgePage() {
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
-        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, 420);
+        const nextCanvasSize = fitInside(image.naturalWidth, image.naturalHeight, defaultEditorMaxSide);
         prepareOriginal(image.naturalWidth, image.naturalHeight);
         setCanvasSize(nextCanvasSize);
         const context = originalRef.current.getContext('2d');
@@ -416,8 +418,8 @@ export function PixelForgePage() {
   const addFrame = () => {
     updateCurrentFrameData();
     const size = canvasRef.current && canvasRef.current.width > 0
-      ? { width: canvasRef.current.width, height: canvasRef.current.height }
-      : { width: 640, height: 640 };
+      ? fitInside(canvasRef.current.width, canvasRef.current.height, defaultEditorMaxSide)
+      : defaultCanvasSize;
     const nextFrame = makeBlankFrame(size.width, size.height);
     const nextIndex = currentFrameIndex + 1;
 

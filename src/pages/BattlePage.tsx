@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { BattleCanvas, type Camera } from '../components/pixel-battle/BattleCanvas';
 import { BattleHeader } from '../components/pixel-battle/BattleHeader';
@@ -16,13 +16,11 @@ import {
   DAILY_BONUS_HOURS,
   MAX_BALANCE,
   clamp,
-  getChunkBounds,
   getRechargeSeconds,
+  loadAllBattlePixels,
   loadBattleLeaderboard,
   loadBattleProfile,
   loadBattleStats,
-  loadMiniMapPixels,
-  loadVisiblePixels,
   placeBattlePixel,
   isBattleHelper,
   isBattleOwner,
@@ -66,13 +64,6 @@ export function BattlePage() {
   const [referenceOpacity, setReferenceOpacity] = useState(0.35);
   const [referencePosition, setReferencePosition] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
   const [referenceScale, setReferenceScale] = useState(1);
-  const visibleLoadId = useRef(0);
-
-  const bounds = useMemo(() => {
-    const worldWidth = canvasSize.width / camera.zoom;
-    const worldHeight = canvasSize.height / camera.zoom;
-    return getChunkBounds(camera.x, camera.y, worldWidth, worldHeight);
-  }, [camera, canvasSize]);
 
   const visibleView = useMemo(() => ({
     x: clamp(camera.x - canvasSize.width / 2 / camera.zoom, 0, CANVAS_SIZE),
@@ -121,31 +112,22 @@ export function BattlePage() {
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setNotice('Supabase is not configured.');
+      setIsLoadingPixels(false);
       return;
     }
     void refreshProfile();
     void refreshStats();
     void refreshLeaderboard();
-    void loadMiniMapPixels().then(({ data }) => setMiniPixels(data ?? []));
-  }, [user]);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setIsLoadingPixels(false);
-      return;
-    }
-
-    const loadId = visibleLoadId.current + 1;
-    visibleLoadId.current = loadId;
     setIsLoadingPixels(true);
-
-    void loadVisiblePixels(bounds).then(({ data, error }) => {
-      if (loadId !== visibleLoadId.current) return;
+    void loadAllBattlePixels().then(({ data, error }) => {
       if (error) setNotice(error.message);
-      if (data) setPixels((current) => mergePixels(current, data));
+      if (data) {
+        setPixels(data);
+        setMiniPixels(data);
+      }
       setIsLoadingPixels(false);
     });
-  }, [bounds.maxX, bounds.maxY, bounds.minX, bounds.minY]);
+  }, [user]);
 
   useEffect(() => {
     const channel = supabase.channel('pixel-battle-room', {

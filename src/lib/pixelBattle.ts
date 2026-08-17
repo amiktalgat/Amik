@@ -14,6 +14,8 @@ export const BATTLE_HELPER_EMAILS = [
 ];
 const VISIBLE_PIXEL_PAGE_SIZE = 1000;
 const VISIBLE_PIXEL_MAX_PAGES = 120;
+const ALL_PIXEL_PAGE_SIZE = 1000;
+const ALL_PIXEL_MAX_PAGES = 500;
 
 export const BATTLE_COLORS = [
   '#000000', '#ffffff', '#f87171', '#ef4444', '#fb923c', '#f59e0b',
@@ -116,6 +118,30 @@ export async function loadVisiblePixels(bounds: ViewBounds) {
 
     pixels.push(...data);
     if (data.length < VISIBLE_PIXEL_PAGE_SIZE) break;
+  }
+
+  return { data: pixels, error: null };
+}
+
+export async function loadAllBattlePixels() {
+  const pixels: BattlePixel[] = [];
+
+  for (let page = 0; page < ALL_PIXEL_MAX_PAGES; page += 1) {
+    const from = page * ALL_PIXEL_PAGE_SIZE;
+    const to = from + ALL_PIXEL_PAGE_SIZE - 1;
+    const { data, error } = await supabase
+      .from('canvas_pixels')
+      .select('x,y,color,user_id,updated_at')
+      .order('x', { ascending: true })
+      .order('y', { ascending: true })
+      .range(from, to)
+      .returns<BattlePixel[]>();
+
+    if (error) return { data: null, error };
+    if (!data || data.length === 0) break;
+
+    pixels.push(...data);
+    if (data.length < ALL_PIXEL_PAGE_SIZE) break;
   }
 
   return { data: pixels, error: null };
