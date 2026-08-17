@@ -59,7 +59,6 @@ export function BattlePage() {
   const [notice, setNotice] = useState('Connecting...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
-  const [hasLoadedPixels, setHasLoadedPixels] = useState(false);
   const [isLoadingPixels, setIsLoadingPixels] = useState(true);
   const [isTutorialOpen, setIsTutorialOpen] = useState(() => localStorage.getItem(tutorialStorageKey) !== 'yes');
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
@@ -138,13 +137,12 @@ export function BattlePage() {
 
     const loadId = visibleLoadId.current + 1;
     visibleLoadId.current = loadId;
-    if (!hasLoadedPixels) setIsLoadingPixels(true);
+    setIsLoadingPixels(true);
 
     void loadVisiblePixels(bounds).then(({ data, error }) => {
       if (loadId !== visibleLoadId.current) return;
       if (error) setNotice(error.message);
       if (data) setPixels((current) => mergePixels(current, data));
-      setHasLoadedPixels(true);
       setIsLoadingPixels(false);
     });
   }, [bounds.maxX, bounds.maxY, bounds.minX, bounds.minY]);

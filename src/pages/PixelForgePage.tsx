@@ -74,6 +74,7 @@ export function PixelForgePage() {
   const [hoverPixel, setHoverPixel] = useState<PixelCoordinates | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isGridVisible, setIsGridVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [gridOpacity, setGridOpacity] = useState(40);
   const [exportScale, setExportScale] = useState<ScaleLevel>(1);
   const [outputSize, setOutputSize] = useState('');
@@ -563,64 +564,11 @@ export function PixelForgePage() {
     : 'No image loaded';
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => loadFile(event.target.files?.[0]);
-
-  return (
-    <div className="pf-app">
-      <PixelForgeHeader
-        canRedo={history.canRedo}
-        canUndo={history.canUndo}
-        mode={mode}
-        onNew={clearDocument}
-        onOpen={() => inputRef.current?.click()}
-        onGenerate={() => generatePixelArt('Pixel art generated', settings, true)}
-        onReset={resetDocument}
-        onExport={exportImage}
-        onModeChange={changeMode}
-        onRedo={history.redo}
-        onUndo={history.undo}
-      />
-      {mode === 'tilemap' ? (
-        <TilemapEditor onStatus={setStatus} />
-      ) : (
-        <>
-          <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
-          <PixelForgeWorkspace
-            canvasRef={canvasRef}
-            canvasSize={canvasSize}
-            gridOpacity={gridOpacity}
-            hasImage={hasImage}
-            hoverPixel={hoverPixel}
-            isGridVisible={isGridVisible}
-            isDragging={isDragging}
-            nextFrameDataUrl={mode === 'animation' && showNextFrame ? frames[currentFrameIndex + 1]?.dataUrl ?? null : null}
-            onionOpacity={onionOpacity}
-            previousFrameDataUrl={mode === 'animation' && showPreviousFrame ? frames[currentFrameIndex - 1]?.dataUrl ?? null : null}
-            pixelSize={settings.pixelSize}
-            zoom={zoom}
-            onDemo={() => makeDemo()}
-            onDragState={setIsDragging}
-            onDrop={loadFile}
-            onOpen={() => inputRef.current?.click()}
-            onPaintEnd={finishPainting}
-            onPaintHover={painter.onPaintHover}
-            onPaintLeave={painter.onPaintLeave}
-            onPaintMove={painter.onPaintMove}
-            onPaintStart={painter.onPaintStart}
-          />
-        </>
-      )}
-      {mode === 'animation' && (
-        <AnimationTimeline
-          currentFrameIndex={currentFrameIndex}
-          frames={frames}
-          onAddFrame={addFrame}
-          onDeleteFrame={deleteFrame}
-          onDuplicateFrame={duplicateFrame}
-          onMoveFrame={moveFrame}
-          onSelectFrame={selectFrame}
-        />
-      )}
-      {mode !== 'tilemap' && <PixelForgeRightPanel
+  const editorPanelMode = mode === 'tilemap' ? 'pixel' : mode;
+  const editorControls = (
+    <>
+      <PixelForgeLeftPanel activeSection={activeSection} onSectionChange={setActiveSection} />
+      <PixelForgeRightPanel
         animationFps={animationFps}
         color={color}
         exportScale={exportScale}
@@ -630,7 +578,7 @@ export function PixelForgePage() {
         isGridVisible={isGridVisible}
         isLoopingAnimation={isLoopingAnimation}
         isPlayingAnimation={isPlayingAnimation}
-        mode={mode}
+        mode={editorPanelMode}
         onionOpacity={onionOpacity}
         settings={settings}
         showNextFrame={showNextFrame}
@@ -668,7 +616,82 @@ export function PixelForgePage() {
         onZoomFit={fitZoom}
         onZoomIn={() => stepZoom(1)}
         onZoomOut={() => stepZoom(-1)}
-      />}
+      />
+    </>
+  );
+
+  return (
+    <div className={`pf-app ${mode !== 'tilemap' ? 'pf-app--drawer' : ''}`}>
+      <PixelForgeHeader
+        canRedo={history.canRedo}
+        canUndo={history.canUndo}
+        mode={mode}
+        onNew={clearDocument}
+        onOpen={() => inputRef.current?.click()}
+        onGenerate={() => generatePixelArt('Pixel art generated', settings, true)}
+        onReset={resetDocument}
+        onExport={exportImage}
+        onModeChange={changeMode}
+        onRedo={history.redo}
+        onUndo={history.undo}
+      />
+      {mode !== 'tilemap' && (
+        <button className="pf-menuToggle" type="button" onClick={() => setIsMenuOpen(true)}>
+          Menu
+        </button>
+      )}
+      {mode === 'tilemap' ? (
+        <TilemapEditor onStatus={setStatus} />
+      ) : (
+        <>
+          {isMenuOpen && (
+            <>
+              <button className="pf-menuOverlay" type="button" aria-label="Close menu" onClick={() => setIsMenuOpen(false)} />
+              <aside className="pf-menuDrawer" aria-label="Editor menu">
+                <div className="pf-menuDrawer__header">
+                  <h2>Editor menu</h2>
+                  <button type="button" onClick={() => setIsMenuOpen(false)}>Close</button>
+                </div>
+                {editorControls}
+              </aside>
+            </>
+          )}
+          <PixelForgeWorkspace
+            canvasRef={canvasRef}
+            canvasSize={canvasSize}
+            gridOpacity={gridOpacity}
+            hasImage={hasImage}
+            hoverPixel={hoverPixel}
+            isGridVisible={isGridVisible}
+            isDragging={isDragging}
+            nextFrameDataUrl={mode === 'animation' && showNextFrame ? frames[currentFrameIndex + 1]?.dataUrl ?? null : null}
+            onionOpacity={onionOpacity}
+            previousFrameDataUrl={mode === 'animation' && showPreviousFrame ? frames[currentFrameIndex - 1]?.dataUrl ?? null : null}
+            pixelSize={settings.pixelSize}
+            zoom={zoom}
+            onDemo={() => makeDemo()}
+            onDragState={setIsDragging}
+            onDrop={loadFile}
+            onOpen={() => inputRef.current?.click()}
+            onPaintEnd={finishPainting}
+            onPaintHover={painter.onPaintHover}
+            onPaintLeave={painter.onPaintLeave}
+            onPaintMove={painter.onPaintMove}
+            onPaintStart={painter.onPaintStart}
+          />
+        </>
+      )}
+      {mode === 'animation' && (
+        <AnimationTimeline
+          currentFrameIndex={currentFrameIndex}
+          frames={frames}
+          onAddFrame={addFrame}
+          onDeleteFrame={deleteFrame}
+          onDuplicateFrame={duplicateFrame}
+          onMoveFrame={moveFrame}
+          onSelectFrame={selectFrame}
+        />
+      )}
       <footer className="pf-statusbar">
         <span>{status}</span>
         <span>{mode === 'tilemap' ? 'Grid: on' : hoverPixel ? `X: ${hoverPixel.x} | Y: ${hoverPixel.y}` : 'X: - | Y: -'}</span>
