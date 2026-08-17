@@ -72,6 +72,16 @@
 .pf-app--drawer .pf-timeline { grid-row: 3; }
 .pf-app--drawer .pf-statusbar { grid-row: 4; }
 
+.pf-app--animation.pf-app--menuOpen .pf-menuDrawer {
+  bottom: 130px;
+}
+
+.pf-app--animation.pf-app--menuOpen .pf-timeline,
+.pf-app--animation.pf-app--menuOpen .pf-statusbar {
+  position: relative;
+  z-index: 13;
+}
+
 .pf-menuRail {
   position: fixed;
   z-index: 9;
@@ -709,6 +719,7 @@
   .pf-app--drawer .pf-workspace { grid-row: 2; }
   .pf-app--drawer .pf-timeline { grid-row: 3; }
   .pf-app--drawer .pf-statusbar { grid-row: 4; }
+  .pf-app--animation.pf-app--menuOpen .pf-menuDrawer { bottom: 190px; }
   .pf-sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; border: 0; }
   .pf-menuDrawer .pf-sidebar { grid-template-columns: 1fr; }
   .pf-menuDrawer .pf-leftPanel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -752,6 +763,7 @@
 .device-preview--mobile .pf-app--drawer .pf-workspace { grid-row: 2; }
 .device-preview--mobile .pf-app--drawer .pf-timeline { grid-row: 3; }
 .device-preview--mobile .pf-app--drawer .pf-statusbar { grid-row: 4; }
+.device-preview--mobile .pf-app--animation.pf-app--menuOpen .pf-menuDrawer { bottom: 190px; }
 
 .device-preview--mobile .pf-sidebar {
   display: grid;

@@ -650,8 +650,15 @@ export function PixelForgePage() {
     </>
   );
 
+  const appClassName = [
+    'pf-app',
+    mode !== 'tilemap' ? 'pf-app--drawer' : '',
+    mode === 'animation' ? 'pf-app--animation' : '',
+    isMenuOpen ? 'pf-app--menuOpen' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`pf-app ${mode !== 'tilemap' ? 'pf-app--drawer' : ''} ${isMenuOpen ? 'pf-app--menuOpen' : ''}`}>
+    <div className={appClassName}>
       <PixelForgeHeader
         canRedo={history.canRedo}
         canUndo={history.canUndo}
