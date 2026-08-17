@@ -730,11 +730,14 @@ export function PixelForgePage() {
         <AnimationTimeline
           currentFrameIndex={currentFrameIndex}
           frames={frames}
+          isPlaying={isPlayingAnimation}
           onAddFrame={addFrame}
           onDeleteFrame={deleteFrame}
           onDuplicateFrame={duplicateFrame}
           onMoveFrame={moveFrame}
           onSelectFrame={selectFrame}
+          onStart={playAnimation}
+          onStop={stopAnimation}
         />
       )}
       <footer className="pf-statusbar">
