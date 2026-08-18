@@ -21,6 +21,7 @@ import {
   loadBattleLeaderboard,
   loadBattleProfile,
   loadBattleStats,
+  loadVisiblePixels,
   placeBattlePixel,
   isBattleHelper,
   isBattleOwner,
@@ -57,7 +58,6 @@ export function BattlePage() {
   const [notice, setNotice] = useState('Connecting...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
-  const [isLoadingPixels, setIsLoadingPixels] = useState(true);
   const [isTutorialOpen, setIsTutorialOpen] = useState(() => localStorage.getItem(tutorialStorageKey) !== 'yes');
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [referenceImageUrl, setReferenceImageUrl] = useState('');
@@ -112,21 +112,39 @@ export function BattlePage() {
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setNotice('Supabase is not configured.');
-      setIsLoadingPixels(false);
       return;
     }
+    let isCancelled = false;
     void refreshProfile();
     void refreshStats();
     void refreshLeaderboard();
-    setIsLoadingPixels(true);
+    setNotice('Opening canvas');
+
+    void loadVisiblePixels({
+      minX: Math.floor(visibleView.x),
+      maxX: Math.ceil(clamp(visibleView.x + visibleView.width, 0, CANVAS_SIZE)),
+      minY: Math.floor(visibleView.y),
+      maxY: Math.ceil(clamp(visibleView.y + visibleView.height, 0, CANVAS_SIZE)),
+    }).then(({ data, error }) => {
+      if (isCancelled) return;
+      if (error) setNotice(error.message);
+      if (data) setPixels(data);
+      setNotice('Canvas ready');
+    });
+
     void loadAllBattlePixels().then(({ data, error }) => {
+      if (isCancelled) return;
       if (error) setNotice(error.message);
       if (data) {
         setPixels(data);
         setMiniPixels(data);
       }
-      setIsLoadingPixels(false);
+      setNotice('Full map loaded');
     });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [user]);
 
   useEffect(() => {
@@ -262,10 +280,6 @@ export function BattlePage() {
     void refreshLeaderboard();
   }
 
-  function handleSignOut() {
-    void supabase.auth.signOut();
-  }
-
   function closeTutorial() {
     localStorage.setItem(tutorialStorageKey, 'yes');
     setIsTutorialOpen(false);
@@ -283,7 +297,6 @@ export function BattlePage() {
         onlineCount={onlineCount}
         stats={stats}
         onReferenceOpen={() => setIsReferenceOpen(true)}
-        onSignOut={handleSignOut}
         onTutorialOpen={() => setIsTutorialOpen(true)}
       />
       <BattleCanvas
@@ -300,14 +313,6 @@ export function BattlePage() {
         onPlace={handlePlace}
         onSizeChange={setCanvasSize}
       />
-      {isLoadingPixels && (
-        <section className="battle-loading" aria-live="polite">
-          <div>
-            <h2>Loading drawings</h2>
-            <p>The shared canvas will appear when the visible pixels are ready.</p>
-          </div>
-        </section>
-      )}
       <aside className="battle-sidebar">
         <BattleHud
           profile={profile}
@@ -354,7 +359,7 @@ export function BattlePage() {
         onScaleChange={setReferenceScale}
         onRemove={() => setReferenceImageUrl('')}
       />
-      <BattleTutorial isOwner={isOwner || isHelper} open={isTutorialOpen && !isLoadingPixels} onClose={closeTutorial} />
+      <BattleTutorial isOwner={isOwner || isHelper} open={isTutorialOpen} onClose={closeTutorial} />
     </main>
   );
 }

@@ -36,7 +36,7 @@ export function PixelForgeHeader({
         PixelForge
       </div>
       <nav className="pf-actions">
-        <Link href="/">Главное меню</Link>
+        <Link href="/choose">Back</Link>
         <button className={mode === 'pixel' ? 'active' : ''} onClick={() => onModeChange('pixel')}>Pixels</button>
         <button className={mode === 'animation' ? 'active' : ''} onClick={() => onModeChange('animation')}>Animation</button>
         <button className={mode === 'tilemap' ? 'active' : ''} onClick={() => onModeChange('tilemap')}>Map</button>

@@ -1,7 +1,7 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Auth } from '../components/Auth';
 import { useAuthSession } from '../lib/auth';
-import { supabase } from '../lib/supabase';
 
 const projectHighlights = [
   'Pixel Editor helps you draw pixel art, build palettes, and save your work.',
@@ -13,9 +13,9 @@ export function RegisterPage() {
   const [, navigate] = useLocation();
   const { user, loading } = useAuthSession();
 
-  async function signOut() {
-    await supabase.auth.signOut();
-  }
+  useEffect(() => {
+    if (!loading && user) navigate('/choose', { replace: true });
+  }, [loading, navigate, user]);
 
   if (loading) {
     return (
@@ -23,6 +23,17 @@ export function RegisterPage() {
         <section className="empty-state">
           <h2>Opening registration</h2>
           <p>One moment while we prepare your account screen.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (user) {
+    return (
+      <main className="auth-page auth-page--single">
+        <section className="empty-state">
+          <h2>Opening workspace</h2>
+          <p>You are already signed in.</p>
         </section>
       </main>
     );
@@ -51,29 +62,13 @@ export function RegisterPage() {
         </div>
       </section>
 
-      {user ? (
-        <section className="auth-card">
-          <p className="eyebrow">Account connected</p>
-          <h2>You are already signed in</h2>
-          <p className="auth-copy">{user.email}</p>
-          <div className="actions">
-            <button className="primary-button" type="button" onClick={() => navigate('/choose')}>
-              Choose what to open
-            </button>
-            <button className="ghost" type="button" onClick={signOut}>
-              Sign out
-            </button>
-          </div>
-        </section>
-      ) : (
-        <Auth
-          copy="Create your account here, then pick AI pictures, Pixel Battle, or the editor."
-          initialMode="signup"
-          showModeSwitch={false}
-          title="Create account"
-          onSuccess={() => navigate('/choose')}
-        />
-      )}
+      <Auth
+        copy="Create your account here, then pick AI pictures, Pixel Battle, or the editor."
+        initialMode="signup"
+        showModeSwitch={false}
+        title="Create account"
+        onSuccess={() => navigate('/choose')}
+      />
     </main>
   );
 }

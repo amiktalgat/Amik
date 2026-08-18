@@ -31,13 +31,17 @@ export function Auth({
     return `${window.location.origin}${window.location.pathname}${window.location.search}`;
   }
 
+  function getGoogleRedirectUrl() {
+    return `${window.location.origin}/choose`;
+  }
+
   async function handleGoogleSignIn() {
     setGoogleBusy(true);
     setMessage('');
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: getRedirectUrl() },
+      options: { redirectTo: getGoogleRedirectUrl() },
     });
 
     if (error) {

@@ -82,7 +82,7 @@ export function AIImagePage() {
           AI Image Studio
         </div>
         <nav className="pf-actions">
-          <Link href="/">Menu</Link>
+          <Link href="/choose">Back</Link>
           <Link href="/pixel-forge">Editor</Link>
           <Link className="active" href="/ai-image">AI Generator</Link>
         </nav>

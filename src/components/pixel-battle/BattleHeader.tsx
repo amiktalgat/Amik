@@ -7,7 +7,6 @@ type BattleHeaderProps = {
   onlineCount: number;
   stats: BattleStats | null;
   onReferenceOpen: () => void;
-  onSignOut: () => void;
   onTutorialOpen: () => void;
 };
 
@@ -16,7 +15,6 @@ export function BattleHeader({
   onlineCount,
   stats,
   onReferenceOpen,
-  onSignOut,
   onTutorialOpen,
 }: BattleHeaderProps) {
   return (
@@ -33,13 +31,9 @@ export function BattleHeader({
         <button className="battle-text-button battle-help-button" type="button" onClick={onTutorialOpen}>
           Help
         </button>
-        <Link href="/">Menu</Link>
+        <Link href="/choose">Menu</Link>
         <Link href="/profile">Profile</Link>
-        {user ? (
-          <button className="battle-text-button" type="button" onClick={onSignOut}>
-            Sign out
-          </button>
-        ) : (
+        {!user && (
           <Link className="battle-login" href="/auth?next=/battle">Sign in</Link>
         )}
       </nav>

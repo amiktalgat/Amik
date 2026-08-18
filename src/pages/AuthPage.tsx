@@ -1,7 +1,7 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Auth } from '../components/Auth';
 import { useAuthSession } from '../lib/auth';
-import { supabase } from '../lib/supabase';
 
 function getNextPath() {
   const next = new URLSearchParams(window.location.search).get('next');
@@ -13,9 +13,9 @@ export function AuthPage() {
   const [, navigate] = useLocation();
   const { user, loading } = useAuthSession();
 
-  async function signOut() {
-    await supabase.auth.signOut();
-  }
+  useEffect(() => {
+    if (!loading && user) navigate(getNextPath(), { replace: true });
+  }, [loading, navigate, user]);
 
   if (loading) {
     return (
@@ -23,6 +23,17 @@ export function AuthPage() {
         <section className="empty-state">
           <h2>Checking sign in</h2>
           <p>One moment while we open your workspace.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (user) {
+    return (
+      <main className="auth-page auth-page--single">
+        <section className="empty-state">
+          <h2>Opening workspace</h2>
+          <p>You are already signed in.</p>
         </section>
       </main>
     );
@@ -43,23 +54,7 @@ export function AuthPage() {
         </div>
       </section>
 
-      {user ? (
-        <section className="auth-card">
-          <p className="eyebrow">Account connected</p>
-          <h2>You are signed in</h2>
-          <p className="auth-copy">{user.email}</p>
-          <div className="actions">
-            <button className="primary-button" type="button" onClick={() => navigate(getNextPath())}>
-              Continue
-            </button>
-            <button className="ghost" type="button" onClick={signOut}>
-              Sign out
-            </button>
-          </div>
-        </section>
-      ) : (
-        <Auth initialMode="signin" showModeSwitch={false} onSuccess={() => navigate(getNextPath())} />
-      )}
+      <Auth initialMode="signin" showModeSwitch={false} onSuccess={() => navigate(getNextPath())} />
     </main>
   );
 }

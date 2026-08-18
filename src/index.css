@@ -108,6 +108,73 @@ body {
   max-width: 390px;
 }
 
+.device-preview--mobile .auth-page {
+  min-height: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 14px;
+  padding: 14px;
+}
+
+.device-preview--mobile .auth-hero {
+  min-height: auto;
+  gap: 18px;
+  padding: 18px;
+}
+
+.device-preview--mobile .auth-hero > div:first-child {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.device-preview--mobile .auth-logo {
+  font-size: 17px;
+}
+
+.device-preview--mobile a.auth-home-link {
+  margin-top: 0;
+  padding: 9px 10px;
+  text-align: center;
+}
+
+.device-preview--mobile .auth-hero h1 {
+  font-size: 30px;
+  line-height: 1.05;
+}
+
+.device-preview--mobile .auth-hero p {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.device-preview--mobile .auth-feature-list {
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.device-preview--mobile .auth-side-link {
+  margin-top: 14px;
+}
+
+.device-preview--mobile .auth-card {
+  width: 100%;
+  padding: 20px;
+}
+
+.device-preview--mobile .auth-card h2 {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.device-preview--mobile .google-button {
+  min-height: 48px;
+  padding: 10px 12px;
+}
+
 .container {
   max-width: 960px;
   margin: 0 auto;
@@ -473,6 +540,11 @@ a.auth-home-link {
   padding: 42px 24px;
 }
 
+.auth-page--single {
+  grid-template-columns: minmax(0, 520px);
+  justify-content: center;
+}
+
 .auth-hero {
   min-height: 520px;
   display: flex;
@@ -652,18 +724,67 @@ a.auth-home-link {
   }
 
   .auth-page {
+    align-items: start;
     grid-template-columns: 1fr;
-    gap: 18px;
-    padding: 18px;
+    gap: 14px;
+    padding: 14px;
   }
 
   .auth-hero {
     min-height: auto;
-    gap: 56px;
-    padding: 24px;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .auth-hero > div:first-child {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .auth-logo {
+    font-size: 17px;
+  }
+
+  a.auth-home-link {
+    margin-top: 0;
+    padding: 9px 10px;
+    text-align: center;
   }
 
   .auth-hero h1 {
-    font-size: 36px;
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .auth-hero p {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .auth-feature-list {
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 14px;
+  }
+
+  .auth-side-link {
+    margin-top: 14px;
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .auth-card h2 {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  .google-button {
+    min-height: 48px;
+    padding: 10px 12px;
   }
 }
