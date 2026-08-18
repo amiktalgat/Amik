@@ -156,7 +156,8 @@ export async function loadMiniMapPixels() {
     .returns<BattlePixel[]>();
 }
 
-export type BattleTool = 'paint' | 'erase';
+export type BattlePaintTool = 'paint' | 'erase';
+export type BattleTool = BattlePaintTool | 'eyedropper';
 
 export function isBattleOwner(email: string | null | undefined) {
   return email?.toLowerCase() === BATTLE_OWNER_EMAIL;
@@ -170,7 +171,7 @@ export function isBattlePrivileged(email: string | null | undefined) {
   return isBattleOwner(email) || isBattleHelper(email);
 }
 
-export async function placeBattlePixel(x: number, y: number, color: string, brushSize = 1, tool: BattleTool = 'paint') {
+export async function placeBattlePixel(x: number, y: number, color: string, brushSize = 1, tool: BattlePaintTool = 'paint') {
   return supabase.functions.invoke<PlacePixelResult>('place-pixel', {
     body: { x, y, color, brushSize, tool },
   });

@@ -187,6 +187,18 @@ export function BattlePage() {
   }
 
   async function handlePlace(x: number, y: number) {
+    if (tool === 'eyedropper') {
+      const pickedPixel = pixels.find((pixel) => pixel.x === x && pixel.y === y);
+      if (!pickedPixel) {
+        setNotice('No pixel color here');
+        return;
+      }
+      setColor(pickedPixel.color);
+      setTool('paint');
+      setNotice('Color picked');
+      return;
+    }
+
     if (!user) {
       navigate('/auth?next=/battle');
       return;
@@ -233,7 +245,8 @@ export function BattlePage() {
       : current);
     setNotice(tool === 'erase' ? 'Pixels erased!' : 'Pixel placed!');
 
-    const { data, error } = await placeBattlePixel(x, y, color, size, tool);
+    const writeTool = tool === 'erase' ? 'erase' : 'paint';
+    const { data, error } = await placeBattlePixel(x, y, color, size, writeTool);
     if (error) {
       const message = await getFunctionErrorMessage(error);
       setNotice(message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : message);
@@ -285,7 +298,7 @@ export function BattlePage() {
       />
       <BattleCanvas
         camera={camera}
-        canPlace={Boolean(user && profile && (hasPowerTools || profile.balance > 0))}
+        canPlace={tool === 'eyedropper' || Boolean(user && profile && (hasPowerTools || profile.balance > 0))}
         color={color}
         pixels={pixels}
         referenceImageUrl={referenceImageUrl}
@@ -313,7 +326,7 @@ export function BattlePage() {
           nextBonusText={nextBonusText}
           canPlace={Boolean(user)}
         />
-        <ColorPalette color={color} onChange={setColor} />
+        <ColorPalette color={color} tool={tool} onChange={setColor} onToolChange={setTool} />
         {hasPowerTools && (
           <OwnerTools
             brushSize={brushSize}

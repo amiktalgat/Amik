@@ -208,6 +208,23 @@
   outline-offset: 1px;
 }
 
+.battle-picker-tool {
+  width: 100%;
+  min-height: 38px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(200, 213, 228, 0.95);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--battle-carbon);
+  font-weight: 850;
+}
+
+.battle-picker-tool.active {
+  border-color: var(--battle-carbon);
+  background: var(--battle-carbon);
+  color: #ffffff;
+}
+
 .battle-color-picker {
   display: flex;
   align-items: center;
