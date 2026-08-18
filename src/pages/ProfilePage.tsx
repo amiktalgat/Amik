@@ -4,17 +4,27 @@ import { SupabaseSetupMessage } from '../components/SupabaseSetupMessage';
 import { useAuthSession } from '../lib/auth';
 import { loadBattleProfile, loadBattleStats, type BattleProfile, type BattleStats } from '../lib/pixelBattle';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { friendlyDataError } from '../lib/userMessages';
 
 export function ProfilePage() {
   const [, navigate] = useLocation();
   const { user, loading } = useAuthSession();
   const [profile, setProfile] = useState<BattleProfile | null>(null);
   const [stats, setStats] = useState<BattleStats | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (!user) return;
-    void loadBattleProfile().then(({ data }) => setProfile(data ?? null));
-    void loadBattleStats().then(({ data }) => setStats(data ?? null));
+    setProfileLoading(true);
+    setMessage('');
+    void Promise.all([loadBattleProfile(), loadBattleStats()]).then(([profileResult, statsResult]) => {
+      if (profileResult.error) setMessage(friendlyDataError(profileResult.error.message));
+      if (statsResult.error) setMessage(friendlyDataError(statsResult.error.message));
+      setProfile(profileResult.data ?? null);
+      setStats(statsResult.data ?? null);
+      setProfileLoading(false);
+    });
   }, [user]);
 
   async function signOut() {
@@ -53,6 +63,17 @@ export function ProfilePage() {
     );
   }
 
+  if (profileLoading) {
+    return (
+      <main className="container">
+        <section className="empty-state">
+          <h2>Loading profile</h2>
+          <p>Getting your Pixel Battle stats ready.</p>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="container">
       <nav className="top-nav">
@@ -64,6 +85,7 @@ export function ProfilePage() {
       <section className="card">
         <p className="eyebrow">My profile</p>
         <h2>{profile?.username ?? user.email}</h2>
+        {message && <p className="message">{message}</p>}
         <ul className="profile-stats">
           <li><span>Email</span><strong>{user.email}</strong></li>
           <li><span>Joined</span><strong>{formatDate(profile?.created_at)}</strong></li>

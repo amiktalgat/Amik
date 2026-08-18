@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { friendlyAuthError } from '../lib/userMessages';
 import { SupabaseSetupMessage } from './SupabaseSetupMessage';
 
 type AuthProps = {
@@ -45,7 +46,7 @@ export function Auth({
     });
 
     if (error) {
-      setMessage(error.message);
+      setMessage(friendlyAuthError(error.message));
       setGoogleBusy(false);
     }
   }
@@ -67,7 +68,7 @@ export function Auth({
       const { data, error } = await request;
 
       if (error) {
-        setMessage(error.message);
+        setMessage(friendlyAuthError(error.message));
         return;
       }
 
@@ -78,7 +79,7 @@ export function Auth({
 
       onSuccess?.();
     } catch {
-      setMessage('Something went wrong. Try again.');
+      setMessage('Something went wrong. Please try again.');
     } finally {
       setBusy(false);
     }

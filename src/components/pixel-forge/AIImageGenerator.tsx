@@ -53,7 +53,7 @@ export function AIImageGenerator({
   const [lastPrompt, setLastPrompt] = useState('');
   const [style, setStyle] = useState<AIImageStyle>('Pixel Art');
   const [size, setSize] = useState<AIImageSize>(32);
-  const [message, setMessage] = useState('AI provider is not configured until the backend has OPENAI_API_KEY.');
+  const [message, setMessage] = useState('Ready to generate an AI image with Gemini.');
 
   useEffect(() => {
     if (!image) return;

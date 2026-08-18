@@ -12,6 +12,7 @@ import { OwnerTools } from '../components/pixel-battle/OwnerTools';
 import { ZoomControls } from '../components/pixel-battle/ZoomControls';
 import { useAuthSession } from '../lib/auth';
 import { getFunctionErrorMessage } from '../lib/functionError';
+import { friendlyDataError } from '../lib/userMessages';
 import {
   CANVAS_SIZE,
   DAILY_BONUS_HOURS,
@@ -55,7 +56,7 @@ export function BattlePage() {
   const [brushSize, setBrushSize] = useState(1);
   const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [tool, setTool] = useState<BattleTool>('paint');
-  const [notice, setNotice] = useState('Connecting...');
+  const [notice, setNotice] = useState('Opening Pixel Battle...');
   const [onlineCount, setOnlineCount] = useState(1);
   const [tick, setTick] = useState(Date.now());
   const [isLoadingPixels, setIsLoadingPixels] = useState(true);
@@ -112,7 +113,7 @@ export function BattlePage() {
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      setNotice('Supabase is not configured.');
+      setNotice('Pixel Battle is not connected yet.');
       setIsLoadingPixels(false);
       return;
     }
@@ -121,7 +122,7 @@ export function BattlePage() {
     void refreshLeaderboard();
     setIsLoadingPixels(true);
     void loadAllBattlePixels().then(({ data, error }) => {
-      if (error) setNotice(error.message);
+      if (error) setNotice(friendlyDataError(error.message));
       if (data) {
         setPixels(data);
         setMiniPixels(data);
@@ -170,7 +171,7 @@ export function BattlePage() {
       return;
     }
     const { data, error } = await loadBattleProfile();
-    if (error) setNotice(error.message);
+    if (error) setNotice(friendlyDataError(error.message));
     if (data) setProfile(data);
   }
 
@@ -181,7 +182,7 @@ export function BattlePage() {
 
   async function refreshLeaderboard() {
     const { data, error } = await loadBattleLeaderboard();
-    if (error) setNotice(error.message);
+    if (error) setNotice(friendlyDataError(error.message));
     else setLeaderboard(data ?? []);
     setIsLeaderboardLoading(false);
   }
@@ -249,7 +250,7 @@ export function BattlePage() {
     const { data, error } = await placeBattlePixel(x, y, color, size, writeTool);
     if (error) {
       const message = await getFunctionErrorMessage(error);
-      setNotice(message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : message);
+      setNotice(friendlyDataError(message));
       setPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels));
       setMiniPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels).slice(-4500));
       setProfile(profile);
@@ -313,8 +314,8 @@ export function BattlePage() {
       {isLoadingPixels && (
         <section className="battle-loading" aria-live="polite">
           <div>
-            <h2>Loading drawings</h2>
-            <p>The shared canvas will appear when the visible pixels are ready.</p>
+            <h2>Loading canvas</h2>
+            <p>Getting the shared Pixel Battle map ready.</p>
           </div>
         </section>
       )}

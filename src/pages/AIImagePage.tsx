@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { AIImageMaker } from '../components/AIImageMaker';
 import { getFunctionErrorMessage } from '../lib/functionError';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { friendlyDataError } from '../lib/userMessages';
 import './pixelForge.css';
 
 type AITextResponse = {
@@ -56,7 +57,7 @@ export function AIImagePage() {
     });
 
     if (error) {
-      setStatus(await getFunctionErrorMessage(error));
+      setStatus(friendlyDataError(await getFunctionErrorMessage(error)));
       setIsGenerating(false);
       return;
     }
