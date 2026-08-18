@@ -500,6 +500,9 @@
   top: 88px;
   left: 12px;
   width: min(320px, calc(100vw - 24px));
+  max-height: calc(100dvh - 112px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 14px;
   border: 1px solid rgba(200, 213, 228, 0.9);
   border-radius: 8px;
@@ -534,7 +537,7 @@
 .battle-reference__drop {
   display: grid;
   place-items: center;
-  min-height: 170px;
+  min-height: 150px;
   overflow: hidden;
   border: 1px dashed var(--battle-line);
   border-radius: 8px;
@@ -552,7 +555,7 @@
 .battle-reference__drop img {
   display: block;
   width: 100%;
-  max-height: 220px;
+  max-height: min(220px, 32dvh);
   object-fit: contain;
 }
 
@@ -694,6 +697,15 @@
     left: 8px;
     right: 8px;
     width: auto;
+    max-height: calc(100dvh - 86px);
+  }
+
+  .battle-reference__drop {
+    min-height: 120px;
+  }
+
+  .battle-reference__drop img {
+    max-height: 180px;
   }
 }
 
@@ -797,4 +809,15 @@
   left: 8px;
   right: 8px;
   width: auto;
+  max-height: calc(100% - 86px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.device-preview--mobile .battle-reference__drop {
+  min-height: 120px;
+}
+
+.device-preview--mobile .battle-reference__drop img {
+  max-height: 180px;
 }

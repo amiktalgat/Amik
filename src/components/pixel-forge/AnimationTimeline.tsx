@@ -32,20 +32,22 @@ export function AnimationTimeline({
           <button
             className={`pf-frameButton ${currentFrameIndex === index ? 'active' : ''}`}
             key={frame.id}
+            title={`Frame ${index + 1}`}
             onClick={() => onSelectFrame(index)}
           >
-            Frame {index + 1}
+            <span aria-hidden="true">▣</span>
+            {index + 1}
           </button>
         ))}
       </div>
       <div className="pf-timelineActions">
-        <button className="pf-primary" disabled={isPlaying} onClick={onStart}>Start</button>
-        <button disabled={!isPlaying} onClick={onStop}>Stop</button>
-        <button onClick={onAddFrame}>Add Frame</button>
-        <button onClick={onDuplicateFrame}>Duplicate Frame</button>
-        <button disabled={frames.length <= 1} onClick={onDeleteFrame}>Delete Frame</button>
-        <button disabled={currentFrameIndex === 0} onClick={() => onMoveFrame(-1)}>Move Left</button>
-        <button disabled={currentFrameIndex === frames.length - 1} onClick={() => onMoveFrame(1)}>Move Right</button>
+        <button aria-label="Start" className="pf-primary" disabled={isPlaying} title="Start" onClick={onStart}>▶</button>
+        <button aria-label="Stop" disabled={!isPlaying} title="Stop" onClick={onStop}>■</button>
+        <button aria-label="Add frame" title="Add frame" onClick={onAddFrame}>+</button>
+        <button aria-label="Duplicate frame" title="Duplicate frame" onClick={onDuplicateFrame}>⧉</button>
+        <button aria-label="Delete frame" disabled={frames.length <= 1} title="Delete frame" onClick={onDeleteFrame}>×</button>
+        <button aria-label="Move frame left" disabled={currentFrameIndex === 0} title="Move frame left" onClick={() => onMoveFrame(-1)}>←</button>
+        <button aria-label="Move frame right" disabled={currentFrameIndex === frames.length - 1} title="Move frame right" onClick={() => onMoveFrame(1)}>→</button>
       </div>
     </section>
   );

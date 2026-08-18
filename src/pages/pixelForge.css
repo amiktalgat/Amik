@@ -95,10 +95,14 @@
 }
 
 .pf-menuRail button {
-  min-width: 82px;
-  padding: 8px 10px;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   box-shadow: 0 12px 28px rgba(23, 32, 51, 0.16);
-  font-size: 13px;
+  font-size: 24px;
   font-weight: 900;
 }
 
@@ -381,8 +385,12 @@
 }
 
 .pf-frameButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   flex: 0 0 auto;
-  min-width: 86px;
+  min-width: 64px;
   text-align: center;
 }
 
@@ -393,8 +401,14 @@
 
 .pf-timelineActions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
   gap: 8px;
+}
+
+.pf-timelineActions button {
+  min-height: 52px;
+  padding: 0;
+  font-size: 24px;
 }
 .pf-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .pf-swatch { aspect-ratio: 1; padding: 0 !important; border-radius: 7px; }
@@ -737,8 +751,11 @@
   }
   .pf-menuRail button {
     flex: 0 0 auto;
-    min-width: 78px;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
     box-shadow: none;
+    font-size: 22px;
   }
   .pf-menuDrawer {
     inset: auto 10px 10px 10px;
@@ -830,8 +847,11 @@
 
 .device-preview--mobile .pf-menuRail button {
   flex: 0 0 auto;
-  min-width: 78px;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
   box-shadow: none;
+  font-size: 22px;
 }
 
 .device-preview--mobile .pf-menuDrawer {

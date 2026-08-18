@@ -51,16 +51,16 @@ const defaultSettings: PixelSettings = {
 type EditorMode = 'pixel' | 'animation' | 'tilemap';
 type EditorMenu = 'guide' | 'palette' | 'size' | 'color' | 'tools' | 'view' | 'transform' | 'export' | 'animation';
 
-const editorMenus: Array<{ id: EditorMenu; label: string; animationOnly?: boolean }> = [
-  { id: 'guide', label: 'Guide' },
-  { id: 'palette', label: 'Palette' },
-  { id: 'size', label: 'Size' },
-  { id: 'color', label: 'Color' },
-  { id: 'tools', label: 'Tools' },
-  { id: 'view', label: 'View' },
-  { id: 'transform', label: 'Move' },
-  { id: 'export', label: 'Export' },
-  { id: 'animation', label: 'Anim', animationOnly: true },
+const editorMenus: Array<{ id: EditorMenu; icon: string; label: string; animationOnly?: boolean }> = [
+  { id: 'guide', icon: '?', label: 'Guide' },
+  { id: 'palette', icon: '◫', label: 'Palette' },
+  { id: 'size', icon: '□', label: 'Size' },
+  { id: 'color', icon: '●', label: 'Color' },
+  { id: 'tools', icon: '✎', label: 'Tools' },
+  { id: 'view', icon: '⌕', label: 'View' },
+  { id: 'transform', icon: '↔', label: 'Move' },
+  { id: 'export', icon: '⇩', label: 'Export' },
+  { id: 'animation', icon: '▶', label: 'Animation', animationOnly: true },
 ];
 
 const defaultSpriteSheetOptions: SpriteSheetOptions = {
@@ -679,11 +679,13 @@ export function PixelForgePage() {
             .map((item) => (
               <button
                 className={activeMenu === item.id ? 'active' : ''}
+                aria-label={item.label}
                 key={item.id}
+                title={item.label}
                 type="button"
                 onClick={() => openMenu(item.id)}
               >
-                {item.label}
+                <span aria-hidden="true">{item.icon}</span>
               </button>
             ))}
         </div>
