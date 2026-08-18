@@ -1,3 +1,4 @@
+import { getFunctionErrorMessage } from './functionError';
 import { isSupabaseConfigured, supabase } from './supabase';
 
 export type AIImageStyle =
@@ -91,7 +92,7 @@ export async function generateAIImage(prompt: string, options: AIImageOptions): 
       abortPromise,
     ]);
 
-    if (error) throw new AIImageError('api_error', error.message);
+    if (error) throw new AIImageError('api_error', await getFunctionErrorMessage(error));
     if (isAIErrorPayload(data)) throw new AIImageError(data.code ?? 'api_error', data.error);
     if (!isAIImagePayload(data)) throw new AIImageError('invalid_response', 'Missing image data.');
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { AIImageMaker } from '../components/AIImageMaker';
+import { getFunctionErrorMessage } from '../lib/functionError';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import './pixelForge.css';
 
@@ -55,7 +56,7 @@ export function AIImagePage() {
     });
 
     if (error) {
-      setStatus(error.message);
+      setStatus(await getFunctionErrorMessage(error));
       setIsGenerating(false);
       return;
     }

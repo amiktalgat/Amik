@@ -11,6 +11,7 @@ import { MiniMap } from '../components/pixel-battle/MiniMap';
 import { OwnerTools } from '../components/pixel-battle/OwnerTools';
 import { ZoomControls } from '../components/pixel-battle/ZoomControls';
 import { useAuthSession } from '../lib/auth';
+import { getFunctionErrorMessage } from '../lib/functionError';
 import {
   CANVAS_SIZE,
   DAILY_BONUS_HOURS,
@@ -234,7 +235,8 @@ export function BattlePage() {
 
     const { data, error } = await placeBattlePixel(x, y, color, size, tool);
     if (error) {
-      setNotice(error.message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : error.message);
+      const message = await getFunctionErrorMessage(error);
+      setNotice(message.includes('rate_limited') ? 'Too many clicks. Wait a second.' : message);
       setPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels));
       setMiniPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels).slice(-4500));
       setProfile(profile);
