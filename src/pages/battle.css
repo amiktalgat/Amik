@@ -627,11 +627,11 @@
 
 @media (max-width: 760px) {
   .battle-shell {
-    --battle-mobile-panel-height: min(48dvh, 390px);
+    --battle-mobile-panel-height: min(42dvh, 340px);
   }
 
   .battle-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr);
     width: calc(100vw - 16px);
     top: 8px;
     left: 8px;
@@ -651,7 +651,14 @@
   .battle-header__nav {
     gap: 6px;
     font-size: 12px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
     white-space: nowrap;
+  }
+
+  .battle-header__nav::-webkit-scrollbar {
+    display: none;
   }
 
   .battle-login,
@@ -671,10 +678,19 @@
     padding-right: 4px;
   }
 
+  .battle-panel {
+    box-shadow: 0 12px 30px rgba(23, 32, 51, 0.1);
+  }
+
   .battle-hud {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     padding: 10px;
+  }
+
+  .battle-hud strong,
+  .battle-hud span {
+    font-size: 13px;
   }
 
   .battle-minimap {
@@ -718,7 +734,7 @@
 }
 
 .device-preview--mobile .battle-shell {
-  --battle-mobile-panel-height: min(48%, 390px);
+  --battle-mobile-panel-height: min(42%, 340px);
   position: absolute;
   inset: 0;
   width: 100%;
@@ -732,7 +748,7 @@
 }
 
 .device-preview--mobile .battle-header {
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   width: calc(100% - 16px);
   top: 8px;
   left: 8px;
@@ -753,7 +769,14 @@
 .device-preview--mobile .battle-header__nav {
   gap: 6px;
   font-size: 12px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
   white-space: nowrap;
+}
+
+.device-preview--mobile .battle-header__nav::-webkit-scrollbar {
+  display: none;
 }
 
 .device-preview--mobile .battle-login,
@@ -773,10 +796,19 @@
   padding-right: 4px;
 }
 
+.device-preview--mobile .battle-panel {
+  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.1);
+}
+
 .device-preview--mobile .battle-hud {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 10px;
+}
+
+.device-preview--mobile .battle-hud strong,
+.device-preview--mobile .battle-hud span {
+  font-size: 13px;
 }
 
 .device-preview--mobile .battle-minimap {

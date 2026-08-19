@@ -724,27 +724,37 @@
 }
 
 @media (max-width: 900px) {
-  .pf-app { grid-template: auto auto minmax(360px, 1fr) auto auto / 1fr; }
-  .pf-app.pf-app--drawer { grid-template: auto auto minmax(360px, 1fr) auto 34px / 1fr; }
+  .pf-app { grid-template: auto auto minmax(280px, 1fr) auto auto 34px / minmax(0, 1fr); }
+  .pf-app.pf-app--drawer { grid-template: auto auto minmax(280px, 1fr) auto 34px / minmax(0, 1fr); }
   .pf-topbar {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
     gap: 8px;
     padding: 10px;
+    min-width: 0;
   }
   .pf-brand {
+    flex: 0 0 auto;
     font-size: 17px;
   }
   .pf-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex: 1 1 auto;
     gap: 7px;
+    min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .pf-actions::-webkit-scrollbar {
+    display: none;
   }
   .pf-actions a,
   .pf-actions button {
+    flex: 0 0 auto;
     min-height: 40px;
     padding: 8px 9px;
     text-align: center;
+    white-space: nowrap;
   }
   .pf-menuRail {
     position: static;
@@ -805,40 +815,54 @@
   .pf-emptyState h1 { font-size: 30px; }
   .pf-emptyState p { font-size: 14px; }
   .pf-timelineActions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pf-aiPageMain { grid-template-columns: 1fr; }
+  .pf-aiPageMain {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
 }
 
 .device-preview--mobile .pf-app {
-  grid-template: auto auto minmax(360px, 1fr) auto auto / 1fr;
+  grid-template: auto auto minmax(280px, 1fr) auto auto 34px / minmax(0, 1fr);
   min-height: 100%;
 }
 
 .device-preview--mobile .pf-app.pf-app--drawer {
-  grid-template: auto auto minmax(360px, 1fr) auto 34px / 1fr;
+  grid-template: auto auto minmax(280px, 1fr) auto 34px / minmax(0, 1fr);
 }
 
 .device-preview--mobile .pf-topbar {
-  align-items: stretch;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
   padding: 10px;
+  min-width: 0;
 }
 
 .device-preview--mobile .pf-brand {
+  flex: 0 0 auto;
   font-size: 17px;
 }
 
 .device-preview--mobile .pf-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex: 1 1 auto;
   gap: 7px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.device-preview--mobile .pf-actions::-webkit-scrollbar {
+  display: none;
 }
 
 .device-preview--mobile .pf-actions a,
 .device-preview--mobile .pf-actions button {
+  flex: 0 0 auto;
   min-height: 40px;
   padding: 8px 9px;
   text-align: center;
+  white-space: nowrap;
 }
 
 .device-preview--mobile .pf-menuRail {
