@@ -8,6 +8,8 @@
   --line: #c8d5e4;
   --wash: #dff3f4;
   --carbon: #172033;
+  --shadow: 0 22px 54px rgba(23, 32, 51, 0.12);
+  --shadow-soft: 0 14px 34px rgba(23, 32, 51, 0.08);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--ink);
 }
@@ -17,8 +19,11 @@
 body {
   min-width: 320px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(237, 244, 248, 0)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(237, 244, 248, 0.2)),
+    linear-gradient(90deg, rgba(20, 184, 166, 0.08) 0 1px, transparent 1px),
+    linear-gradient(180deg, rgba(249, 115, 22, 0.06) 0 1px, transparent 1px),
     var(--bg);
+  background-size: auto, 44px 44px, 44px 44px, auto;
 }
 
 .device-preview {
@@ -260,7 +265,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 24px;
-  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.08);
+  box-shadow: var(--shadow-soft);
 }
 
 .card h2 { font-size: 22px; margin-bottom: 16px; }
@@ -284,6 +289,13 @@ input {
   font-size: 16px;
   background: #fff;
   color: var(--ink);
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+input:focus {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+  outline: none;
 }
 
 button {
@@ -295,6 +307,16 @@ button {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s, border-color 0.18s;
+}
+button:not(:disabled):hover {
+  box-shadow: 0 12px 28px rgba(249, 115, 22, 0.18);
+  transform: translateY(-1px);
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(20, 184, 166, 0.35);
+  outline-offset: 3px;
 }
 button:disabled { opacity: 0.6; cursor: default; }
 
@@ -307,7 +329,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 
 .primary-button {
   width: 100%;
-  background: var(--clay);
+  background: linear-gradient(135deg, #ff8a24, var(--clay));
 }
 
 a.home-link {
@@ -344,7 +366,7 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--card);
-  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.08);
+  box-shadow: var(--shadow-soft);
 }
 .empty-state h2 {
   font-size: 24px;
@@ -406,17 +428,34 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--card);
-  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.08);
+  box-shadow: var(--shadow);
 }
 
 .home-intro {
+  position: relative;
+  overflow: hidden;
   display: grid;
   align-content: center;
   min-height: 360px;
   padding: 34px;
   background:
-    linear-gradient(135deg, rgba(20, 184, 166, 0.14), rgba(249, 115, 22, 0.14)),
+    linear-gradient(135deg, rgba(20, 184, 166, 0.18), rgba(249, 115, 22, 0.16)),
     var(--card);
+}
+
+.home-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.42) 0 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.home-intro > * {
+  position: relative;
 }
 
 .home-intro h1 {
@@ -467,12 +506,19 @@ a.auth-home-link {
   color: var(--ink);
   font-weight: 800;
   text-decoration: none;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
 
 .home-auth-button--primary {
   border-color: var(--clay);
-  background: var(--clay);
+  background: linear-gradient(135deg, #ff8a24, var(--clay));
   color: #fff;
+}
+
+.home-auth-button:hover {
+  border-color: var(--clay);
+  box-shadow: 0 14px 30px rgba(23, 32, 51, 0.1);
+  transform: translateY(-2px);
 }
 
 .choice-page {
@@ -505,6 +551,8 @@ a.auth-home-link {
 }
 
 .choice-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 12px;
   min-height: 210px;
@@ -513,13 +561,23 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--card);
-  box-shadow: 0 18px 42px rgba(23, 32, 51, 0.08);
+  box-shadow: var(--shadow-soft);
   color: var(--ink);
   text-decoration: none;
+  transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+.choice-card::before {
+  content: '';
+  width: 44px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--clay), var(--mint));
 }
 
 .choice-card:hover {
   border-color: var(--clay);
+  box-shadow: var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -589,6 +647,8 @@ a.auth-home-link {
 }
 
 .auth-hero {
+  position: relative;
+  overflow: hidden;
   min-height: 520px;
   display: flex;
   flex-direction: column;
@@ -597,8 +657,23 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(246, 141, 31, 0.14), rgba(236, 171, 55, 0.16)),
+    linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(20, 184, 166, 0.12)),
     var(--wash);
+}
+
+.auth-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.48) 0 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0 1px, transparent 1px);
+  background-size: 34px 34px;
+  pointer-events: none;
+}
+
+.auth-hero > * {
+  position: relative;
 }
 
 .auth-logo {
@@ -644,7 +719,7 @@ a.auth-home-link {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 28px;
-  box-shadow: 0 22px 52px rgba(23, 32, 51, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .auth-card h2 {
@@ -668,6 +743,11 @@ a.auth-home-link {
   border: 1px solid var(--line);
   background: #fff;
   color: var(--ink);
+}
+
+.google-button:hover {
+  border-color: var(--mint);
+  box-shadow: 0 14px 30px rgba(20, 184, 166, 0.12);
 }
 
 .google-button span {
