@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { CANVAS_SIZE, type BattlePixel } from '../../lib/pixelBattle';
 
 type MiniMapProps = {
@@ -25,18 +26,26 @@ export function MiniMap({ pixels, view, onJump }: MiniMapProps) {
     <section className="battle-panel battle-minimap">
       <div className="battle-panel__title">Mini-map</div>
       <button className="battle-minimap__map" type="button" onClick={handleClick}>
-        {pixels.map((pixel) => (
-          <span
-            key={`${pixel.x}:${pixel.y}`}
-            style={{
-              backgroundColor: pixel.color,
-              left: `${(pixel.x / CANVAS_SIZE) * 100}%`,
-              top: `${(pixel.y / CANVAS_SIZE) * 100}%`,
-            }}
-          />
-        ))}
+        <MiniMapPixels pixels={pixels} />
         <i style={box} />
       </button>
     </section>
   );
 }
+
+const MiniMapPixels = memo(function MiniMapPixels({ pixels }: { pixels: BattlePixel[] }) {
+  return (
+    <>
+      {pixels.map((pixel) => (
+        <span
+          key={`${pixel.x}:${pixel.y}`}
+          style={{
+            backgroundColor: pixel.color,
+            left: `${(pixel.x / CANVAS_SIZE) * 100}%`,
+            top: `${(pixel.y / CANVAS_SIZE) * 100}%`,
+          }}
+        />
+      ))}
+    </>
+  );
+});

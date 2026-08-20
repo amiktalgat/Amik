@@ -6,6 +6,9 @@ import { useLoadedImage } from '../../lib/useLoadedImage';
 
 export type Camera = { x: number; y: number; zoom: number };
 
+const minZoom = 1;
+const maxZoom = 32;
+
 type BattleCanvasProps = {
   camera: Camera;
   color: string;
@@ -38,6 +41,7 @@ export function BattleCanvas(props: BattleCanvasProps) {
   const size = useCanvasElementSize(canvasRef, { width: 900, height: 620 });
   const referenceImage = useLoadedImage(props.referenceImageUrl);
   const [hover, setHover] = useState<{ x: number; y: number } | null>(null);
+  const hoverRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     onSizeChange(size);
@@ -98,7 +102,7 @@ export function BattleCanvas(props: BattleCanvasProps) {
     props.onCameraChange({
       x: clamp(next.x, 0, CANVAS_SIZE - 1),
       y: clamp(next.y, 0, CANVAS_SIZE - 1),
-      zoom: clamp(next.zoom, 0.2, 32),
+      zoom: clamp(next.zoom, minZoom, maxZoom),
     });
   }
 
@@ -123,8 +127,12 @@ export function BattleCanvas(props: BattleCanvasProps) {
     const pointer = pointers.current.get(event.pointerId);
     const world = screenToWorld(event.clientX, event.clientY);
     if (world && isInside(world.x, world.y)) {
-      setHover(world);
-      props.onCursorChange(world);
+      const currentHover = hoverRef.current;
+      if (!currentHover || currentHover.x !== world.x || currentHover.y !== world.y) {
+        hoverRef.current = world;
+        setHover(world);
+        props.onCursorChange(world);
+      }
     }
     if (!pointer) return;
     pointer.moved ||= Math.hypot(event.clientX - pointer.startX, event.clientY - pointer.startY) > 4;
@@ -160,6 +168,7 @@ export function BattleCanvas(props: BattleCanvasProps) {
   return (
     <canvas ref={canvasRef} className="battle-canvas" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp} onWheel={handleWheel} onPointerLeave={() => {
+        hoverRef.current = null;
         setHover(null);
         props.onCursorChange(null);
       }} />

@@ -38,6 +38,9 @@ import './battle.css';
 
 const colorStorageKey = 'pixelBattleColor';
 const tutorialStorageKey = 'pixelBattleTutorialSeen';
+const minBattleZoom = 1;
+const maxBattleZoom = 32;
+const miniMapPixelLimit = 4500;
 const ownerBrushSizes = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48];
 const helperBrushSizes = [1, 2, 4];
 
@@ -125,7 +128,7 @@ export function BattlePage() {
       if (error) setNotice(friendlyDataError(error.message));
       if (data) {
         setPixels(data);
-        setMiniPixels(data);
+        setMiniPixels(data.slice(-miniMapPixelLimit));
       }
       setIsLoadingPixels(false);
     });
@@ -149,7 +152,7 @@ export function BattlePage() {
         }
         const next = payload.new as BattlePixel;
         setPixels((current) => mergePixels(current, [next]));
-        setMiniPixels((current) => mergePixels(current, [next]).slice(-4500));
+        setMiniPixels((current) => mergePixels(current, [next]).slice(-miniMapPixelLimit));
         window.setTimeout(() => void refreshLeaderboard(), 400);
       })
       .subscribe((status) => {
@@ -232,7 +235,7 @@ export function BattlePage() {
     };
 
     setPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase'));
-    setMiniPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase').slice(-4500));
+    setMiniPixels((current) => applyBrushPixels(current, optimisticPixels, tool === 'erase').slice(-miniMapPixelLimit));
     setProfile(optimisticProfile);
     setStats((current) => current
       ? {
@@ -252,7 +255,7 @@ export function BattlePage() {
       const message = await getFunctionErrorMessage(error);
       setNotice(friendlyDataError(message));
       setPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels));
-      setMiniPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels).slice(-4500));
+      setMiniPixels((current) => restoreBrushPixels(current, optimisticPixels, previousPixels).slice(-miniMapPixelLimit));
       setProfile(profile);
       void refreshStats();
       await refreshProfile();
@@ -260,7 +263,7 @@ export function BattlePage() {
     }
     if (data) {
       setPixels((current) => applyBrushPixels(current, data.pixels, data.erased));
-      setMiniPixels((current) => applyBrushPixels(current, data.pixels, data.erased).slice(-4500));
+      setMiniPixels((current) => applyBrushPixels(current, data.pixels, data.erased).slice(-miniMapPixelLimit));
       if (data.erased) {
         const hiddenErasedCount = Math.max(0, data.affected - previousPixels.length);
         setStats((current) => current
@@ -341,8 +344,8 @@ export function BattlePage() {
         <ZoomControls
           onCenter={() => setCamera({ x: 1000, y: 1000, zoom: camera.zoom })}
           onReset={() => setCamera({ x: camera.x, y: camera.y, zoom: 4 })}
-          onZoomIn={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 1.25, 0.2, 32) })}
-          onZoomOut={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 0.8, 0.2, 32) })}
+          onZoomIn={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 1.25, minBattleZoom, maxBattleZoom) })}
+          onZoomOut={() => setCamera({ ...camera, zoom: clamp(camera.zoom * 0.8, minBattleZoom, maxBattleZoom) })}
         />
         <Leaderboard entries={leaderboard} currentUserId={user?.id} loading={isLeaderboardLoading} />
         <MiniMap
