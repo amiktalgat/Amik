@@ -221,6 +221,43 @@ body {
   font-size: 15px;
 }
 
+.device-preview--mobile .home-menu {
+  width: 100%;
+  max-width: 390px;
+  padding: 16px 14px 48px;
+}
+
+.device-preview--mobile .home-landing {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.device-preview--mobile .home-intro {
+  min-height: 0;
+  padding: 20px;
+}
+
+.device-preview--mobile .home-intro h1 {
+  font-size: 38px;
+  line-height: 1.02;
+}
+
+.device-preview--mobile .home-intro p,
+.device-preview--mobile .home-auth-panel p {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.device-preview--mobile .home-auth-panel {
+  padding: 20px;
+}
+
+.device-preview--mobile .home-auth-panel h2 {
+  font-size: 26px;
+  line-height: 1.1;
+}
+
 .container {
   max-width: 960px;
   margin: 0 auto;
@@ -818,6 +855,10 @@ a.auth-home-link {
 }
 
 @media (max-width: 760px) {
+  .container {
+    padding: 16px 14px 48px;
+  }
+
   .home-grid {
     grid-template-columns: 1fr;
   }
@@ -860,16 +901,32 @@ a.auth-home-link {
   .home-landing {
     grid-template-columns: 1fr;
     gap: 14px;
-    margin-top: 5vh;
+    margin-top: 18px;
   }
 
   .home-intro {
     min-height: 0;
-    padding: 24px;
+    padding: 20px;
   }
 
   .home-intro h1 {
-    font-size: 40px;
+    font-size: 38px;
+    line-height: 1.02;
+  }
+
+  .home-intro p,
+  .home-auth-panel p {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .home-auth-panel {
+    padding: 20px;
+  }
+
+  .home-auth-panel h2 {
+    font-size: 26px;
+    line-height: 1.1;
   }
 
   .auth-page {

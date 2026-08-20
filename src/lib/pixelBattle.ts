@@ -2,9 +2,9 @@ import { supabase } from './supabase';
 
 export const CANVAS_SIZE = 2000;
 export const CHUNK_SIZE = 256;
-export const MAX_BALANCE = 100;
+export const MAX_BALANCE = 200;
 export const DAILY_BONUS_HOURS = 24;
-export const BASE_RECHARGE_SECONDS = 7;
+export const BASE_RECHARGE_SECONDS = 3;
 export const BATTLE_OWNER_EMAIL = 'amiktalgat@gmail.com';
 export const BATTLE_HELPER_EMAILS = [
   'david3747god@gmail.com',

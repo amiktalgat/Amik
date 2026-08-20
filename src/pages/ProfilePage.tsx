@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { SupabaseSetupMessage } from '../components/SupabaseSetupMessage';
 import { useAuthSession } from '../lib/auth';
-import { loadBattleProfile, loadBattleStats, type BattleProfile, type BattleStats } from '../lib/pixelBattle';
+import { MAX_BALANCE, loadBattleProfile, loadBattleStats, type BattleProfile, type BattleStats } from '../lib/pixelBattle';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { friendlyDataError } from '../lib/userMessages';
 
@@ -90,7 +90,7 @@ export function ProfilePage() {
           <li><span>Email</span><strong>{user.email}</strong></li>
           <li><span>Joined</span><strong>{formatDate(profile?.created_at)}</strong></li>
           <li><span>Total pixels placed</span><strong>{profile?.placed_pixels ?? 0}</strong></li>
-          <li><span>Current balance</span><strong>{profile?.balance ?? 0} / 100</strong></li>
+          <li><span>Current balance</span><strong>{profile?.balance ?? 0} / {MAX_BALANCE}</strong></li>
           <li><span>Best streak</span><strong>{profile?.best_streak ?? 0}</strong></li>
           <li><span>Active days</span><strong>{profile?.active_days ?? 1}</strong></li>
           <li><span>My battle history</span><strong>{stats?.myPixels ?? 0}</strong></li>
